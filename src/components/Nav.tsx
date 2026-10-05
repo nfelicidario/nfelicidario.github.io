@@ -25,7 +25,7 @@ export function Nav() {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className="bubble-sm px-3 py-1.5 text-[14px] text-muted transition-colors hover:bg-raised hover:text-ink"
+                className="rounded-full px-3 py-1.5 text-[14px] text-muted transition-colors hover:bg-raised hover:text-ink"
               >
                 {l.label}
               </Link>

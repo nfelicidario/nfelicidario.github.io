@@ -117,7 +117,7 @@ export function Gate({ blob, title }: { blob: GatedBlob; title: string }) {
       <button
         type="submit"
         disabled={busy}
-        className="bubble-sm justify-self-start bg-accent px-4 py-2 text-[14px] font-semibold text-white disabled:opacity-60"
+        className="rounded-full justify-self-start bg-accent px-4 py-2 text-[14px] font-semibold text-white disabled:opacity-60"
       >
         {busy ? "Unlocking…" : "Unlock"}
       </button>

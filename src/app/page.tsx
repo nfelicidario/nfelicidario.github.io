@@ -1,31 +1,41 @@
+import Link from "next/link";
 import { ProjectCard } from "@/components/ProjectCard";
 import { earlier, now, projects } from "@/content/projects";
 
-const tags = ["0 → 1", "Production TypeScript", "Prototypes in code", "Agentic SDLC", "Chicago"];
+const ledger = [
+  { when: "Jul 2026", what: "RCS Studio went GA. Vibes' first self-serve product in a decade.", href: "/work/rcs-studio/" },
+  { when: "2026", what: "Provisioning rebuilt: 8 hours of ops work per request down to 90 minutes.", href: "/work/provisioning/" },
+  { when: "Mar 2026", what: "First production merge. Now shipping on par with the team's engineers.", href: "/work/making-the-team-faster/" },
+  { when: "2020–25", what: "Co-founded Stride. Monthly active users 2% to 22% after Tracks.", href: "/work/stride/" },
+];
 
 export default function Home() {
   return (
     <div className="container-x">
-      <section className="mx-auto max-w-6xl pt-10 pb-12 text-center md:pt-16">
-        <h1 className="mx-auto max-w-[14ch] text-[clamp(44px,8.5vw,112px)] font-bold text-ink">
-          Product designer who{" "}
-          <span className="text-accent">ships the code.</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-[52ch] text-[17px] md:text-[19px]">
-          Senior product designer at Vibes, co-founder of Stride. I find the product a
-          company should have built, then build it, in production TypeScript alongside
-          the engineers.
-        </p>
-        <ul className="mt-6 flex flex-wrap justify-center gap-2">
-          {tags.map((t) => (
-            <li
-              key={t}
-              className="bubble-sm border border-rule bg-surface px-3 py-1.5 text-[13px] text-body"
-            >
-              {t}
+      <section className="mx-auto grid max-w-6xl gap-8 pt-8 pb-10 md:grid-cols-[1.1fr_1fr] md:items-end md:pt-12">
+        <div>
+          <h1 className="max-w-[15ch] text-[clamp(34px,4.6vw,58px)] font-bold text-ink">
+            Product designer who <span className="text-accent">ships the code.</span>
+          </h1>
+          <p className="mt-4 max-w-[46ch] text-[16px] md:text-[17px]">
+            Senior product designer at Vibes, co-founder of Stride, in Chicago. I find the
+            product a company should have built, then build it, in production TypeScript
+            alongside the engineers.
+          </p>
+        </div>
+        <ol className="grid gap-1.5 border-t border-rule pt-4 md:border-t-0 md:pt-0">
+          {ledger.map((l) => (
+            <li key={l.href}>
+              <Link
+                href={l.href}
+                className="group grid grid-cols-[72px_1fr] items-baseline gap-3 rounded-lg px-2 py-1.5 -mx-2 transition-colors hover:bg-raised"
+              >
+                <span className="label num">{l.when}</span>
+                <span className="text-[14.5px] text-body group-hover:text-ink">{l.what}</span>
+              </Link>
             </li>
           ))}
-        </ul>
+        </ol>
       </section>
 
       <section className="mx-auto max-w-6xl" aria-labelledby="work">
@@ -44,7 +54,7 @@ export default function Home() {
           {earlier.map((e) => (
             <li
               key={e.org}
-              className="bubble-sm grid grid-cols-[1fr_auto] items-baseline gap-3 border border-dashed border-rule px-4 py-3 text-[14px]"
+              className="grid grid-cols-[1fr_auto] items-baseline gap-3 rounded-xl border border-dashed border-rule px-4 py-3 text-[14px]"
             >
               <span>
                 <b className="font-semibold text-ink">{e.org}</b>
