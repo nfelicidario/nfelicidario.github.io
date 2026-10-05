@@ -17,7 +17,7 @@ function Row({ m, line, filled = false }: { m: Milestone; line: Line; filled?: b
       <span className="text-[14.5px] text-body group-hover:text-ink">{m.what}</span>
     </>
   );
-  const cls = "group grid grid-cols-[64px_20px_1fr] gap-x-3 rounded-lg px-2 py-1.5 -mx-2";
+  const cls = "group grid grid-cols-[72px_20px_1fr] gap-x-3 rounded-lg px-2 py-1.5 -mx-2";
   return m.href ? (
     <Link href={m.href} className={`${cls} transition-colors hover:bg-raised`}>
       {inner}
@@ -73,7 +73,7 @@ export function Timeline({
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="label -mx-2 grid grid-cols-[64px_20px_1fr] gap-x-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-raised hover:text-ink"
+        className="label -mx-2 grid grid-cols-[72px_20px_1fr] gap-x-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-raised hover:text-ink"
       >
         <span />
         <span className="tl-marker self-stretch" data-line="both" />
