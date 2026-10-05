@@ -1,0 +1,15 @@
+#!/bin/sh
+# Blocks a commit if any staged change contains a term listed in .confidential-terms
+# (one term per line, case-insensitive). That file is local-only and gitignored.
+TERMS=".confidential-terms"
+[ -f "$TERMS" ] || exit 0
+PATTERN=$(grep -v '^\s*$' "$TERMS" | grep -v '^#' | paste -sd'|' -)
+[ -n "$PATTERN" ] || exit 0
+HITS=$(git diff --cached -U0 | grep '^+' | grep -v '^+++' | grep -n -i -E "$PATTERN")
+if [ -n "$HITS" ]; then
+  echo "Commit blocked: staged changes contain confidential terms:"
+  echo "$HITS" | cut -c1-160
+  echo "Remove them, or edit .confidential-terms if this is a false positive."
+  exit 1
+fi
+exit 0
