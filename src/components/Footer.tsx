@@ -30,7 +30,7 @@ export function Footer() {
           </li>
         </ul>
         <p className="text-[13px] text-muted">
-          Built with Next.js and Claude Code. Chicago, {new Date().getFullYear()}.
+          Built with Next.js and Claude Code, {new Date().getFullYear()}.
         </p>
       </div>
     </footer>

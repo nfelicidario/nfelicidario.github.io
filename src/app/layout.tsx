@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Figtree, Martian_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Figtree } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
@@ -13,12 +13,6 @@ const display = Bricolage_Grotesque({
 const sans = Figtree({
   variable: "--font-sans",
   subsets: ["latin"],
-});
-
-const mono = Martian_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -35,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${display.variable} ${sans.variable} ${mono.variable} h-full`}
+      className={`${display.variable} ${sans.variable} h-full`}
     >
       <body className="min-h-full flex flex-col">
         <Nav />

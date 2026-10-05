@@ -46,7 +46,7 @@ export function ThemeToggle() {
       onClick={() => choose(next)}
       aria-label={`Theme: ${label}. Switch to ${next}.`}
       title={`Theme: ${label}`}
-      className="rounded-full ml-1 border border-rule px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.06em] text-muted transition-colors hover:border-accent hover:text-ink"
+      className="label ml-1 rounded-full border border-rule px-2.5 py-1 transition-colors hover:border-accent hover:text-ink"
     >
       {label}
     </button>

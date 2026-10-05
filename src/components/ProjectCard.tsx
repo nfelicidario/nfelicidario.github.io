@@ -13,7 +13,7 @@ export function ProjectCard({ p, index }: { p: Project; index: number }) {
     >
       <Link
         href={`/work/${p.slug}/`}
-        className="bubble group grid h-full grid-rows-[auto_1fr_auto] gap-4 border border-rule bg-surface p-4 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent"
+        className="bubble group grid h-full grid-rows-[auto_1fr_auto] gap-5 border border-rule bg-surface p-5 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent"
       >
         <div
           className="bubble-sm relative h-40 overflow-hidden"

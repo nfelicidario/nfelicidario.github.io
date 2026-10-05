@@ -5,14 +5,19 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { Milestone } from "@/content/timeline";
 
-function Row({ m }: { m: Milestone }) {
+type Line = "down" | "both" | "up" | "none";
+
+function Row({ m, line, filled = false }: { m: Milestone; line: Line; filled?: boolean }) {
   const inner = (
     <>
-      <span className="label num pt-[3px]">{m.when}</span>
+      <span className="label num pt-[3px] text-right">{m.when}</span>
+      <span className="tl-marker self-stretch" data-line={line}>
+        <span className="tl-dot" data-filled={filled} />
+      </span>
       <span className="text-[14.5px] text-body group-hover:text-ink">{m.what}</span>
     </>
   );
-  const cls = "group grid grid-cols-[72px_1fr] items-start gap-3 rounded-lg px-2 py-1.5 -mx-2";
+  const cls = "group grid grid-cols-[64px_20px_1fr] gap-x-3 rounded-lg px-2 py-1.5 -mx-2";
   return m.href ? (
     <Link href={m.href} className={`${cls} transition-colors hover:bg-raised`}>
       {inner}
@@ -33,9 +38,9 @@ export function Timeline({
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="grid gap-1">
-      {recent.map((m) => (
-        <Row key={m.when + m.what} m={m} />
+    <div className="grid">
+      {recent.map((m, i) => (
+        <Row key={m.when + m.what} m={m} line={i === 0 ? "down" : "both"} filled={i === 0} />
       ))}
 
       <AnimatePresence initial={false}>
@@ -48,7 +53,7 @@ export function Timeline({
             transition={{ duration: 0.35, ease: [0.2, 0.7, 0.2, 1] }}
             className="overflow-hidden"
           >
-            <div className="grid gap-1 py-1">
+            <div className="grid">
               {more.map((m, i) => (
                 <motion.div
                   key={m.when + m.what}
@@ -56,7 +61,7 @@ export function Timeline({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.05 * i, duration: 0.25 }}
                 >
-                  <Row m={m} />
+                  <Row m={m} line="both" />
                 </motion.div>
               ))}
             </div>
@@ -68,15 +73,14 @@ export function Timeline({
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="label -mx-2 grid grid-cols-[72px_1fr] items-center gap-3 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-raised hover:text-ink"
+        className="label -mx-2 grid grid-cols-[64px_20px_1fr] gap-x-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-raised hover:text-ink"
       >
-        <span aria-hidden="true" className="text-rule">
-          ·····
-        </span>
-        <span>{open ? "Show less" : `See full timeline · ${more.length} more`}</span>
+        <span />
+        <span className="tl-marker self-stretch" data-line="both" />
+        <span>{open ? "Collapse timeline" : `Expand timeline · ${more.length} more`}</span>
       </button>
 
-      <Row m={origin} />
+      <Row m={origin} line="up" />
     </div>
   );
 }

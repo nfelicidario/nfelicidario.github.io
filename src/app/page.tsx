@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ProjectCard } from "@/components/ProjectCard";
+import { VibesIcon } from "@/components/VibesIcon";
 import { Timeline } from "@/components/Timeline";
 import { earlier, now, projects } from "@/content/projects";
 import { more, origin, recent } from "@/content/timeline";
@@ -16,15 +17,19 @@ const tags = [
 export default function Home() {
   return (
     <div className="container-x">
-      <section className="mx-auto grid max-w-6xl gap-8 pt-8 pb-10 md:grid-cols-[1.1fr_1fr] md:items-end md:pt-12">
+      <section className="mx-auto grid max-w-6xl gap-10 pt-10 pb-20 md:grid-cols-[1.1fr_1fr] md:items-center md:pt-16 md:pb-24">
         <div>
           <h1 className="max-w-[15ch] text-[clamp(34px,4.6vw,58px)] font-bold text-ink">
             Product designer who <span className="text-accent">ships the code.</span>
           </h1>
-          <p className="mt-4 text-[15px] md:text-[16px]">
-            Senior Product Designer at Vibes · Co-founder, Stride · Chicago
+          <p className="mt-5 flex flex-wrap items-center gap-x-1.5 text-[15px] md:text-[16px]">
+            <span>Senior Product Designer @</span>
+            <span className="inline-flex items-center gap-1 font-semibold text-accent">
+              <VibesIcon className="h-[1.05em] w-auto" />
+              Vibes
+            </span>
           </p>
-          <ul className="mt-3 flex flex-wrap gap-1.5">
+          <ul className="mt-4 flex flex-wrap gap-2">
             {tags.map((t) => (
               <li
                 key={t}
@@ -41,18 +46,18 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl" aria-labelledby="work">
-        <div className="mb-4 flex items-baseline justify-between">
+        <div className="mb-5 flex items-baseline justify-between">
           <h2 id="work" className="text-[22px] font-bold text-ink">
             Work
           </h2>
           <span className="label">4 case studies · 2025–26 first</span>
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           {projects.map((p, i) => (
             <ProjectCard key={p.slug} p={p} index={i} />
           ))}
         </div>
-        <ul className="mt-3 grid gap-3 md:grid-cols-2">
+        <ul className="mt-4 grid gap-4 md:grid-cols-2">
           {earlier.map((e) => (
             <li
               key={e.org}
@@ -68,8 +73,8 @@ export default function Home() {
         </ul>
       </section>
 
-      <section className="mx-auto mt-14 max-w-6xl" aria-labelledby="hiw">
-        <div className="mb-4 flex items-baseline justify-between">
+      <section className="mx-auto mt-24 max-w-6xl" aria-labelledby="hiw">
+        <div className="mb-5 flex items-baseline justify-between">
           <h2 id="hiw" className="text-[22px] font-bold text-ink">
             How I work
           </h2>
@@ -77,7 +82,7 @@ export default function Home() {
             Read the full page →
           </Link>
         </div>
-        <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr]">
+        <div className="grid gap-4 md:grid-cols-[1fr_1fr_1fr]">
           <div className="bubble border border-rule bg-surface p-4">
             <div className="label mb-2">Before · Aug 2025 – Feb 2026</div>
             <p className="text-[14.5px]">
@@ -102,8 +107,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto mt-14 max-w-6xl" aria-labelledby="now">
-        <div className="mb-4 flex items-baseline justify-between">
+      <section className="mx-auto mt-24 max-w-6xl" aria-labelledby="now">
+        <div className="mb-5 flex items-baseline justify-between">
           <h2 id="now" className="text-[22px] font-bold text-ink">
             Now
           </h2>
@@ -122,8 +127,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto mt-14 max-w-6xl" aria-labelledby="about">
-        <div className="mb-4 flex items-baseline justify-between">
+      <section className="mx-auto mt-24 max-w-6xl" aria-labelledby="about">
+        <div className="mb-5 flex items-baseline justify-between">
           <h2 id="about" className="text-[22px] font-bold text-ink">
             About
           </h2>
