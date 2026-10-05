@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { ProjectCard } from "@/components/ProjectCard";
+import { Timeline } from "@/components/Timeline";
 import { earlier, now, projects } from "@/content/projects";
+import { more, origin, recent } from "@/content/timeline";
 
-const ledger = [
-  { when: "Jul 2026", what: "RCS Studio went GA. Vibes' first self-serve product in a decade.", href: "/work/rcs-studio/" },
-  { when: "2026", what: "Provisioning rebuilt: 8 hours of ops work per request down to 90 minutes.", href: "/work/provisioning/" },
-  { when: "Mar 2026", what: "First production merge. Now shipping on par with the team's engineers.", href: "/work/making-the-team-faster/" },
-  { when: "2020–25", what: "Co-founded Stride. Monthly active users 2% to 22% after Tracks.", href: "/work/stride/" },
+const tags = [
+  "0 → 1",
+  "Production TypeScript",
+  "Prototypes in code",
+  "Agentic SDLC",
+  "Design systems",
+  "Product strategy",
 ];
 
 export default function Home() {
@@ -17,25 +21,23 @@ export default function Home() {
           <h1 className="max-w-[15ch] text-[clamp(34px,4.6vw,58px)] font-bold text-ink">
             Product designer who <span className="text-accent">ships the code.</span>
           </h1>
-          <p className="mt-4 max-w-[46ch] text-[16px] md:text-[17px]">
-            Senior product designer at Vibes, co-founder of Stride, in Chicago. I find the
-            product a company should have built, then build it, in production TypeScript
-            alongside the engineers.
+          <p className="mt-4 text-[15px] md:text-[16px]">
+            Senior Product Designer at Vibes · Co-founder, Stride · Chicago
           </p>
-        </div>
-        <ol className="grid gap-1.5 border-t border-rule pt-4 md:border-t-0 md:pt-0">
-          {ledger.map((l) => (
-            <li key={l.href}>
-              <Link
-                href={l.href}
-                className="group grid grid-cols-[72px_1fr] items-baseline gap-3 rounded-lg px-2 py-1.5 -mx-2 transition-colors hover:bg-raised"
+          <ul className="mt-3 flex flex-wrap gap-1.5">
+            {tags.map((t) => (
+              <li
+                key={t}
+                className="rounded-full border border-rule bg-surface px-2.5 py-1 text-[12.5px] text-body"
               >
-                <span className="label num">{l.when}</span>
-                <span className="text-[14.5px] text-body group-hover:text-ink">{l.what}</span>
-              </Link>
-            </li>
-          ))}
-        </ol>
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="border-t border-rule pt-4 md:border-t-0 md:pt-0">
+          <Timeline recent={recent} more={more} origin={origin} />
+        </div>
       </section>
 
       <section className="mx-auto max-w-6xl" aria-labelledby="work">
@@ -66,6 +68,40 @@ export default function Home() {
         </ul>
       </section>
 
+      <section className="mx-auto mt-14 max-w-6xl" aria-labelledby="hiw">
+        <div className="mb-4 flex items-baseline justify-between">
+          <h2 id="hiw" className="text-[22px] font-bold text-ink">
+            How I work
+          </h2>
+          <Link href="/how-i-work/" className="label hover:text-ink">
+            Read the full page →
+          </Link>
+        </div>
+        <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr]">
+          <div className="bubble border border-rule bg-surface p-4">
+            <div className="label mb-2">Before · Aug 2025 – Feb 2026</div>
+            <p className="text-[14.5px]">
+              A Figma design doc for nearly every change. Epics and stories, handoff, then
+              design QA on the build.
+            </p>
+          </div>
+          <div className="bubble border border-accent bg-surface p-4">
+            <div className="label mb-2 text-accent">After · Mar 2026 →</div>
+            <p className="text-[14.5px]">
+              Prototype in code with mock data, deployed to a shared environment. Engineers
+              point Claude Code at my branch. What ships matches.
+            </p>
+          </div>
+          <div className="bubble border border-rule bg-surface p-4">
+            <div className="label mb-2">What spread</div>
+            <p className="text-[14.5px]">
+              The planning flow about half the org now runs on. Roadmap and review formats
+              used from IC updates to board meetings.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto mt-14 max-w-6xl" aria-labelledby="now">
         <div className="mb-4 flex items-baseline justify-between">
           <h2 id="now" className="text-[22px] font-bold text-ink">
@@ -84,6 +120,22 @@ export default function Home() {
             <p className="mt-1.5 max-w-[70ch] text-[15px]">{now.body}</p>
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto mt-14 max-w-6xl" aria-labelledby="about">
+        <div className="mb-4 flex items-baseline justify-between">
+          <h2 id="about" className="text-[22px] font-bold text-ink">
+            About
+          </h2>
+          <Link href="/about/" className="label hover:text-ink">
+            More →
+          </Link>
+        </div>
+        <p className="measure text-[15.5px]">
+          I started in graphic design, learned to code to ship my own ideas, and spent five
+          years as a startup co-founder before joining Vibes. I cover the whole loop:
+          strategy, design, and production code.
+        </p>
       </section>
     </div>
   );
