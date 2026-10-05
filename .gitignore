@@ -27,6 +27,7 @@
 # testing
 # typescript
 # vercel
+gated-src/
 next-env.d.ts
 npm-debug.log*
 out

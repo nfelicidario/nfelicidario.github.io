@@ -1,26 +1,127 @@
 @import "tailwindcss";
 
+/* ---------- Tokens: light is the base ---------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --bg: #edf2f8;
+  --surface: #f7fafd;
+  --raised: #e2eaf4;
+  --ink: #0b1b33;
+  --body: #2b3a50;
+  --muted: #5f7089;
+  --rule: #c9d6e6;
+  --accent: #1f4fe0;
+  --accent-soft: #dbe5fb;
+  --ok: #1c7a4f;
+  --ok-soft: #dcf1e6;
+  --warn: #b96a00;
+  --warn-soft: #fbebd3;
+  --shadow: 0 1px 0 rgba(11, 27, 51, 0.04), 0 24px 56px -32px rgba(11, 27, 51, 0.35);
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* the one shape: a message bubble, three round corners and one square */
+  --r-bubble: 20px 20px 20px 6px;
+  --r-bubble-me: 20px 20px 6px 20px;
+  --r-sm: 12px 12px 12px 4px;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --bg: #0a1322;
+    --surface: #0f1b2e;
+    --raised: #15243b;
+    --ink: #e8eef7;
+    --body: #c2cedf;
+    --muted: #8496af;
+    --rule: #223650;
+    --accent: #7fa7ff;
+    --accent-soft: #152a52;
+    --ok: #7fe0ae;
+    --ok-soft: #163b2a;
+    --warn: #ffb454;
+    --warn-soft: #3a2e12;
+    --shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 24px 56px -32px rgba(0, 0, 0, 0.8);
   }
 }
+:root[data-theme="dark"] {
+  --bg: #0a1322;
+  --surface: #0f1b2e;
+  --raised: #15243b;
+  --ink: #e8eef7;
+  --body: #c2cedf;
+  --muted: #8496af;
+  --rule: #223650;
+  --accent: #7fa7ff;
+  --accent-soft: #152a52;
+  --ok: #7fe0ae;
+  --ok-soft: #163b2a;
+  --warn: #ffb454;
+  --warn-soft: #3a2e12;
+  --shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 24px 56px -32px rgba(0, 0, 0, 0.8);
+}
 
+/* ---------- Tailwind theme mapping ---------- */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-ink: var(--ink);
+  --color-body: var(--body);
+  --color-muted: var(--muted);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+
+  --font-display: var(--font-display), system-ui, sans-serif;
+  --font-sans: var(--font-sans), system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+
+  --radius-bubble: var(--r-bubble);
+  --radius-bubble-me: var(--r-bubble-me);
+  --radius-sm-bubble: var(--r-sm);
+}
+
+/* ---------- Base ---------- */
+html {
+  color-scheme: light dark;
+}
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 {
+  font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+p { color: var(--body); }
+::selection { background: var(--accent-soft); color: var(--ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ---------- Utilities ---------- */
+@utility label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+@utility num { font-variant-numeric: tabular-nums; }
+@utility bubble { border-radius: var(--r-bubble); }
+@utility bubble-me { border-radius: var(--r-bubble-me); }
+@utility bubble-sm { border-radius: var(--r-sm); }
+@utility measure { max-width: 62ch; }
+@utility container-x {
+  padding-inline: clamp(16px, 4vw, 48px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
