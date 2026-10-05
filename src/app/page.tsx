@@ -12,6 +12,9 @@ const tags = [
   "Agentic SDLC",
   "Design systems",
   "Product strategy",
+  "User research",
+  "Roadmaps & PRDs",
+  "Self-serve products",
 ];
 
 export default function Home() {
@@ -24,8 +27,8 @@ export default function Home() {
           </h1>
           <p className="mt-5 flex flex-wrap items-center gap-x-1.5 text-[15px] md:text-[16px]">
             <span>Senior Product Designer @</span>
-            <span className="inline-flex items-center gap-1 font-semibold text-accent">
-              <VibesIcon className="h-[1.05em] w-auto" />
+            <span className="inline-flex items-center gap-1 font-semibold text-ink">
+              <VibesIcon className="h-[1.05em] w-auto text-accent" />
               Vibes
             </span>
           </p>

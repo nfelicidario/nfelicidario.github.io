@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Figtree } from "next/font/google";
+import { Funnel_Display, Figtree } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 
-const display = Bricolage_Grotesque({
+const display = Funnel_Display({
   variable: "--font-display",
   subsets: ["latin"],
-  axes: ["opsz"],
 });
 
 const sans = Figtree({
