@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "./ThemeToggle";
 
 const links = [
   { href: "/", label: "Work" },
@@ -30,6 +31,9 @@ export function Nav() {
               </Link>
             </li>
           ))}
+          <li>
+            <ThemeToggle />
+          </li>
         </ul>
       </nav>
     </header>
