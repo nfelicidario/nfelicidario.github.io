@@ -42,6 +42,10 @@ export const more: Milestone[] = [
     what: "Learned to code at PerkSpot to prove a Chrome extension idea to the CEO. Shipped after I left. 100k+ users.",
   },
   {
+    when: "2018",
+    what: "Founded the Michigan Fishing team at the University of Michigan. Built its brand, site, and merch while running it.",
+  },
+  {
     when: "2016",
     what: "Co-founded Step on Poverty with four other high schoolers in Troy, MI. 9,000+ pairs of shoes by 2017.",
     links: [
