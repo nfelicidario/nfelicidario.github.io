@@ -28,3 +28,9 @@ Rules:
 - Headings use the display font automatically. Never add new fonts.
 - Motion: `motion/react` is installed. Per-beat, never ambient. Respect reduced motion (globals.css already shortens animations).
 - No images from outside the project. Recreate with JSX/SVG and mock data.
+
+## Hero stage (added Oct 6)
+Every case study hero is a full-width `HeroStage` (src/components/case/HeroStage.tsx) with four tiers of the same story:
+interactive prototype → autoplay animation → GIF (recorded later) → 3–5 stills in a carousel.
+Pass it as `stage={<HeroStage label="..." interactive={<Proto />} autoplay={<Proto autoplay />} stills={[{render:<Frame1/>, caption:"..."}]} />}` to `CaseHero`.
+Build prototypes so ONE component serves both tiers: accept an `autoplay?: boolean` prop that drives the same states on a timer (loop), and export static frame components (or a `frames` array) for the stills. Icons: `lucide-react` only. Prototypes must fill the stage (position absolute inset 0, or h-full w-full), work at 16:9, and degrade to something readable at 360px wide.

@@ -5,6 +5,8 @@ export type Milestone = {
   href?: string;
   /** small external links shown after the text (press, announcements) */
   links?: { label: string; href: string }[];
+  /** detail lines revealed on hover or focus */
+  sub?: string[];
 };
 
 /** Most recent first. */

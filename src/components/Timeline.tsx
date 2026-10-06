@@ -3,32 +3,55 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { ArrowUpRight, Newspaper } from "lucide-react";
 import type { Milestone } from "@/content/timeline";
 
 type Line = "down" | "both" | "up" | "none";
 
 function Row({ m, line, filled = false }: { m: Milestone; line: Line; filled?: boolean }) {
+  const hasPress = !!m.links?.length;
   const inner = (
     <>
       <span className="label num pt-[3px] text-right">{m.when}</span>
       <span className="tl-marker self-stretch" data-line={line}>
         <span className="tl-dot" data-filled={filled} />
       </span>
-      <span className="text-[14.5px] text-body group-hover:text-ink">
-        {m.what}
-        {m.links && (
-          <span className="ml-1.5 inline-flex flex-wrap gap-x-1.5">
-            {m.links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                target="_blank"
-                rel="noopener"
-                className="label text-accent hover:underline"
-              >
-                {l.label} ↗
-              </a>
-            ))}
+      <span className="min-w-0">
+        <span className="flex items-start gap-1.5 text-[14.5px] text-body group-hover:text-ink">
+          <span>{m.what}</span>
+          {hasPress && (
+            <Newspaper
+              size={14}
+              aria-label="Press coverage"
+              className="mt-[4px] shrink-0 text-muted group-hover:text-accent"
+            />
+          )}
+        </span>
+        {(m.sub?.length || hasPress) && (
+          <span className="grid max-h-0 overflow-hidden transition-[max-height] duration-300 ease-out group-hover:max-h-40 group-focus-within:max-h-40">
+            <span className="grid gap-0.5 pt-1.5 pb-1">
+              {m.sub?.map((t) => (
+                <span key={t} className="text-[13px] text-muted">
+                  {t}
+                </span>
+              ))}
+              {m.links && (
+                <span className="flex flex-wrap gap-x-3 pt-0.5">
+                  {m.links.map((l) => (
+                    <a
+                      key={l.href}
+                      href={l.href}
+                      target="_blank"
+                      rel="noopener"
+                      className="label inline-flex items-center gap-0.5 text-accent hover:underline"
+                    >
+                      {l.label}
+                      <ArrowUpRight size={12} />
+                    </a>
+                  ))}
+                </span>
+              )}
+            </span>
           </span>
         )}
       </span>
@@ -40,7 +63,9 @@ function Row({ m, line, filled = false }: { m: Milestone; line: Line; filled?: b
       {inner}
     </Link>
   ) : (
-    <div className={cls}>{inner}</div>
+    <div className={`${cls} hover:bg-raised`} tabIndex={0}>
+      {inner}
+    </div>
   );
 }
 

@@ -9,14 +9,42 @@ export function CaseHero({
   title,
   lede,
   meta,
+  stage,
   artifact,
 }: {
   kicker: string;
   title: string;
   lede: string;
   meta: Meta[];
+  /** full-width hero stage (preferred): see HeroStage */
+  stage?: ReactNode;
+  /** legacy: a side artifact next to the title */
   artifact?: ReactNode;
 }) {
+  if (stage) {
+    return (
+      <section className="mx-auto max-w-6xl pt-6 pb-14 md:pt-8 md:pb-16">
+        <div className="mb-3 flex items-baseline justify-between gap-4">
+          <div className="label text-accent">{kicker}</div>
+        </div>
+        {stage}
+        <div className="mt-8 grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start">
+          <div>
+            <h1 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">{title}</h1>
+            <p className="mt-4 max-w-[52ch] text-[16px]">{lede}</p>
+          </div>
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-3 border-t border-rule pt-4 text-[13.5px] md:border-t-0 md:border-l md:pl-6 md:pt-0">
+            {meta.map((m) => (
+              <div key={m.label}>
+                <dt className="label mb-0.5">{m.label}</dt>
+                <dd className="font-medium text-ink">{m.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="mx-auto grid max-w-6xl gap-10 pt-10 pb-16 md:grid-cols-[1fr_1fr] md:items-center md:pt-16 md:pb-20">
       <div>
