@@ -3,7 +3,7 @@ export type Milestone = {
   what: string;
   /** internal case-study link: makes the whole row clickable */
   href?: string;
-  /** small external links shown after the text (press, announcements) */
+  /** small external links revealed on hover (press, announcements) */
   links?: { label: string; href: string }[];
   /** detail lines revealed on hover or focus */
   sub?: string[];
@@ -13,17 +13,23 @@ export type Milestone = {
 export const recent: Milestone[] = [
   {
     when: "Jul 2026",
-    what: "RCS Studio went GA, Vibes' first self-serve product in a decade. I owned it end to end.",
+    what: "RCS Studio reached general availability at Vibes, designed and built end to end.",
+    sub: [
+      "Owned the design, requirements, roadmap, and production code.",
+      "The company's first self-serve product in a decade.",
+    ],
     href: "/work/rcs-studio/",
   },
   {
     when: "Mar 2026",
-    what: "First production merge with Claude Code at Vibes. Now shipping on par with the team's engineers.",
+    what: "First production merge with Claude Code at Vibes. Design and build stopped being separate.",
+    sub: ["Now ships on par with the team's engineers."],
     href: "/work/making-the-team-faster/",
   },
   {
     when: "2023",
-    what: "Stride raised a $750,000 seed round. I made the deck, prototype, and product video behind it.",
+    what: "Stride raised a $750,000 seed round led by Lightbank.",
+    sub: ["Made the deck, prototype, and product video for the raise."],
     links: [
       {
         label: "Built In Chicago",
@@ -36,20 +42,39 @@ export const recent: Milestone[] = [
 export const more: Milestone[] = [
   {
     when: "2020",
-    what: "Shipped production frontend code at Capital One after its bootcamp. Design and build stopped being separate.",
-  },
-  { when: "2020", what: "Co-founded Stride." },
-  {
-    when: "2018",
-    what: "Learned to code at PerkSpot to prove a Chrome extension idea to the CEO. Shipped after I left. 100k+ users.",
+    what: "Completed Capital One's coding bootcamp, then shipped production frontend code there.",
+    sub: ["Vue.js and Node.js for a servicing platform used by 1,000+ agents."],
   },
   {
+    when: "2020",
+    what: "Co-founded Stride, B2B coaching delivered inside Slack and Microsoft Teams.",
+    sub: [
+      "Founding product designer; owned product, design, brand, and marketing.",
+      "Grew from 1 to 20 clients over five years.",
+    ],
+  },
+  {
     when: "2018",
-    what: "Founded the Michigan Fishing team at the University of Michigan. Built its brand, site, and merch while running it.",
+    what: "Design intern at PerkSpot. Prototyped a Chrome extension to prove an idea to the CEO.",
+    sub: [
+      "The idea came from conversations with sales, account management, and support.",
+      "Learned JavaScript, HTML, and CSS to build the proof of concept.",
+      "Shipped after the internship ended. 100,000+ users today.",
+    ],
+  },
+  {
+    when: "2018",
+    what: "Founded the Michigan Fishing team at the University of Michigan.",
+    sub: ["Built its brand, website, and merch while running it."],
   },
   {
     when: "2016",
-    what: "Co-founded Step on Poverty with four other high schoolers in Troy, MI. 9,000+ pairs of shoes by 2017.",
+    what: "Co-founded Step on Poverty, a 501(c)(3), with other high schoolers in Troy, Michigan.",
+    sub: [
+      "Started after serving as youth advisers for Leadership Troy.",
+      "9,000+ pairs of shoes by Oct 2017, resold by micro-enterprises in developing nations.",
+      "Guidance and funding for students' projects; websites for three Troy nonprofits.",
+    ],
     links: [
       {
         label: "Oakland Press",
@@ -63,15 +88,18 @@ export const more: Milestone[] = [
   },
   {
     when: "2015",
-    what: "Started a business modernizing local orgs' digital marketing. It failed. First lesson in what people pay for.",
+    what: "Digital marketing modernization for local businesses, many with no online presence at all.",
+    sub: ["It did not last. An early lesson in the gap between a real need and a paying one."],
   },
   {
     when: "2015",
-    what: "Became webmaster for two nonprofits I belonged to, and the youngest member of their boards.",
+    what: "Served as webmaster for two nonprofits.",
+    sub: ["Youngest member on both boards."],
   },
 ];
 
 export const origin: Milestone = {
   when: "2013",
-  what: "Taught myself visual design making fliers, posters, and brand pieces for local nonprofits. Still how I learn.",
+  what: "Self-taught visual design foundations: fliers, posters, and brand pieces for local nonprofits.",
+  sub: ["High school years, 2012 to 2016."],
 };
