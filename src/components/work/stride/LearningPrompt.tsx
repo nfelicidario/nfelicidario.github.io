@@ -12,7 +12,7 @@ const reactions = [
 
 type ReactionId = (typeof reactions)[number]["id"];
 
-function StrideMark({ className = "" }: { className?: string }) {
+export function StrideMark({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 40 40" aria-hidden="true" className={className}>
       <rect width="40" height="40" rx="9" fill="#f1c233" />
@@ -27,7 +27,7 @@ function StrideMark({ className = "" }: { className?: string }) {
   );
 }
 
-function Header({ time }: { time: string }) {
+export function Header({ time }: { time: string }) {
   return (
     <div className="flex items-center gap-2 text-[13px]">
       <span className="font-bold text-ink">Stride</span>

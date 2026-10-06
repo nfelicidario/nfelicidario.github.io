@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Artifact, Beat, CaseHero, Hindsight, NextCase, Outcome, Tldr } from "@/components/case/CaseLayout";
 import { LookShift } from "@/components/work/rcs-studio/LookShift";
-import { RichMessage } from "@/components/work/rcs-studio/RichMessage";
+import { RcsStudioStage } from "@/components/work/rcs-studio/hero/RcsStudioStage";
 import { Simplify } from "@/components/work/rcs-studio/Simplify";
 import { ThesisVsReality } from "@/components/work/rcs-studio/ThesisVsReality";
 import { ThreeUsers } from "@/components/work/rcs-studio/ThreeUsers";
@@ -47,7 +47,7 @@ export default function Page() {
           { label: "Timeline", value: "Aug 2025 to Jul 2026" },
           { label: "Stack", value: "Figma, then TypeScript, React, Claude Code" },
         ]}
-        artifact={<RichMessage />}
+        stage={<RcsStudioStage />}
       />
 
       <Tldr

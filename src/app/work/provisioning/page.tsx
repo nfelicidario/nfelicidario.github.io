@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Artifact, Beat, CaseHero, Hindsight, NextCase, Outcome, Tldr } from "@/components/case/CaseLayout";
 import { Gate } from "@/components/Gate";
 import blob from "@/content/gated/provisioning.json";
-import { BeforeAfterPortals } from "@/components/work/provisioning/BeforeAfterPortals";
+import { ProvisioningStage } from "@/components/work/provisioning/hero/ProvisioningStage";
 import { IntakeForm } from "@/components/work/provisioning/IntakeForm";
 import { RequestsVsSubmissions } from "@/components/work/provisioning/RequestsVsSubmissions";
 import { Generalizes } from "@/components/work/provisioning/Generalizes";
@@ -43,11 +43,7 @@ export default function ProvisioningPage() {
           { label: "Timeline", value: "Late 2025 to present" },
           { label: "Stack", value: "TypeScript, React, Claude Code" },
         ]}
-        artifact={
-          <Artifact label="One request, before and after" pill="Abstract">
-            <BeforeAfterPortals />
-          </Artifact>
-        }
+        stage={<ProvisioningStage />}
       />
 
       <Tldr

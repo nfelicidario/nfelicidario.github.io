@@ -8,7 +8,7 @@ import {
   Outcome,
   Tldr,
 } from "@/components/case/CaseLayout";
-import { LearningPrompt } from "@/components/work/stride/LearningPrompt";
+import { StrideStage } from "@/components/work/stride/hero/StrideStage";
 import { PivotDiagram } from "@/components/work/stride/PivotDiagram";
 import { TrackProgress } from "@/components/work/stride/TrackProgress";
 import { FoundingDesignerGrid } from "@/components/work/stride/FoundingDesignerGrid";
@@ -35,7 +35,7 @@ export default function Page() {
           { label: "Timeline", value: "2020 to 2025" },
           { label: "Outcome", value: "1 to 20 clients, $750K seed round" },
         ]}
-        artifact={<LearningPrompt />}
+        stage={<StrideStage />}
       />
 
       <Tldr

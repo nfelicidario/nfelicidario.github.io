@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Artifact, Beat, CaseHero, Hindsight, NextCase, Outcome, Tldr } from "@/components/case/CaseLayout";
-import { IssueHierarchy, PlanningFlow } from "@/components/work/making-the-team-faster/PlanningFlow";
+import { IssueHierarchy } from "@/components/work/making-the-team-faster/PlanningFlow";
+import { TeamFasterStage } from "@/components/work/making-the-team-faster/hero/TeamFasterStage";
 import { Adoption } from "@/components/work/making-the-team-faster/Adoption";
 import { Pipeline } from "@/components/work/making-the-team-faster/Pipeline";
 import { BranchAsSpec } from "@/components/work/making-the-team-faster/BranchAsSpec";
@@ -21,11 +22,7 @@ export default function MakingTheTeamFaster() {
           { label: "Timeline", value: "Aug 2025 to present" },
           { label: "Tools", value: "Linear, GitLab CI, Claude Code, Claude Design, Figma" },
         ]}
-        artifact={
-          <Artifact label="The six-stage project flow" pill="Interactive · mock projects">
-            <PlanningFlow />
-          </Artifact>
-        }
+        stage={<TeamFasterStage />}
       />
 
       <Tldr
