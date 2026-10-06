@@ -14,7 +14,24 @@ function Row({ m, line, filled = false }: { m: Milestone; line: Line; filled?: b
       <span className="tl-marker self-stretch" data-line={line}>
         <span className="tl-dot" data-filled={filled} />
       </span>
-      <span className="text-[14.5px] text-body group-hover:text-ink">{m.what}</span>
+      <span className="text-[14.5px] text-body group-hover:text-ink">
+        {m.what}
+        {m.links && (
+          <span className="ml-1.5 inline-flex flex-wrap gap-x-1.5">
+            {m.links.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                target="_blank"
+                rel="noopener"
+                className="label text-accent hover:underline"
+              >
+                {l.label} ↗
+              </a>
+            ))}
+          </span>
+        )}
+      </span>
     </>
   );
   const cls = "group grid grid-cols-[72px_20px_1fr] gap-x-3 rounded-lg px-2 py-1.5 -mx-2";
