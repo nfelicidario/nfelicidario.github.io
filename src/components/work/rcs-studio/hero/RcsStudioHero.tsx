@@ -2,6 +2,19 @@
 
 import { useEffect, useId, useReducer, useState, type Dispatch, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useHeroFooter } from "@/components/case/HeroStage";
+import {
+  AgentInfo,
+  AndroidPhone,
+  Composer,
+  MessageBubble,
+  MessagesHeader,
+  RichCard,
+  SuggestionChips,
+  Timestamp,
+  TypingIndicator,
+  type BubbleStatus,
+} from "@/components/phone";
 import {
   BadgeCheck,
   Check,
@@ -23,9 +36,12 @@ import {
  * Journey: make it yours → sign up → provision (brand, agent, campaign) → submit → live.
  *
  * Each phase draws its own card on the page ground:
- *  - make it yours, provisioning, submitted, live: a two-pane card (panel left, phone right)
+ *  - make it yours, provisioning, submitted, live: a 50/50 card (panel left, Android phone right
+ *    on a tinted pane), stacking below 768px
  *  - sign up: a narrow centered card, no phone
  * The card animates its size between phases with a layout transition.
+ * Step progression, Replay, and Skip to live belong to the stage footer (useHeroFooter), not the panes.
+ * The phone is the shared kit in src/components/phone (Google Messages RCS UI).
  *
  * One state machine (a flat list of frames) drives both modes:
  *  - interactive: the viewer advances with real controls; a few frames auto-advance (a reply arriving)
@@ -100,12 +116,13 @@ const STEP_ORDER: Step[] = ["yours", "signup", "brand", "agent", "campaign", "su
 const STEP_LABELS: Record<Step, string> = {
   yours: "Make it yours",
   signup: "Sign up",
-  brand: "Brand details",
-  agent: "Agent details",
-  campaign: "Campaign details",
-  submitted: "Submit for review",
-  live: "Agent live",
+  brand: "Brand",
+  agent: "Agent",
+  campaign: "Campaign",
+  submitted: "Review",
+  live: "Live",
 };
+const FOOTER_STEPS = STEP_ORDER.map((st) => STEP_LABELS[st]);
 
 /* ------------------------------------------------------------- mock data */
 
@@ -305,6 +322,28 @@ function shown(s: State, timed: boolean, f: Field): string {
 export function RcsStudioHero({ autoplay = false }: { autoplay?: boolean }) {
   const reduced = useReducedMotion();
   const [s, dispatch] = useReducer(reducer, 0, initial);
+  const footer = useHeroFooter();
+  const step = FRAMES[s.i].step;
+  const stepIndex = STEP_ORDER.indexOf(step);
+
+  /** steps, Replay, and Skip to live go to the stage footer (ReducedHero publishes its own) */
+  useEffect(() => {
+    if (reduced) return;
+    footer.set({
+      steps: FOOTER_STEPS,
+      current: stepIndex,
+      actions: [
+        { label: "Replay", icon: <RotateCcw size={12} aria-hidden="true" />, onClick: () => dispatch({ type: "RESET" }) },
+        {
+          label: "Skip to live",
+          icon: <SkipForward size={12} aria-hidden="true" />,
+          onClick: () => dispatch({ type: "GOTO", i: F.live }),
+          hidden: autoplay || step === "live",
+        },
+      ],
+    });
+    return () => footer.set(null);
+  }, [footer, reduced, stepIndex, step, autoplay]);
 
   useEffect(() => {
     if (reduced) return;
@@ -333,6 +372,15 @@ export function RcsStudioHero({ autoplay = false }: { autoplay?: boolean }) {
 /** reduced motion: no timers; final state plus a step list, phone still tappable */
 function ReducedHero() {
   const [liveChip, setLiveChip] = useState<number | null>(null);
+  const footer = useHeroFooter();
+  useEffect(() => {
+    footer.set({
+      steps: FOOTER_STEPS,
+      current: STEP_ORDER.length - 1,
+      actions: [{ label: "Replay", icon: <RotateCcw size={12} aria-hidden="true" />, onClick: () => setLiveChip(null), hidden: liveChip === null }],
+    });
+    return () => footer.set(null);
+  }, [footer, liveChip]);
   const base = initial();
   const s: State = { ...base, values: derive(base.values), i: liveChip === null ? F.live : F.liveReplied, liveChip };
   const dispatch: Dispatch<Action> = (a) => {
@@ -439,28 +487,15 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, foc
       <motion.div
         layout={!still}
         transition={{ layout: { type: "spring", stiffness: 260, damping: 32 } }}
-        className={`bubble relative flex max-h-full w-full overflow-hidden border border-rule bg-surface shadow-[var(--shadow)] ${
-          hasPhone ? "h-full max-w-[1040px]" : "h-auto max-w-[400px]"
+        className={`bubble relative grid max-h-full w-full grid-rows-[minmax(0,1fr)] overflow-hidden border border-rule bg-surface shadow-[var(--shadow)] ${
+          hasPhone ? "h-full max-w-[1040px] grid-cols-1 md:grid-cols-2" : "h-auto max-w-[400px] grid-cols-1"
         }`}
       >
         <motion.div
           layout={still ? false : "position"}
-          className={`${panelCls} min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-4 py-4 md:px-5 md:py-5`}
+          className={`${panelCls} min-h-0 min-w-0 flex-col overflow-y-auto px-4 py-4 md:px-6 md:py-6`}
         >
-          <div className="min-h-0 flex-1">
-            {left ?? <FlowPanel s={s} timed={timed} still={still} dispatch={dispatch} />}
-          </div>
-          {!inert && !still && step !== "live" && (
-            <div className="pt-4">
-              <button
-                type="button"
-                onClick={() => dispatch({ type: "GOTO", i: F.live })}
-                className="inline-flex items-center gap-1 rounded-full text-[11.5px] font-medium text-muted hover:text-ink"
-              >
-                Skip to live <SkipForward size={12} aria-hidden="true" />
-              </button>
-            </div>
-          )}
+          <div className="my-auto">{left ?? <FlowPanel s={s} timed={timed} still={still} dispatch={dispatch} />}</div>
         </motion.div>
 
         <AnimatePresence initial={false} mode="popLayout">
@@ -472,7 +507,7 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, foc
               animate={{ opacity: 1 }}
               exit={still ? undefined : { opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className={`${phoneCls} min-h-0 shrink-0 place-items-center border-l border-rule bg-raised/50 p-4 md:p-5`}
+              className={`${phoneCls} min-h-0 min-w-0 place-items-center overflow-hidden border-rule bg-accent-soft/40 p-4 md:border-l md:p-6`}
             >
               <Phone s={s} timed={timed} still={still} dispatch={dispatch} />
             </motion.div>
@@ -514,15 +549,6 @@ function FlowPanel({ s, timed, still, dispatch }: PanelProps) {
               <StatusPill status="Live" />
             </div>
             <EndCard />
-            {!timed && (
-              <button
-                type="button"
-                onClick={() => dispatch({ type: "RESET" })}
-                className="inline-flex w-fit items-center gap-1.5 rounded-full border border-rule bg-surface px-3 py-1 text-[12px] font-medium text-ink hover:border-accent hover:text-accent"
-              >
-                <RotateCcw size={12} aria-hidden="true" /> Replay
-              </button>
-            )}
           </>
         )}
       </motion.div>
@@ -540,7 +566,6 @@ function MakeItYours({ s, timed, still, dispatch }: PanelProps) {
 
   return (
     <>
-      <Kicker n={1} label="Make it yours" />
       <div>
         <h3 className="text-[clamp(18px,2vw,24px)] font-bold text-ink">Your brand, inside Messages.</h3>
         <p className="mt-2 max-w-[36ch] text-[14px] text-body">
@@ -839,7 +864,6 @@ function SignUp({ s, timed, still, dispatch }: PanelProps) {
   const go = (i: number) => dispatch({ type: "GOTO", i });
   return (
     <>
-      <Kicker n={2} label="Sign up" />
       <div>
         <h3 className="text-[clamp(18px,2vw,22px)] font-bold text-ink">Save {s.values.agentName.trim() || "your agent"}.</h3>
         <p className="mt-1.5 text-[13.5px] text-body">An account keeps your agent while we set it up.</p>
@@ -871,7 +895,6 @@ function SignUp({ s, timed, still, dispatch }: PanelProps) {
 function Provision({ s, timed, still, dispatch }: PanelProps) {
   const step = FRAMES[s.i].step;
   const go = (i: number) => dispatch({ type: "GOTO", i });
-  const stage = step === "brand" ? 0 : step === "agent" ? 1 : step === "campaign" ? 2 : 3;
   const status = step === "submitted" ? "Submitted" : "Draft";
   const optIn = shown(s, timed, "optIn");
   const invalid = s.i === F.campaignInvalid;
@@ -887,32 +910,11 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
     <>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
-          <div className="label">{stage < 3 ? `Step ${stage + 1} of 3` : "Provisioning"}</div>
+          <div className="label">Provisioning</div>
           <div className="truncate text-[15px] font-semibold text-ink">{s.values.agentName}</div>
         </div>
         <StatusPill status={status} />
       </div>
-
-      {stage < 3 && (
-        <ol className="flex items-center gap-1.5 text-[11.5px]" aria-label="Progress">
-          {(["Brand", "Agent", "Campaign"] as const).map((n, k) => {
-            const state = k < stage ? "done" : k === stage ? "current" : "todo";
-            return (
-              <li key={n} className="flex items-center gap-1.5" aria-current={state === "current" ? "step" : undefined}>
-                <span
-                  className={`grid h-4.5 w-4.5 place-items-center rounded-full text-[10px] font-semibold ${
-                    state === "done" ? "bg-ok-soft text-ok" : state === "current" ? "bg-accent text-white" : "bg-raised text-muted"
-                  }`}
-                >
-                  {state === "done" ? <Check size={10} aria-hidden="true" /> : k + 1}
-                </span>
-                <span className={state === "current" ? "font-semibold text-ink" : "text-muted"}>{n}</span>
-                {k < 2 && <span aria-hidden="true" className="mx-0.5 h-px w-4 bg-rule" />}
-              </li>
-            );
-          })}
-        </ol>
-      )}
 
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
@@ -1107,14 +1109,6 @@ function Success({ title, body, still }: { title: string; body: string; still: b
   );
 }
 
-function Kicker({ n, label }: { n: number; label: string }) {
-  return (
-    <div className="label text-accent">
-      Step {n} · {label}
-    </div>
-  );
-}
-
 function Primary({
   children,
   onClick,
@@ -1301,140 +1295,120 @@ function Field({
 
 /* ----------------------------------------------------------------- phone */
 
-type Msg = { id: string; from: "bot" | "me"; kind?: "card" | "ghost"; text: string };
+type Msg = { id: string; from: "agent" | "user"; kind?: "card" | "ghost"; text: string; status?: BubbleStatus };
 
+const CARD = { title: "Tuesday Family Box", meta: "$32", text: "Four entrees, two sides and two house sauces. Pickup only." };
+
+/**
+ * The Android phone, built from the shared kit. Three screens:
+ *  - yours and live: a Google Messages thread with the greeting, a rich card, suggested replies,
+ *    the tapped reply as a user bubble, the typing indicator, then the agent's answer
+ *  - brand and agent steps: the agent info screen, filling in as the form does
+ *  - campaign and submitted: the sample message, or a ghost bubble until it exists
+ */
 function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still: boolean; dispatch: Dispatch<Action> }) {
   const step = FRAMES[s.i].step;
   const mode = step === "yours" ? "yours" : step === "live" ? "live" : "preview";
+  const infoScreen = step === "brand" || step === "agent";
 
   const name = s.values.agentName.trim();
   const color = normalizeHex(s.values.color) ?? DEFAULT_COLOR;
   const sample = shown(s, timed, "sample");
-  const cardText = "Four entrees, two sides and two house sauces. Pickup only.";
 
   let messages: Msg[] = [];
   let chips: Chip[] = [];
   let chipsEnabled = false;
   let picked: number | null = null;
+  let typing = false;
 
   if (mode === "yours") {
+    const replied = s.i >= F.yoursReplied && s.chip !== null;
     messages = [
-      { id: "greet", from: "bot", text: `Hi Sam, it's ${name || "your agent"}. The Tuesday Family Box is back this week.` },
-      { id: "card", from: "bot", kind: "card", text: cardText },
+      { id: "greet", from: "agent", text: `Hi Sam, it's ${name || "your agent"}. The Tuesday Family Box is back this week.` },
+      { id: "card", from: "agent", kind: "card", text: CARD.text },
     ];
-    if (s.chip !== null) messages.push({ id: "me", from: "me", text: YOURS_CHIPS[s.chip].label });
-    if (s.i >= F.yoursReplied && s.chip !== null) messages.push({ id: "reply", from: "bot", text: YOURS_CHIPS[s.chip].reply });
+    if (s.chip !== null) messages.push({ id: "me", from: "user", text: YOURS_CHIPS[s.chip].label, status: replied ? "read" : "delivered" });
+    if (replied) messages.push({ id: "reply", from: "agent", text: YOURS_CHIPS[s.chip as number].reply });
+    typing = s.chip !== null && !replied;
     chips = YOURS_CHIPS;
     chipsEnabled = s.chip === null;
     picked = s.chip;
   } else if (mode === "live") {
+    const tapped = s.i >= F.liveTapped && s.liveChip !== null;
+    const replied = s.i >= F.liveReplied && s.liveChip !== null;
     messages = [
-      { id: "greet", from: "bot", text: s.values.sample },
-      { id: "card", from: "bot", kind: "card", text: cardText },
+      { id: "greet", from: "agent", text: s.values.sample },
+      { id: "card", from: "agent", kind: "card", text: CARD.text },
     ];
-    if (s.i >= F.liveTapped && s.liveChip !== null) messages.push({ id: "me", from: "me", text: LIVE_CHIPS[s.liveChip].label });
-    if (s.i >= F.liveReplied && s.liveChip !== null) messages.push({ id: "reply", from: "bot", text: LIVE_CHIPS[s.liveChip].reply });
+    if (tapped) messages.push({ id: "me", from: "user", text: LIVE_CHIPS[s.liveChip as number].label, status: replied ? "read" : "delivered" });
+    if (replied) messages.push({ id: "reply", from: "agent", text: LIVE_CHIPS[s.liveChip as number].reply });
+    typing = tapped && !replied;
     chips = LIVE_CHIPS;
     chipsEnabled = s.i === F.live;
     picked = s.liveChip;
   } else {
     messages = sample
-      ? [{ id: "sample", from: "bot", text: sample }]
-      : [{ id: "ghost", from: "bot", kind: "ghost", text: "Your first message shows up here." }];
+      ? [{ id: "sample", from: "agent", text: sample }]
+      : [{ id: "ghost", from: "agent", kind: "ghost", text: "Your first message shows up here." }];
   }
 
   const headerName = name || "Your agent";
-  const sub =
-    mode === "yours" ? "Verified sender" : mode === "live" ? "Verified · your agent" : step === "submitted" ? "In carrier review" : "Preview";
+  const verified = mode !== "preview";
+  const subtitle = verified ? "Verified business" : step === "submitted" ? "In carrier review" : "Preview";
+  const logo = (size: string) => <LogoMark logo={s.logo} color={color} name={name} className={`h-full w-full ${size}`} />;
+  const enter = still ? false : { opacity: 0, y: 8 };
 
   return (
-    <div className="h-[460px] max-w-full md:h-full md:max-h-[560px]" style={{ aspectRatio: "9 / 19" }}>
-      <div className="flex h-full w-full flex-col rounded-[2.2rem] border-[6px] border-[#1c2433] bg-[#1c2433] shadow-[var(--shadow)]">
-        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.8rem] bg-bg">
-          <div aria-hidden="true" className="absolute top-2 left-1/2 h-1.5 w-14 -translate-x-1/2 rounded-full bg-[#0b0f17]" />
-
-          <div className="flex items-center gap-2.5 border-b border-rule bg-surface px-3.5 pt-5 pb-2.5">
-            <LogoMark logo={s.logo} color={color} name={name} className="h-8 w-8 rounded-lg text-[12px]" />
-            <div className="min-w-0 leading-tight">
-              <div className="truncate text-[13px] font-semibold text-ink">{headerName}</div>
-              <div className="flex items-center gap-1 text-[11px] text-muted" aria-live="polite">
-                {mode === "live" ? (
-                  <BadgeCheck size={12} aria-hidden="true" className="text-ok" />
-                ) : mode === "yours" ? (
-                  <BadgeCheck size={12} aria-hidden="true" style={{ color }} />
-                ) : step === "submitted" ? (
-                  <Clock size={11} aria-hidden="true" />
-                ) : null}
-                {sub}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden px-3 py-3" aria-live="polite">
+    <AndroidPhone brandColor={color} theme="auto" fit="contain" label="Phone preview">
+      <MessagesHeader logo={logo("text-[15px]")} name={headerName} verified={verified} subtitle={subtitle} />
+      {infoScreen ? (
+        <AgentInfo
+          logo={logo("text-[28px]")}
+          name={headerName}
+          description={shown(s, timed, "description") || undefined}
+          website={shown(s, timed, "website") || undefined}
+          email={shown(s, timed, "contact") || undefined}
+        />
+      ) : (
+        <>
+          <div className="flex min-h-0 flex-1 flex-col justify-end gap-2 overflow-hidden px-4 pb-2" aria-live="polite">
+            <Timestamp>Today · 9:30 AM</Timestamp>
             <AnimatePresence initial={false}>
               {messages.map((m) => (
                 <motion.div
                   key={`${mode}-${m.id}`}
-                  layout={!still}
-                  initial={still ? false : { opacity: 0, y: 8 }}
+                  initial={enter}
                   animate={{ opacity: 1, y: 0 }}
                   exit={still ? undefined : { opacity: 0 }}
                   transition={{ duration: 0.26, ease: "easeOut" }}
-                  className={m.from === "me" ? "self-end" : "self-start"}
+                  className={`flex w-full flex-col ${m.from === "user" ? "items-end" : "items-start"}`}
                 >
                   {m.kind === "card" ? (
-                    <div className="bubble w-[82%] min-w-[150px] overflow-hidden border border-rule bg-surface">
-                      <div
-                        aria-hidden="true"
-                        className="aspect-[2/1]"
-                        style={{ background: `linear-gradient(135deg, ${color} 0%, var(--accent-soft) 60%, var(--raised) 100%)` }}
-                      />
-                      <div className="px-3 py-2">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <div className="text-[13px] font-semibold text-ink">Tuesday Family Box</div>
-                          <div className="num text-[12px] font-semibold text-ink">$32</div>
-                        </div>
-                        <p className="mt-0.5 text-[12px] leading-snug text-body">{m.text}</p>
-                      </div>
-                    </div>
-                  ) : m.kind === "ghost" ? (
-                    <div className="bubble max-w-[85%] border border-dashed border-rule px-3 py-2 text-[12.5px] leading-snug text-muted">{m.text}</div>
-                  ) : m.from === "me" ? (
-                    <div className="bubble-me max-w-[80%] px-3 py-2 text-[12.5px] leading-snug text-white" style={{ background: color }}>
-                      {m.text}
-                    </div>
+                    <RichCard title={CARD.title} meta={CARD.meta} description={m.text} mediaHeight="short" width="86%" />
                   ) : (
-                    <div className="bubble max-w-[85%] border border-rule bg-surface px-3 py-2 text-[12.5px] leading-snug text-ink">{m.text}</div>
+                    <MessageBubble from={m.from} ghost={m.kind === "ghost"} status={m.status}>
+                      {m.text}
+                    </MessageBubble>
                   )}
                 </motion.div>
               ))}
             </AnimatePresence>
-          </div>
-
-          <div className="border-t border-rule bg-surface px-3 pt-2 pb-3">
-            <div className="label mb-1.5 text-[10px]">Suggested replies</div>
-            {chips.length ? (
-              <div className="flex flex-wrap gap-1.5">
-                {chips.map((c, k) => (
-                  <button
-                    key={c.label}
-                    type="button"
-                    onClick={() => dispatch({ type: "TAP", chip: k, now: still })}
-                    disabled={!chipsEnabled}
-                    aria-pressed={picked === k}
-                    className="rounded-full border px-2.5 py-1 text-[12px] font-medium transition-colors disabled:cursor-default disabled:opacity-40"
-                    style={{ borderColor: color, color }}
-                  >
-                    {c.label}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[11.5px] text-muted">Appear once the agent is live.</p>
+            {typing && (
+              <motion.div initial={enter} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="flex w-full flex-col items-start">
+                <TypingIndicator />
+              </motion.div>
             )}
           </div>
-        </div>
-      </div>
-    </div>
+          <SuggestionChips
+            wrap
+            label="Suggested replies"
+            suggestions={chips.map((c, k) => ({ label: c.label, selected: picked === k }))}
+            onSelect={(k) => dispatch({ type: "TAP", chip: k, now: still })}
+            disabled={!chipsEnabled}
+          />
+          <Composer />
+        </>
+      )}
+    </AndroidPhone>
   );
 }
