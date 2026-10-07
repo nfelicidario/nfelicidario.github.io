@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { Artifact, Beat, CaseHero, Hindsight, NextCase, Outcome, Tldr } from "@/components/case/CaseLayout";
 import { LookShift } from "@/components/work/rcs-studio/LookShift";
@@ -112,8 +113,8 @@ export default function Page() {
       </Beat>
 
       <Beat
-        chapter="Chapter 3 · Three users, not one"
-        title="The user nobody had designed for"
+        chapter="Chapter 3"
+        title="Two customers, not one developer"
         artifact={
           <Artifact label="Who actually showed up" pill="Personas">
             <ThreeUsers />
@@ -121,9 +122,18 @@ export default function Page() {
         }
       >
         <p>
-          Once provisioning was the real first step, the product had three users instead of one: marketing
-          operations who had never written code, the technical builders we started with, and our own
-          operations team doing every provisioning step by hand.
+          Once provisioning was the real first step, the product had two customers, not one. Marketing
+          operations people who needed an agent provisioned for a campaign and had never written code, and
+          the technical builders we had designed for, who wanted the flow builder once an agent existed.
+          Right before beta I split the product around those two.
+        </p>
+        <p>
+          Behind both of them was a third group: our own operations team, doing the provisioning work by
+          hand. Designing for them became its own project, told in{" "}
+          <Link href="/work/provisioning/" className="text-body underline decoration-rule underline-offset-2 transition-colors hover:text-accent hover:decoration-accent">
+            the next case study
+          </Link>
+          .
         </p>
         <p>
           Right before beta I split the product around the first two and started designing for the third. The

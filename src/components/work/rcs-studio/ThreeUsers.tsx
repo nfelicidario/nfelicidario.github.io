@@ -1,19 +1,24 @@
 const users = [
   {
+    group: "Customer",
     name: "Marketing operations",
-    line: "Needed an agent provisioned and had never written code.",
+    line: "Needs an agent provisioned for a campaign. Has never written code.",
     glyph: "M",
-  },
-  {
-    name: "Technical builders",
-    line: "The original audience. Wanted the flow builder once an agent existed.",
-    glyph: "T",
-  },
-  {
-    name: "Our own operations team",
-    line: "Doing every provisioning step by hand over email. Nothing visual, nothing tracked.",
-    glyph: "O",
     highlight: true,
+  },
+  {
+    group: "Customer",
+    name: "Technical builders",
+    line: "The original audience. Wants the flow builder once an agent exists.",
+    glyph: "T",
+    highlight: true,
+  },
+  {
+    group: "Internal",
+    name: "Our operations team",
+    line: "Does the provisioning work behind the scenes. Their story is the next case study.",
+    glyph: "O",
+    highlight: false,
   },
 ];
 
@@ -33,9 +38,9 @@ export function ThreeUsers() {
           >
             {u.glyph}
           </span>
-          <div className="mt-3 text-[14.5px] font-semibold text-ink">{u.name}</div>
+          <div className="label mt-3">{u.group}</div>
+          <div className="mt-0.5 text-[14.5px] font-semibold text-ink">{u.name}</div>
           <p className="mt-1 text-[13px] leading-snug text-body">{u.line}</p>
-          {u.highlight && <div className="label mt-3 text-accent">Nobody had designed for them</div>}
         </div>
       ))}
     </div>
