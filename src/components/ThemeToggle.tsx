@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Moon, Sun, SunMoon } from "lucide-react";
 
 type Theme = "light" | "dark" | "system";
 const KEY = "theme";
@@ -46,9 +47,10 @@ export function ThemeToggle() {
       onClick={() => choose(next)}
       aria-label={`Theme: ${label}. Switch to ${next}.`}
       title={`Theme: ${label}`}
-      className="label ml-1 rounded-full border border-rule px-2.5 py-1 transition-colors hover:border-accent hover:text-ink"
+      className="ml-1 rounded-full border border-rule p-1.5 text-muted transition-colors hover:border-accent hover:text-ink"
     >
-      {label}
+      {theme === "light" ? <Sun size={14} /> : theme === "dark" ? <Moon size={14} /> : <SunMoon size={14} />}
+      <span className="sr-only">{label}</span>
     </button>
   );
 }

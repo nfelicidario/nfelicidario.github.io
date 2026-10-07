@@ -66,7 +66,7 @@ export function AgentInfo({ logo, name, description, verified = false, banner, w
         </span>
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, fontSize: 22, fontWeight: 500, lineHeight: 1.2 }}>
           <span style={{ minWidth: 0, overflowWrap: "anywhere" }}>{name}</span>
-          {verified && <VerifiedBadge size={20} />}
+          {verified && <VerifiedBadge size={24} />}
         </div>
         {description && (
           <p style={{ margin: "10px 0 0", fontSize: 14, lineHeight: "19px", color: "var(--ph-on-surface-variant)", overflowWrap: "anywhere" }}>

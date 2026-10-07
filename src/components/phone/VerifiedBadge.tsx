@@ -23,7 +23,7 @@ export type VerifiedBadgeProps = {
 export const VERIFIED_PATH =
   "m344-60-76-128-144-32 14-148-98-112 98-112-14-148 144-32 76-128 136 58 136-58 76 128 144 32-14 148 98 112-98 112 14 148-144 32-76 128-136-58-136 58Zm94-278 226-226-56-58-170 170-86-84-56 56 142 142Z";
 
-export function VerifiedBadge({ size = 16, color = "var(--ph-verified, #1A73E8)", label = "Verified", style }: VerifiedBadgeProps) {
+export function VerifiedBadge({ size = 16, color = "var(--accent, #1F4FE0)", label = "Verified", style }: VerifiedBadgeProps) {
   const decorative = label === "";
   return (
     <svg

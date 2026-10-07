@@ -1,6 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarRange, Layers, UserRound, Users, type LucideIcon } from "lucide-react";
+
+const META_ICONS: Record<string, LucideIcon> = {
+  role: UserRound,
+  team: Users,
+  timeline: CalendarRange,
+  stack: Layers,
+};
 import { projects } from "@/content/projects";
 
 export type Meta = { label: string; value: string };
@@ -41,13 +48,21 @@ export function CaseHero({
             <h1 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">{title}</h1>
             <p className="mt-4 max-w-[52ch] text-[16px]">{lede}</p>
           </div>
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-3 border-t border-rule pt-4 text-[13.5px] md:border-t-0 md:border-l md:pl-6 md:pt-0">
-            {meta.map((m) => (
-              <div key={m.label}>
-                <dt className="label mb-0.5">{m.label}</dt>
-                <dd className="font-medium text-ink">{m.value}</dd>
-              </div>
-            ))}
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-rule pt-4 text-[13.5px] md:border-t-0 md:border-l md:pl-6 md:pt-0">
+            {meta.map((m) => {
+              const Icon = META_ICONS[m.label.toLowerCase()];
+              return (
+                <div key={m.label} className="grid grid-cols-[18px_1fr] gap-x-2">
+                  <span className="pt-[1px] text-muted" aria-hidden="true">
+                    {Icon && <Icon size={14} />}
+                  </span>
+                  <div>
+                    <dt className="label mb-0.5">{m.label}</dt>
+                    <dd className="font-medium text-ink">{m.value}</dd>
+                  </div>
+                </div>
+              );
+            })}
           </dl>
         </div>
       </section>
@@ -183,7 +198,10 @@ export function NextCase({ slug }: { slug: string }) {
     <section className="mx-auto max-w-6xl border-t border-rule py-12">
       <div className="label mb-3">Next case study</div>
       <Link href={`/work/${p.slug}/`} className="group grid gap-1">
-        <span className="text-[24px] font-bold text-ink group-hover:text-accent">{p.title} →</span>
+        <span className="inline-flex items-center gap-2 text-[24px] font-bold text-ink group-hover:text-accent">
+          {p.title}
+          <ArrowRight size={20} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+        </span>
         <span className="text-[14.5px] text-muted">{p.summary}</span>
       </Link>
     </section>

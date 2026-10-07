@@ -56,7 +56,7 @@ export function MessagesHeader({ logo, name, verified = false, subtitle, call = 
       <div style={{ minWidth: 0, flex: 1, lineHeight: 1.2 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 16, fontWeight: 500 }}>
           <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
-          {verified && <VerifiedBadge size={16} />}
+          {verified && <VerifiedBadge size={19} />}
         </div>
         {subtitle && (
           <div style={{ fontSize: 12, color: "var(--ph-on-surface-variant)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>

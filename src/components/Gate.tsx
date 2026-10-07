@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { Lock } from "lucide-react";
 
 export type GatedBlob = {
   v: number;
@@ -93,7 +94,8 @@ export function Gate({ blob, title }: { blob: GatedBlob; title: string }) {
         if (v) void tryPass(v, true);
       }}
     >
-      <label htmlFor={inputId} className="text-[15px] font-semibold text-ink">
+      <label htmlFor={inputId} className="inline-flex items-center gap-2 text-[15px] font-semibold text-ink">
+        <Lock size={15} className="text-muted" aria-hidden="true" />
         This case study is passphrase protected.
       </label>
       <p className="text-[14px]">

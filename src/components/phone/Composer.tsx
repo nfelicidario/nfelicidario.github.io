@@ -22,8 +22,8 @@ export function Composer({ placeholder = "RCS message", text = "" }: ComposerPro
         flexShrink: 0,
         alignItems: "center",
         gap: 8,
-        padding: "6px 12px 10px",
-        background: "var(--ph-bg)",
+        padding: "8px 12px 10px",
+        background: "transparent",
       }}
     >
       <span style={round}>
@@ -39,7 +39,7 @@ export function Composer({ placeholder = "RCS message", text = "" }: ComposerPro
           gap: 10,
           padding: "0 10px 0 18px",
           borderRadius: 999,
-          background: "var(--ph-surface-high)",
+          background: "var(--ph-surface)",
           color: text ? "var(--ph-on-surface)" : "var(--ph-on-surface-variant)",
           fontSize: 15,
         }}
@@ -68,6 +68,6 @@ const round = {
   flexShrink: 0,
   placeItems: "center",
   borderRadius: 999,
-  background: "var(--ph-surface-high)",
+  background: "var(--ph-surface)",
   color: "var(--ph-on-surface)",
 } as const;

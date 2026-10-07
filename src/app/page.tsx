@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/ProjectCard";
 import { VibesIcon } from "@/components/VibesIcon";
 import { Timeline } from "@/components/Timeline";
@@ -80,8 +81,9 @@ export default function Home() {
           <h2 id="hiw" className="text-[22px] font-bold text-ink">
             How I work
           </h2>
-          <Link href="/how-i-work/" className="label hover:text-ink">
-            Read the full page →
+          <Link href="/how-i-work/" className="label inline-flex items-center gap-1 hover:text-ink">
+            Read the full page
+            <ArrowRight size={12} aria-hidden="true" />
           </Link>
         </div>
         <div className="grid gap-4 md:grid-cols-[1fr_1fr_1fr]">
@@ -134,8 +136,9 @@ export default function Home() {
           <h2 id="about" className="text-[22px] font-bold text-ink">
             About
           </h2>
-          <Link href="/about/" className="label hover:text-ink">
-            More →
+          <Link href="/about/" className="label inline-flex items-center gap-1 hover:text-ink">
+            More
+            <ArrowRight size={12} aria-hidden="true" />
           </Link>
         </div>
         <p className="measure text-[15.5px]">

@@ -1410,8 +1410,8 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
               onSelect={(k) => dispatch({ type: "TAP", chip: k, now: still })}
               disabled={!chipsEnabled}
             />
-            <Composer />
           </ConversationPanel>
+          <Composer />
         </>
       )}
     </AndroidPhone>
