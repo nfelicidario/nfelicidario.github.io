@@ -11,6 +11,7 @@ export function RcsStudioStage() {
       autoplay={<RcsStudioHero autoplay />}
       gif={{ src: "/work/rcs-studio/hero.gif", alt: "An RCS conversation, then sign-up, provisioning, review, and a live agent, with mock data" }}
       stills={rcsStudioStills}
+      frame={false}
     />
   );
 }

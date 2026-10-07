@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Globe, Newspaper, SquareArrowOutUpRight } from "lucide-react";
+import { EllipsisVertical, Globe, Newspaper, SquareArrowOutUpRight } from "lucide-react";
 import type { Milestone } from "@/content/timeline";
 
 type Line = "down" | "both" | "up" | "none";
@@ -68,22 +68,34 @@ function Row({
   onToggle: () => void;
 }) {
   const hasDetails = !!(m.sub?.length || m.links?.length);
-  const hasPress = !!m.links?.some((l) => l.kind !== "web");
+  const kinds = Array.from(new Set((m.links ?? []).map((l) => (l.kind === "web" ? "web" : "press"))));
 
   const inner: ReactNode = (
     <>
-      <span className="label num pt-[3px] text-right">{m.when}</span>
+      <span className="label num pt-[3px] text-right">
+        {m.when.includes(" ") ? (
+          <>
+            <span className="opacity-50">{m.when.split(" ")[0]}</span> {m.when.split(" ")[1]}
+          </>
+        ) : (
+          m.when
+        )}
+      </span>
       <span className="tl-marker self-stretch" data-line={line}>
         <span className="tl-dot" data-filled={filled} />
       </span>
       <span className="relative min-w-0">
         <span className="text-[14.5px] text-body group-hover:text-ink">
           {m.what}
-          {hasPress && (
-            <span className="ml-1.5 inline-block align-[-2px] text-muted group-hover:text-accent" title="Press coverage">
-              <PressIcon />
+          {kinds.map((k) => (
+            <span
+              key={k}
+              className="ml-1.5 inline-block align-[-2px] text-muted"
+              title={k === "web" ? "Live product" : "Press coverage"}
+            >
+              {k === "web" ? <Globe size={14} aria-hidden="true" /> : <PressIcon />}
             </span>
-          )}
+          ))}
         </span>
         {/* Details float below the line so the page never reflows (no scroll-anchoring jumps). */}
         <AnimatePresence initial={false}>
@@ -216,19 +228,29 @@ export function Timeline({
         )}
       </AnimatePresence>
 
-      <button
-        type="button"
-        onClick={() => {
-          setSettled(false);
-          setExpanded((v) => !v);
-        }}
-        aria-expanded={expanded}
-        className="label -mx-2 grid grid-cols-[72px_20px_1fr] gap-x-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-raised hover:text-ink"
-      >
+      <div className="grid grid-cols-[72px_20px_1fr] gap-x-3 px-2 -mx-2">
         <span />
-        <span className="tl-marker self-stretch" data-line="both" />
-        <span>{expanded ? "Collapse timeline" : `Expand timeline · ${more.length} more`}</span>
-      </button>
+        <span className="tl-marker self-stretch" data-line={expanded ? "both" : "none"}>
+          {!expanded && (
+            <span className="relative z-10 mt-[5px] text-rule" aria-hidden="true">
+              <EllipsisVertical size={16} strokeWidth={2.5} />
+            </span>
+          )}
+        </span>
+        <span>
+          <button
+            type="button"
+            onClick={() => {
+              setSettled(false);
+              setExpanded((v) => !v);
+            }}
+            aria-expanded={expanded}
+            className="label -ml-2 rounded-md px-2 py-1.5 transition-colors hover:bg-raised hover:text-ink"
+          >
+            {expanded ? "Collapse timeline" : `Expand timeline · ${more.length} more`}
+          </button>
+        </span>
+      </div>
 
       {row(origin, "up")}
     </div>

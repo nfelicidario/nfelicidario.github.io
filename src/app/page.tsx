@@ -6,9 +6,9 @@ import { earlier, now, projects } from "@/content/projects";
 import { more, origin, recent } from "@/content/timeline";
 
 const tags = [
-  "Co-founder, 2x",
-  "Founding designer",
   "0 → 1",
+  "Founder, 2x",
+  "Product strategy",
   "Shipped to GA",
   "Production TypeScript",
   "Prototypes over handoffs",
