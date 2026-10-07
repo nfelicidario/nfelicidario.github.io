@@ -46,7 +46,7 @@ export const more: Milestone[] = [
     sub: ["Vue.js and Node.js for a servicing platform used by 1,000+ agents."],
   },
   {
-    when: "2020",
+    when: "Q1 2020",
     what: "Co-founded Stride, B2B coaching delivered inside Slack and Microsoft Teams.",
     sub: [
       "Founding product designer; owned product, design, brand, and marketing.",
