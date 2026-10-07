@@ -42,7 +42,7 @@ export default function Page() {
       <CaseHero
         kicker="Vibes · 2025–26"
         title="We built the second step first"
-        lede="RCS Studio started as a f        lede="RCS Studio launched as a flow builder for developers, and beta customers showed me the product was really the step before it."
+        lede="RCS Studio launched as a flow builder for developers, and beta customers showed me the product was really the step before it."
         heading={
           <ToggleTool
             id="rcs-h1"
@@ -78,7 +78,8 @@ export default function Page() {
             ]}
           />
         }
-e", value: "Sole product designer" },
+        meta={[
+          { label: "Role", value: "Sole product designer" },
           { label: "Team", value: "Engineering manager, three engineers" },
           { label: "Timeline", value: "Aug 2025 to Jul 2026" },
           { label: "Stack", value: "Figma, then TypeScript, React, Claude Code" },
