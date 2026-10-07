@@ -3,41 +3,50 @@
 import Link from "next/link";
 import { useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowUpRight, Newspaper } from "lucide-react";
+import { Globe, Newspaper, SquareArrowOutUpRight } from "lucide-react";
 import type { Milestone } from "@/content/timeline";
 
 type Line = "down" | "both" | "up" | "none";
 
-const OPEN_DELAY = 260; // hover intent: sweeping the cursor across rows opens nothing
-const CLOSE_DELAY = 160;
+const OPEN_DELAY = 240; // hover intent: a passing cursor opens nothing
+const CLOSE_DELAY = 180;
 const EASE = [0.2, 0.7, 0.2, 1] as const;
+
+function PressIcon({ className = "" }: { className?: string }) {
+  // flipped horizontally per the design
+  return <Newspaper size={14} aria-hidden="true" className={`-scale-x-100 ${className}`} />;
+}
 
 function Details({ m }: { m: Milestone }) {
   return (
-    <span className="grid gap-1 pt-2 pb-1.5">
-      {m.sub?.map((t) => (
-        <span key={t} className="text-[13px] leading-snug text-muted">
-          {t}
-        </span>
-      ))}
-      {m.links && (
-        <span className="flex flex-wrap gap-x-3 pt-0.5">
-          {m.links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              target="_blank"
-              rel="noopener"
-              onClick={(e) => e.stopPropagation()}
-              className="label inline-flex items-center gap-0.5 text-accent hover:underline"
-            >
-              {l.label}
-              <ArrowUpRight size={12} />
-            </a>
+    <div className="grid gap-1.5">
+      {!!m.sub?.length && (
+        <ul className="grid gap-1 pl-4 text-[13px] leading-snug text-muted marker:text-rule" style={{ listStyle: "disc" }}>
+          {m.sub.map((t) => (
+            <li key={t}>{t}</li>
           ))}
-        </span>
+        </ul>
       )}
-    </span>
+      {!!m.links?.length && (
+        <ul className="grid gap-1 pt-0.5">
+          {m.links.map((l) => (
+            <li key={l.href}>
+              <a
+                href={l.href}
+                target="_blank"
+                rel="noopener"
+                onClick={(e) => e.stopPropagation()}
+                className="label inline-flex items-center gap-1.5 text-accent hover:underline"
+              >
+                {l.kind === "web" ? <Globe size={14} aria-hidden="true" /> : <PressIcon />}
+                <span>{l.label}</span>
+                <SquareArrowOutUpRight size={12} aria-label="Opens in a new tab" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 
@@ -59,7 +68,7 @@ function Row({
   onToggle: () => void;
 }) {
   const hasDetails = !!(m.sub?.length || m.links?.length);
-  const hasPress = !!m.links?.length;
+  const hasPress = !!m.links?.some((l) => l.kind !== "web");
 
   const inner: ReactNode = (
     <>
@@ -67,26 +76,25 @@ function Row({
       <span className="tl-marker self-stretch" data-line={line}>
         <span className="tl-dot" data-filled={filled} />
       </span>
-      <span className="min-w-0">
-        <span className="flex items-start gap-1.5 text-[14.5px] text-body group-hover:text-ink">
-          <span>{m.what}</span>
+      <span className="relative min-w-0">
+        <span className="text-[14.5px] text-body group-hover:text-ink">
+          {m.what}
           {hasPress && (
-            <Newspaper
-              size={14}
-              aria-label="Press coverage"
-              className="mt-[4px] shrink-0 text-muted group-hover:text-accent"
-            />
+            <span className="ml-1.5 inline-block align-[-2px] text-muted group-hover:text-accent" title="Press coverage">
+              <PressIcon />
+            </span>
           )}
         </span>
+        {/* Details float below the line so the page never reflows (no scroll-anchoring jumps). */}
         <AnimatePresence initial={false}>
           {open && hasDetails && (
             <motion.span
               key="details"
-              className="block overflow-hidden"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ height: { duration: 0.38, ease: EASE }, opacity: { duration: 0.25 } }}
+              className="bubble-sm absolute left-0 right-0 top-full z-20 mt-1.5 block border border-rule bg-surface px-3 py-2.5 shadow-[var(--shadow)]"
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.22, ease: EASE }}
             >
               <Details m={m} />
             </motion.span>
@@ -142,6 +150,7 @@ export function Timeline({
   origin: Milestone;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [settled, setSettled] = useState(false); // expanded block finished animating: release overflow clip
   const [openKey, setOpenKey] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -177,7 +186,7 @@ export function Timeline({
   };
 
   return (
-    <div className="grid">
+    <div className="grid" style={{ overflowAnchor: "none" }}>
       {recent.map((m, i) => row(m, i === 0 ? "down" : "both", i === 0))}
 
       <AnimatePresence initial={false}>
@@ -188,7 +197,8 @@ export function Timeline({
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.4, ease: EASE }}
-            className="overflow-hidden"
+            onAnimationComplete={() => setSettled(expanded)}
+            style={{ overflow: settled ? "visible" : "hidden" }}
           >
             <div className="grid">
               {more.map((m, i) => (
@@ -208,7 +218,10 @@ export function Timeline({
 
       <button
         type="button"
-        onClick={() => setExpanded((v) => !v)}
+        onClick={() => {
+          setSettled(false);
+          setExpanded((v) => !v);
+        }}
         aria-expanded={expanded}
         className="label -mx-2 grid grid-cols-[72px_20px_1fr] gap-x-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-raised hover:text-ink"
       >

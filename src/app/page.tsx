@@ -6,15 +6,15 @@ import { earlier, now, projects } from "@/content/projects";
 import { more, origin, recent } from "@/content/timeline";
 
 const tags = [
+  "Co-founder, 2x",
+  "Founding designer",
   "0 → 1",
+  "Shipped to GA",
   "Production TypeScript",
-  "Prototypes in code",
+  "Prototypes over handoffs",
+  "Roadmaps & PRDs",
   "Agentic SDLC",
   "Design systems",
-  "Product strategy",
-  "User research",
-  "Roadmaps & PRDs",
-  "Self-serve products",
 ];
 
 export default function Home() {
@@ -23,11 +23,11 @@ export default function Home() {
       <section className="mx-auto grid max-w-6xl gap-10 pt-10 pb-20 md:grid-cols-[1.1fr_1fr] md:items-center md:pt-16 md:pb-24">
         <div>
           <h1 className="max-w-[15ch] text-[clamp(34px,4.6vw,58px)] font-bold text-ink">
-            Product designer who <span className="text-accent">ships the code.</span>
+            Product designer who <span className="text-accent">ships code.</span>
           </h1>
           <p className="mt-5 flex flex-wrap items-center gap-x-1.5 text-[15px] md:text-[16px]">
             <span>Senior Product Designer @</span>
-            <span className="inline-flex items-center gap-1 font-semibold text-ink">
+            <span className="inline-flex items-center gap-1 text-ink">
               <VibesIcon className="h-[1.05em] w-auto text-accent" />
               Vibes
             </span>

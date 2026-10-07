@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s · Nolan Felicidario",
   },
   description:
-    "Product designer who ships the code. Senior product designer at Vibes, co-founder of Stride.",
+    "Product designer who ships code. Senior product designer at Vibes, co-founder of Stride.",
   metadataBase: new URL("https://www.nolanfelicidario.com"),
 };
 

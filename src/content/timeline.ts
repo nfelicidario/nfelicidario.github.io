@@ -3,8 +3,8 @@ export type Milestone = {
   what: string;
   /** internal case-study link: makes the whole row clickable */
   href?: string;
-  /** small external links revealed on hover (press, announcements) */
-  links?: { label: string; href: string }[];
+  /** small external links revealed on hover (press, announcements, live products) */
+  links?: { label: string; href: string; kind?: "press" | "web" }[];
   /** detail lines revealed on hover or focus */
   sub?: string[];
 };
@@ -61,11 +61,13 @@ export const more: Milestone[] = [
       "Learned JavaScript, HTML, and CSS to build the proof of concept.",
       "Shipped after the internship ended. 100,000+ users today.",
     ],
-  },
-  {
-    when: "2018",
-    what: "Founded the Michigan Fishing team at the University of Michigan.",
-    sub: ["Built its brand, website, and merch while running it."],
+    links: [
+      {
+        label: "Chrome Web Store",
+        href: "https://chromewebstore.google.com/detail/perkspot-save-while-you-s/ecnfmmdoiiihbbpenbgdienmdpejbmdj",
+        kind: "web",
+      },
+    ],
   },
   {
     when: "2016",
