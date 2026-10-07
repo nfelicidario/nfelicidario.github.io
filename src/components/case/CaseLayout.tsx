@@ -18,6 +18,7 @@ export function CaseHero({
   lede,
   meta,
   stage,
+  heading,
   artifact,
 }: {
   kicker: string;
@@ -26,6 +27,8 @@ export function CaseHero({
   meta: Meta[];
   /** full-width hero stage (preferred): see HeroStage */
   stage?: ReactNode;
+  /** overrides the title and lede block (used by the Toggle Tool to compare headline variants) */
+  heading?: ReactNode;
   /** legacy: a side artifact next to the title */
   artifact?: ReactNode;
 }) {
@@ -45,8 +48,12 @@ export function CaseHero({
         {stage}
         <div className="mt-14 grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start md:mt-16">
           <div>
-            <h1 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">{title}</h1>
-            <p className="mt-4 max-w-[52ch] text-[16px]">{lede}</p>
+            {heading ?? (
+              <>
+                <h1 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">{title}</h1>
+                <p className="mt-4 max-w-[52ch] text-[16px]">{lede}</p>
+              </>
+            )}
           </div>
           <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-rule pt-4 text-[13.5px] md:border-t-0 md:border-l md:pl-6 md:pt-0">
             {meta.map((m) => {

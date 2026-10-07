@@ -6,6 +6,7 @@ import { RcsStudioStage } from "@/components/work/rcs-studio/hero/RcsStudioStage
 import { Simplify } from "@/components/work/rcs-studio/Simplify";
 import { ThesisVsReality } from "@/components/work/rcs-studio/ThesisVsReality";
 import { ThreeUsers } from "@/components/work/rcs-studio/ThreeUsers";
+import { ToggleTool } from "@/components/ToggleTool";
 
 export const metadata: Metadata = { title: "RCS Studio" };
 
@@ -40,10 +41,44 @@ export default function Page() {
     <div className="container-x">
       <CaseHero
         kicker="Vibes · 2025–26"
-        title="The product we thought we were building, and the one customers needed"
-        lede="RCS Studio started as a flow builder for developers. Beta customers showed me the real first step was provisioning, so I repositioned the product around it right before launch. It is now the portal for every RCS agent Vibes provisions."
-        meta={[
-          { label: "Role", value: "Sole product designer" },
+        title="We built the second step first"
+        lede="RCS Studio started as a f        lede="RCS Studio launched as a flow builder for developers, and beta customers showed me the product was really the step before it."
+        heading={
+          <ToggleTool
+            id="rcs-h1"
+            label="Headline"
+            variants={[
+              {
+                name: "Fact",
+                render: (
+                  <>
+                    <h1 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">We built the second step first</h1>
+                    <p className="mt-4 max-w-[52ch] text-[16px]">RCS Studio launched as a flow builder for developers, and beta customers showed me the product was really the step before it.</p>
+                  </>
+                ),
+              },
+              {
+                name: "Lesson",
+                render: (
+                  <>
+                    <h1 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">The first step was the product</h1>
+                    <p className="mt-4 max-w-[52ch] text-[16px]">Nobody arrived wanting to build a message flow. They wanted an agent that could send one, so I repositioned the product around getting there.</p>
+                  </>
+                ),
+              },
+              {
+                name: "Outcome",
+                render: (
+                  <>
+                    <h1 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">The pivot that made self-serve work at Vibes</h1>
+                    <p className="mt-4 max-w-[52ch] text-[16px]">A hackathon flow builder became the portal for every RCS agent Vibes provisions, and the proof that customers would sign up without a sales call.</p>
+                  </>
+                ),
+              },
+            ]}
+          />
+        }
+e", value: "Sole product designer" },
           { label: "Team", value: "Engineering manager, three engineers" },
           { label: "Timeline", value: "Aug 2025 to Jul 2026" },
           { label: "Stack", value: "Figma, then TypeScript, React, Claude Code" },
