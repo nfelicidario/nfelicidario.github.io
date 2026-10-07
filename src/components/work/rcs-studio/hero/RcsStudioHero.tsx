@@ -1404,14 +1404,14 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
                 </motion.div>
               )}
             </div>
+            <SuggestionChips
+              label="Suggested replies"
+              suggestions={chips.map((c, k) => ({ label: c.label, selected: picked === k }))}
+              onSelect={(k) => dispatch({ type: "TAP", chip: k, now: still })}
+              disabled={!chipsEnabled}
+            />
+            <Composer />
           </ConversationPanel>
-          <SuggestionChips
-            label="Suggested replies"
-            suggestions={chips.map((c, k) => ({ label: c.label, selected: picked === k }))}
-            onSelect={(k) => dispatch({ type: "TAP", chip: k, now: still })}
-            disabled={!chipsEnabled}
-          />
-          <Composer />
         </>
       )}
     </AndroidPhone>
