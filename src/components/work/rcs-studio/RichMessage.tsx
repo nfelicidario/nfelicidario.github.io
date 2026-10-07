@@ -11,7 +11,7 @@ const script: Msg[] = [
     from: "bot",
     text: "Hi Sam, it's Poblano's. The Tuesday Burrito Box is back this week.",
   },
-  { id: "card", from: "bot", kind: "card", text: "Four burritos, chips and two house salsas. Pickup only." },
+  { id: "card", from: "bot", kind: "card", text: "Four burritos, chips, and two house salsas. Pickup only." },
 ];
 
 const chips: { label: string; reply: string }[] = [

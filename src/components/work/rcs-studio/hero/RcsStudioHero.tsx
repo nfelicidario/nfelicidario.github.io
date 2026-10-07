@@ -435,7 +435,7 @@ function still(i: number, overrides: Partial<State> = {}): State {
 export const rcsStudioStills: { render: ReactNode; caption: string }[] = [
   {
     render: <HeroView s={still(F.yoursReplied)} timed still focus="phone" />,
-    caption: "Make it yours: name, logo and brand color, previewed live on the phone.",
+    caption: "Make it yours: name, logo, and brand color, previewed live on the phone.",
   },
   {
     render: <HeroView s={still(F.signupFilled)} timed still focus="panel" />,
@@ -571,7 +571,7 @@ function MakeItYours({ s, timed, still, dispatch }: PanelProps) {
       <div>
         <h3 className="text-[clamp(18px,2vw,24px)] font-bold text-ink">Your brand, inside Messages.</h3>
         <p className="mt-2 max-w-[36ch] text-[14px] text-body">
-          Name it, drop in a logo and pick a color. The phone updates as you go.
+          Name it, drop in a logo, and pick a color. The phone updates as you go.
         </p>
       </div>
       <form

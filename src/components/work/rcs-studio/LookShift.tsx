@@ -1,4 +1,4 @@
-/* Abstract tiles. Type scale, spacing and color only. No real screens. */
+/* Abstract tiles. Type scale, spacing, and color only. No real screens. */
 
 const inheritedSwatches = ["#e5484d", "#f5a524", "#30a46c", "#8e4ec6", "#0091ff", "#e93d82"];
 
