@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ArrowLeft } from "lucide-react";
 import { projects } from "@/content/projects";
 
 export type Meta = { label: string; value: string };
@@ -24,7 +25,14 @@ export function CaseHero({
   if (stage) {
     return (
       <section className="mx-auto max-w-6xl pt-6 pb-14 md:pt-8 md:pb-16">
-        <div className="mb-3 flex items-baseline justify-between gap-4">
+        <div className="mb-3 flex items-center justify-between gap-4">
+          <Link
+            href="/#work"
+            className="label inline-flex items-center gap-1 text-muted transition-colors hover:text-ink"
+          >
+            <ArrowLeft size={14} aria-hidden="true" />
+            Work
+          </Link>
           <div className="label text-accent">{kicker}</div>
         </div>
         {stage}

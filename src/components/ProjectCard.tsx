@@ -16,22 +16,36 @@ export function ProjectCard({ p, index }: { p: Project; index: number }) {
         className="bubble group grid h-full grid-rows-[auto_1fr_auto] gap-5 border border-rule bg-surface p-5 transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent"
       >
         <div
-          className="bubble-sm relative h-40 overflow-hidden"
+          className="bubble-sm relative h-44 overflow-hidden bg-raised"
           style={{
             background: `radial-gradient(120% 90% at 18% 12%, ${p.hues[0]}, ${p.hues[1]} 70%)`,
           }}
-          aria-hidden="true"
         >
-          {/* placeholder "message" marks until the real artifact lands */}
-          <div className="absolute inset-x-4 bottom-4 flex flex-col gap-2">
-            <span className="bubble h-3 w-2/3 bg-white/25" />
-            <span className="bubble h-3 w-1/2 bg-white/15" />
-            <span className="bubble-me h-3 w-1/3 self-end bg-white/40" />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={p.gif}
+            alt=""
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover object-top grayscale transition-[filter] duration-500 group-hover:grayscale-0"
+          />
         </div>
         <div>
           <h3 className="text-[22px] font-bold text-ink">{p.title}</h3>
-          <p className="mt-1.5 text-[14.5px] leading-snug">{p.summary}</p>
+          <div className="mt-3 grid gap-3 text-[13.5px] leading-snug">
+            <ul className="grid gap-1 pl-4 text-body marker:text-rule" style={{ listStyle: "disc" }}>
+              {p.bullets.map((b) => (
+                <li key={b}>{b}</li>
+              ))}
+            </ul>
+            <div>
+              <div className="label mb-1">Outcome</div>
+              <ul className="grid gap-1 pl-4 text-body marker:text-accent" style={{ listStyle: "disc" }}>
+                {p.outcomes.map((o) => (
+                  <li key={o}>{o}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
         <div className="flex items-center justify-between">
           <span className="label">

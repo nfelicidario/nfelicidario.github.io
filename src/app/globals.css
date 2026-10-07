@@ -130,7 +130,7 @@ p { color: var(--body); }
 .tl-marker { position: relative; display: flex; justify-content: center; }
 .tl-marker::before {
   content: ""; position: absolute; left: 50%; width: 0;
-  border-left: 1.5px dashed var(--rule); top: 0; bottom: 0; transform: translateX(-50%);
+  border-left: 1.5px dashed color-mix(in srgb, var(--muted) 55%, var(--rule)); top: 0; bottom: 0; transform: translateX(-50%);
 }
 .tl-marker[data-line="down"]::before { top: 50%; }
 .tl-marker[data-line="up"]::before { bottom: 50%; }

@@ -130,40 +130,8 @@ export function HeroStage({
         id={id}
         className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-1 pt-3"
       >
-        <span className="label">{label}</span>
-        <span className="flex items-center justify-center gap-4">
-          {showProtoFooter && footer.steps && (
-            <span className="flex items-center gap-2" aria-label={`Step ${(footer.current ?? 0) + 1} of ${footer.steps.length}`}>
-              <span className="flex items-center gap-1.5" aria-hidden="true">
-                {footer.steps.map((name, i) => (
-                  <span
-                    key={name}
-                    title={name}
-                    className={`block h-1.5 rounded-full transition-all duration-300 ${
-                      i === footer.current ? "w-4 bg-accent" : "w-1.5 bg-rule"
-                    }`}
-                  />
-                ))}
-              </span>
-              <span className="label text-ink">{footer.steps[footer.current ?? 0]}</span>
-            </span>
-          )}
-          {showProtoFooter &&
-            footer.actions
-              ?.filter((a) => !a.hidden)
-              .map((a) => (
-                <button
-                  key={a.label}
-                  type="button"
-                  onClick={a.onClick}
-                  className="label inline-flex items-center gap-1 rounded-full px-2 py-1 transition-colors hover:bg-raised hover:text-ink"
-                >
-                  {a.label}
-                  {a.icon}
-                </button>
-              ))}
-        </span>
-        <span role="group" aria-label="Fidelity" className="flex items-center justify-end gap-0.5">
+        <span className="sr-only">{label}</span>
+        <span role="group" aria-label="Fidelity" className="flex items-center gap-0.5">
           {tiers
             .filter((t) => t.available)
             .map((t) => (
@@ -181,6 +149,40 @@ export function HeroStage({
                 <span className="sr-only">{t.title}</span>
               </button>
             ))}
+        </span>
+        <span className="flex items-center justify-center gap-3">
+          {showProtoFooter && footer.steps && (
+            <span className="flex items-center gap-2" aria-label={`Step ${(footer.current ?? 0) + 1} of ${footer.steps.length}`}>
+              <span className="flex items-center gap-1.5" aria-hidden="true">
+                {footer.steps.map((name, i) => (
+                  <span
+                    key={name}
+                    title={name}
+                    className={`block h-1.5 rounded-full transition-all duration-300 ${
+                      i === footer.current ? "w-4 bg-accent" : "w-1.5 bg-rule"
+                    }`}
+                  />
+                ))}
+              </span>
+              <span className="label text-ink">{footer.steps[footer.current ?? 0]}</span>
+            </span>
+          )}
+        </span>
+        <span className="flex items-center justify-end gap-1">
+          {showProtoFooter &&
+            footer.actions
+              ?.filter((a) => !a.hidden)
+              .map((a) => (
+                <button
+                  key={a.label}
+                  type="button"
+                  onClick={a.onClick}
+                  className="label inline-flex items-center gap-1 rounded-full px-2 py-1 transition-colors hover:bg-raised hover:text-ink"
+                >
+                  {a.label}
+                  {a.icon}
+                </button>
+              ))}
         </span>
       </figcaption>
     </figure>

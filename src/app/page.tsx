@@ -12,7 +12,6 @@ const tags = [
   "Agentic SDLC",
   "Production TypeScript",
   "Design systems",
-  "Shipped to GA",
   "Roadmaps & PRDs",
   "Founder",
 ];
