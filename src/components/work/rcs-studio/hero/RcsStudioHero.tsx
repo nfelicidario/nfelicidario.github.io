@@ -690,7 +690,7 @@ function LogoField({
           setDrag(false);
           load(e.dataTransfer.files[0]);
         }}
-        className={`bubble-sm flex items-center gap-3 border border-dashed p-2 transition-colors has-[:focus-visible]:border-accent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent-soft ${
+        className={`bubble-sm relative flex items-center gap-3 border border-dashed p-2 transition-colors has-[:focus-visible]:border-accent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent-soft ${
           drag || highlight ? "border-accent bg-accent-soft/40 ring-2 ring-accent-soft" : "border-rule bg-bg"
         }`}
       >
