@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight, Images, MousePointerClick, Play, Film } from "lucide-react";
 
 /**
@@ -17,6 +17,20 @@ import { ChevronLeft, ChevronRight, Images, MousePointerClick, Play, Film } from
  * prototype draws its own cards per phase; the label and tier control then float below it.
  */
 export type Still = { render: ReactNode; caption: string };
+
+/** What a prototype publishes to the stage footer: its steps, the current one, and its actions. */
+export type HeroFooterState = {
+  steps?: string[];
+  current?: number;
+  actions?: { label: string; icon?: ReactNode; onClick: () => void; hidden?: boolean }[];
+};
+const HeroFooterContext = createContext<{ set: (s: HeroFooterState | null) => void } | null>(null);
+
+/** Prototypes call this to drive the footer. No-op outside a HeroStage. */
+export function useHeroFooter() {
+  const ctx = useContext(HeroFooterContext);
+  return useMemo(() => ({ set: ctx?.set ?? (() => {}) }), [ctx]);
+}
 
 export type HeroStageProps = {
   label: string;
@@ -42,6 +56,9 @@ export function HeroStage({
 }: HeroStageProps) {
   const [mode, setMode] = useState<Mode>("interactive");
   const [frameIdx, setFrameIdx] = useState(0);
+  const [footer, setFooter] = useState<HeroFooterState | null>(null);
+  const setFooterStable = useCallback((f: HeroFooterState | null) => setFooter(f), []);
+  const ctx = useMemo(() => ({ set: setFooterStable }), [setFooterStable]);
   const id = useId();
 
   useEffect(() => {
@@ -64,7 +81,10 @@ export function HeroStage({
   const still = stills[Math.min(frameIdx, stills.length - 1)];
   const card = "bubble overflow-hidden border border-rule bg-surface";
 
+  const showProtoFooter = (mode === "interactive" || mode === "autoplay") && footer;
+
   return (
+    <HeroFooterContext.Provider value={ctx}>
     <figure className="relative" aria-labelledby={id}>
       <div className={`relative w-full ${frame ? card : ""}`} style={{ aspectRatio: aspect }}>
         {mode === "interactive" && <div className="absolute inset-0">{interactive}</div>}
@@ -108,10 +128,42 @@ export function HeroStage({
 
       <figcaption
         id={id}
-        className={`flex items-center justify-between gap-3 px-1 pt-2.5 ${frame ? "" : ""}`}
+        className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-1 pt-3"
       >
         <span className="label">{label}</span>
-        <span role="group" aria-label="Fidelity" className="flex items-center gap-0.5">
+        <span className="flex items-center justify-center gap-4">
+          {showProtoFooter && footer.steps && (
+            <span className="flex items-center gap-2" aria-label={`Step ${(footer.current ?? 0) + 1} of ${footer.steps.length}`}>
+              <span className="flex items-center gap-1.5" aria-hidden="true">
+                {footer.steps.map((name, i) => (
+                  <span
+                    key={name}
+                    title={name}
+                    className={`block h-1.5 rounded-full transition-all duration-300 ${
+                      i === footer.current ? "w-4 bg-accent" : "w-1.5 bg-rule"
+                    }`}
+                  />
+                ))}
+              </span>
+              <span className="label text-ink">{footer.steps[footer.current ?? 0]}</span>
+            </span>
+          )}
+          {showProtoFooter &&
+            footer.actions
+              ?.filter((a) => !a.hidden)
+              .map((a) => (
+                <button
+                  key={a.label}
+                  type="button"
+                  onClick={a.onClick}
+                  className="label inline-flex items-center gap-1 rounded-full px-2 py-1 transition-colors hover:bg-raised hover:text-ink"
+                >
+                  {a.label}
+                  {a.icon}
+                </button>
+              ))}
+        </span>
+        <span role="group" aria-label="Fidelity" className="flex items-center justify-end gap-0.5">
           {tiers
             .filter((t) => t.available)
             .map((t) => (
@@ -132,5 +184,6 @@ export function HeroStage({
         </span>
       </figcaption>
     </figure>
+    </HeroFooterContext.Provider>
   );
 }

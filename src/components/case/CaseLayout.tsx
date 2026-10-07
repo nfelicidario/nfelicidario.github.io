@@ -28,7 +28,7 @@ export function CaseHero({
           <div className="label text-accent">{kicker}</div>
         </div>
         {stage}
-        <div className="mt-8 grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start">
+        <div className="mt-14 grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start md:mt-16">
           <div>
             <h1 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">{title}</h1>
             <p className="mt-4 max-w-[52ch] text-[16px]">{lede}</p>

@@ -34,3 +34,17 @@ Every case study hero is a full-width `HeroStage` (src/components/case/HeroStage
 interactive prototype → autoplay animation → GIF (recorded later) → 3–5 stills in a carousel.
 Pass it as `stage={<HeroStage label="..." interactive={<Proto />} autoplay={<Proto autoplay />} stills={[{render:<Frame1/>, caption:"..."}]} />}` to `CaseHero`.
 Build prototypes so ONE component serves both tiers: accept an `autoplay?: boolean` prop that drives the same states on a timer (loop), and export static frame components (or a `frames` array) for the stills. Icons: `lucide-react` only. Prototypes must fill the stage (position absolute inset 0, or h-full w-full), work at 16:9, and degrade to something readable at 360px wide.
+
+## Stage footer (added Oct 7)
+The stage footer is a 3-column row under the stage: label · [step dots + current step name + prototype actions] · tier control.
+Prototypes publish into the middle column with `useHeroFooter()` from HeroStage.tsx:
+```tsx
+const footer = useHeroFooter();
+useEffect(() => {
+  footer.set({ steps: ["Make it yours", "Sign up", "Provision", "Review", "Live"], current: stepIndex,
+    actions: [{ label: "Replay", icon: <RotateCcw size={12} />, onClick: reset },
+              { label: "Skip to live", icon: <SkipForward size={12} />, onClick: skip, hidden: autoplay || isLive }] });
+  return () => footer.set(null);
+}, [stepIndex, autoplay, isLive]);
+```
+Do not render step eyebrows or control buttons inside the prototype; the footer owns them.
