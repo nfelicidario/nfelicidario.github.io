@@ -25,10 +25,10 @@ export function ConversationPanel({ children, style }: ConversationPanelProps) {
         flex: 1,
         flexDirection: "column",
         gap: 8,
-        margin: `0 ${PANEL_INSET}px 2px`,
+        margin: `0 ${PANEL_INSET}px 0`,
         padding: "10px 10px 10px",
         overflow: "hidden",
-        borderRadius: PANEL_RADIUS,
+        borderRadius: `${PANEL_RADIUS}px ${PANEL_RADIUS}px 0 0`,
         background: "var(--ph-surface)",
         ...style,
       }}

@@ -131,24 +131,21 @@ export function HeroStage({
         className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-1 pt-3"
       >
         <span className="sr-only">{label}</span>
-        <span role="group" aria-label="Fidelity" className="flex items-center gap-0.5">
-          {tiers
-            .filter((t) => t.available)
-            .map((t) => (
-              <button
-                key={t.key}
-                type="button"
-                title={t.title}
-                aria-pressed={mode === t.key}
-                onClick={() => setMode(t.key)}
-                className={`rounded-full p-1.5 transition-colors ${
-                  mode === t.key ? "bg-raised text-ink" : "text-muted hover:text-ink"
-                }`}
-              >
-                {t.icon}
-                <span className="sr-only">{t.title}</span>
-              </button>
-            ))}
+        <span className="flex items-center gap-1">
+          {showProtoFooter &&
+            footer.actions
+              ?.filter((a) => !a.hidden)
+              .map((a) => (
+                <button
+                  key={a.label}
+                  type="button"
+                  onClick={a.onClick}
+                  className="label inline-flex items-center gap-1 rounded-full px-2 py-1 transition-colors hover:bg-raised hover:text-ink"
+                >
+                  {a.icon}
+                  {a.label}
+                </button>
+              ))}
         </span>
         <span className="flex items-center justify-center gap-3">
           {showProtoFooter && footer.steps && (
@@ -168,21 +165,24 @@ export function HeroStage({
             </span>
           )}
         </span>
-        <span className="flex items-center justify-end gap-1">
-          {showProtoFooter &&
-            footer.actions
-              ?.filter((a) => !a.hidden)
-              .map((a) => (
-                <button
-                  key={a.label}
-                  type="button"
-                  onClick={a.onClick}
-                  className="label inline-flex items-center gap-1 rounded-full px-2 py-1 transition-colors hover:bg-raised hover:text-ink"
-                >
-                  {a.label}
-                  {a.icon}
-                </button>
-              ))}
+        <span role="group" aria-label="Fidelity" className="flex items-center justify-end gap-0.5">
+          {tiers
+            .filter((t) => t.available)
+            .map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                title={t.title}
+                aria-pressed={mode === t.key}
+                onClick={() => setMode(t.key)}
+                className={`rounded-full p-1.5 transition-colors ${
+                  mode === t.key ? "bg-raised text-ink" : "text-muted hover:text-ink"
+                }`}
+              >
+                {t.icon}
+                <span className="sr-only">{t.title}</span>
+              </button>
+            ))}
         </span>
       </figcaption>
     </figure>

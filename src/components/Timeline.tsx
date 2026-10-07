@@ -70,9 +70,10 @@ function Row({
   const hasDetails = !!(m.sub?.length || m.links?.length);
   const kinds = Array.from(new Set((m.links ?? []).map((l) => (l.kind === "web" ? "web" : "press"))));
 
+  const cell = "py-1.5 transition-colors duration-200 group-hover:bg-raised";
   const inner: ReactNode = (
     <>
-      <span className="label num pt-[3px] text-right">
+      <span className={`label num justify-self-end whitespace-nowrap rounded-l-lg pl-2 pr-3 pt-[9px] ${cell}`}>
         {m.when.includes(" ") ? (
           <>
             <span className="opacity-50">{m.when.split(" ")[0]}</span> {m.when.split(" ")[1]}
@@ -81,15 +82,15 @@ function Row({
           m.when
         )}
       </span>
-      <span className="tl-marker self-stretch" data-line={line}>
+      <span className={`tl-marker self-stretch ${cell}`} data-line={line}>
         <span className="tl-dot" data-filled={filled} />
       </span>
-      <span className="relative min-w-0">
-        <span
-          className="text-[14.5px] text-body group-hover:text-ink"
-          onMouseEnter={onIntent}
-          onMouseLeave={onLeave}
-        >
+      <span
+        className={`relative min-w-0 rounded-r-lg pl-3 pr-3 ${cell}`}
+        onMouseEnter={onIntent}
+        onMouseLeave={onLeave}
+      >
+        <span className="text-[14.5px] text-body group-hover:text-ink">
           {m.what}
           {kinds.map((k) => (
             <span
@@ -106,9 +107,7 @@ function Row({
           {open && hasDetails && (
             <motion.span
               key="details"
-              onMouseEnter={onIntent}
-              onMouseLeave={onLeave}
-              className="bubble-sm absolute left-0 right-0 top-full z-20 mt-1.5 block border border-rule bg-surface px-3 py-2.5 shadow-[var(--shadow)]"
+              className="bubble-sm absolute left-3 right-0 top-full z-20 mt-1 block border border-rule bg-surface px-3 py-2.5 shadow-[var(--shadow)]"
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
@@ -122,8 +121,7 @@ function Row({
     </>
   );
 
-  const cls =
-    "group grid grid-cols-[60px_20px_1fr] gap-x-3 rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-raised";
+  const cls = "group grid grid-cols-[60px_20px_auto] justify-start";
   const handlers = {
     onFocus: onIntent,
     onBlur: onLeave,
@@ -232,7 +230,7 @@ export function Timeline({
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-[60px_20px_1fr] gap-x-3 px-2">
+      <div className="grid grid-cols-[60px_20px_auto] justify-start">
         <span />
         <button
           type="button"
@@ -241,7 +239,7 @@ export function Timeline({
             setExpanded((v) => !v);
           }}
           aria-expanded={expanded}
-          className="label col-span-2 -ml-2 grid grid-cols-[20px_1fr] items-center gap-x-3 rounded-lg py-1.5 pl-2 pr-2 text-left opacity-60 transition-[opacity,background-color,color] hover:bg-raised hover:text-ink hover:opacity-100 focus-visible:opacity-100"
+          className="label col-span-2 grid grid-cols-[20px_auto] items-center gap-x-3 rounded-lg py-1.5 pr-3 text-left opacity-60 transition-[opacity,background-color,color] hover:bg-raised hover:text-ink hover:opacity-100 focus-visible:opacity-100"
         >
           <span className="flex justify-center" aria-hidden="true">
             {expanded ? <ChevronsDownUp size={16} strokeWidth={2} /> : <ChevronsUpDown size={16} strokeWidth={2} />}

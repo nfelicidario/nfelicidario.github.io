@@ -71,7 +71,7 @@ export const more: Milestone[] = [
   },
   {
     when: "2016",
-    what: "Co-founded Step on Poverty, a 501(c)(3), with other high schoolers in Troy, Michigan.",
+    what: "Founded Step on Poverty, a 501(c)(3), with other high schoolers in Troy, Michigan.",
     sub: [
       "Started after serving as youth advisers for Leadership Troy.",
       "9,000+ pairs of shoes by Oct 2017, resold by micro-enterprises in developing nations.",

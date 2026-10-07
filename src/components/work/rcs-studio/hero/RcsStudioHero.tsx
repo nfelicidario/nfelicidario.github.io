@@ -476,7 +476,7 @@ const noop: Dispatch<Action> = () => {};
 
 function HeroView({ s, timed, still = false, inert = false, dispatch = noop, focus, left }: ViewProps) {
   const step = FRAMES[s.i].step;
-  const hasPhone = step !== "signup";
+  const hasPhone = step !== "signup" && step !== "brand";
   const panelCls = focus === "phone" ? "hidden md:flex" : "flex";
   const phoneCls = focus === "phone" ? "grid" : "hidden md:grid";
 
@@ -490,7 +490,7 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, foc
         layout={!still}
         transition={{ layout: { type: "spring", stiffness: 260, damping: 32 } }}
         className={`bubble relative grid max-h-full w-full grid-rows-[minmax(0,1fr)] overflow-hidden border border-rule bg-surface shadow-[var(--shadow)] ${
-          hasPhone ? "h-full max-w-[1040px] grid-cols-1 md:grid-cols-2" : "h-auto max-w-[400px] grid-cols-1"
+          hasPhone ? "h-full max-w-[1040px] grid-cols-1 md:grid-cols-2" : step === "brand" ? "h-auto max-w-[480px] grid-cols-1" : "h-auto max-w-[400px] grid-cols-1"
         }`}
       >
         <motion.div
