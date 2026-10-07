@@ -10,8 +10,10 @@ import { BatteryFull, Signal, Wifi } from "lucide-react";
  * hit testing, and motion layout animations honest.
  *
  * Colors are phone-local CSS variables derived from `brandColor` (Material 3 roles: surface,
- * surface containers, on-surface, outline), with light and dark variants. Nothing here reads
- * the site's Tailwind tokens, so the mockup looks the same on any page.
+ * surface containers, on-surface, outline), with light and dark variants. The screen ground
+ * (`--ph-bg`) is the surface-container tier that the status bar, header, chips, and composer
+ * share; `ConversationPanel` and `AgentInfo` sit on it as a lighter `--ph-surface` panel.
+ * Nothing here reads the site's Tailwind tokens, so the mockup looks the same on any page.
  */
 
 export const PHONE = {
@@ -53,7 +55,8 @@ export function phoneTokens(brand: string, theme: "light" | "dark"): CSSProperti
     "--ph-on-brand": "#ffffff",
     "--ph-brand-text": brand,
     "--ph-brand-soft": mix(14, "#ffffff"),
-    "--ph-bg": mix(3, "#ffffff"),
+    "--ph-bg": mix(5, "#eceef2"),
+    "--ph-surface": mix(2, "#ffffff"),
     "--ph-surface-low": mix(6, "#ffffff"),
     "--ph-surface-high": mix(11, "#ffffff"),
     "--ph-on-surface": "#1b1c1f",
@@ -70,8 +73,9 @@ export function phoneTokens(brand: string, theme: "light" | "dark"): CSSProperti
     "--ph-on-brand": "#ffffff",
     "--ph-brand-text": mix(55, "#ffffff"),
     "--ph-brand-soft": mix(26, "#1a1c21"),
-    "--ph-bg": mix(7, "#111318"),
-    "--ph-surface-low": mix(9, "#1a1c21"),
+    "--ph-bg": mix(6, "#0e1014"),
+    "--ph-surface": mix(8, "#1b1d22"),
+    "--ph-surface-low": mix(11, "#24262b"),
     "--ph-surface-high": mix(13, "#2a2c31"),
     "--ph-on-surface": "#e3e2e8",
     "--ph-on-surface-variant": "#c5c6cd",

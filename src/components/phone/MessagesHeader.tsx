@@ -1,18 +1,22 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { ArrowLeft, BadgeCheck, EllipsisVertical, Phone } from "lucide-react";
+import { ArrowLeft, EllipsisVertical, Phone } from "lucide-react";
+import { VerifiedBadge } from "./VerifiedBadge";
 
 /**
  * Google Messages conversation top bar for an RBM agent: back arrow, the agent logo as a
- * rounded square, display name with the verified check, an optional call icon, and overflow.
+ * rounded square, display name with the filled verified badge, an optional call icon, and
+ * overflow. It sits on the screen's darker ground (surface container); the conversation
+ * panel below it is the lighter surface.
  */
 export type MessagesHeaderProps = {
   /** anything 1:1; it is clipped to a rounded square */
   logo: ReactNode;
   name: string;
+  /** the filled check badge after the name; no subtitle, the badge says it */
   verified?: boolean;
-  /** small line under the name, e.g. "Verified business" or "Preview" */
+  /** optional status line under the name, e.g. "Preview". Not for "Verified business". */
   subtitle?: ReactNode;
   /** show the call icon (agents with a phone number) */
   call?: boolean;
@@ -52,9 +56,7 @@ export function MessagesHeader({ logo, name, verified = false, subtitle, call = 
       <div style={{ minWidth: 0, flex: 1, lineHeight: 1.2 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 16, fontWeight: 500 }}>
           <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
-          {verified && (
-            <BadgeCheck size={16} aria-label="Verified" style={{ flexShrink: 0, color: "var(--ph-verified)" }} />
-          )}
+          {verified && <VerifiedBadge size={16} />}
         </div>
         {subtitle && (
           <div style={{ fontSize: 12, color: "var(--ph-on-surface-variant)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>

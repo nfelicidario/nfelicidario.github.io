@@ -1,13 +1,16 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { BadgeCheck, Globe, Mail, Phone } from "lucide-react";
+import { Globe, Mail, Phone } from "lucide-react";
 import { MediaPlaceholder } from "./RichCard";
+import { VerifiedBadge } from "./VerifiedBadge";
+import { PANEL_INSET, PANEL_RADIUS } from "./ConversationPanel";
 
 /**
  * The agent info screen a user reaches from the conversation header: hero banner (45:14),
- * the logo overlapping it as a rounded square, display name, the verified line, the 100-char
- * description, then website, phone, and email rows, with the privacy and terms links.
+ * the logo overlapping it as a rounded square, display name with the filled verified badge,
+ * the 100-char description, then website, phone, and email rows, with the privacy and terms
+ * links. Rendered on the same lighter inset panel as the conversation.
  */
 export type AgentInfoProps = {
   logo: ReactNode;
@@ -31,7 +34,18 @@ export function AgentInfo({ logo, name, description, verified = false, banner, w
   if (email) rows.push({ icon: <Mail size={20} aria-hidden="true" />, text: email, label: "Email" });
 
   return (
-    <div style={{ display: "flex", minHeight: 0, flex: 1, flexDirection: "column", overflow: "hidden" }}>
+    <div
+      style={{
+        display: "flex",
+        minHeight: 0,
+        flex: 1,
+        flexDirection: "column",
+        margin: `0 ${PANEL_INSET}px ${PANEL_INSET}px`,
+        overflow: "hidden",
+        borderRadius: PANEL_RADIUS,
+        background: "var(--ph-surface)",
+      }}
+    >
       <div aria-hidden="true" style={{ aspectRatio: "45 / 14", flexShrink: 0, overflow: "hidden" }}>{banner ?? <MediaPlaceholder />}</div>
       <div style={{ padding: "0 20px" }}>
         <span
@@ -45,18 +59,15 @@ export function AgentInfo({ logo, name, description, verified = false, banner, w
             placeItems: "center",
             borderRadius: 16,
             background: "#ffffff",
-            boxShadow: "0 0 0 3px var(--ph-bg)",
+            boxShadow: "0 0 0 3px var(--ph-surface)",
           }}
         >
           {logo}
         </span>
-        <div style={{ marginTop: 10, fontSize: 22, fontWeight: 500, lineHeight: 1.2, overflowWrap: "anywhere" }}>{name}</div>
-        {verified && (
-          <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 4, fontSize: 13, color: "var(--ph-on-surface-variant)" }}>
-            <BadgeCheck size={16} aria-hidden="true" style={{ color: "var(--ph-verified)" }} />
-            Verified business
-          </div>
-        )}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, fontSize: 22, fontWeight: 500, lineHeight: 1.2 }}>
+          <span style={{ minWidth: 0, overflowWrap: "anywhere" }}>{name}</span>
+          {verified && <VerifiedBadge size={20} />}
+        </div>
         {description && (
           <p style={{ margin: "10px 0 0", fontSize: 14, lineHeight: "19px", color: "var(--ph-on-surface-variant)", overflowWrap: "anywhere" }}>
             {description}

@@ -7,6 +7,8 @@ import {
   AgentInfo,
   AndroidPhone,
   Composer,
+  ConversationPanel,
+  DemoBanner,
   MessageBubble,
   MessagesHeader,
   RichCard,
@@ -1301,9 +1303,9 @@ const CARD = { title: "Tuesday Family Box", meta: "$32", text: "Four entrees, tw
 
 /**
  * The Android phone, built from the shared kit. Three screens:
- *  - yours and live: a Google Messages thread with the greeting, a rich card, suggested replies,
- *    the tapped reply as a user bubble, the typing indicator, then the agent's answer
- *  - brand and agent steps: the agent info screen, filling in as the form does
+ *  - yours and live: a Google Messages thread with the demo banner, the greeting, a rich card,
+ *    suggested replies, the tapped reply as a user bubble, the typing indicator, then the agent's answer
+ *  - brand and agent steps: the agent info screen, filling in as the form does (no banner)
  *  - campaign and submitted: the sample message, or a ghost bubble until it exists
  */
 function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still: boolean; dispatch: Dispatch<Action> }) {
@@ -1354,7 +1356,8 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
 
   const headerName = name || "Your agent";
   const verified = mode !== "preview";
-  const subtitle = verified ? "Verified business" : step === "submitted" ? "In carrier review" : "Preview";
+  /** the badge alone marks a verified agent; the status line only shows before it is */
+  const subtitle = verified ? undefined : step === "submitted" ? "In carrier review" : "Preview";
   const logo = (size: string) => <LogoMark logo={s.logo} color={color} name={name} className={`h-full w-full ${size}`} />;
   const enter = still ? false : { opacity: 0, y: 8 };
 
@@ -1371,36 +1374,38 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
         />
       ) : (
         <>
-          <div className="flex min-h-0 flex-1 flex-col justify-end gap-2 overflow-hidden px-4 pb-2" aria-live="polite">
-            <Timestamp>Today · 9:30 AM</Timestamp>
-            <AnimatePresence initial={false}>
-              {messages.map((m) => (
-                <motion.div
-                  key={`${mode}-${m.id}`}
-                  initial={enter}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={still ? undefined : { opacity: 0 }}
-                  transition={{ duration: 0.26, ease: "easeOut" }}
-                  className={`flex w-full flex-col ${m.from === "user" ? "items-end" : "items-start"}`}
-                >
-                  {m.kind === "card" ? (
-                    <RichCard title={CARD.title} meta={CARD.meta} description={m.text} mediaHeight="short" width="86%" />
-                  ) : (
-                    <MessageBubble from={m.from} ghost={m.kind === "ghost"} status={m.status}>
-                      {m.text}
-                    </MessageBubble>
-                  )}
+          <ConversationPanel>
+            {mode !== "preview" && <DemoBanner />}
+            <div className="flex min-h-0 flex-1 flex-col justify-end gap-2 overflow-hidden" aria-live="polite">
+              <Timestamp>Today · 9:30 AM</Timestamp>
+              <AnimatePresence initial={false}>
+                {messages.map((m) => (
+                  <motion.div
+                    key={`${mode}-${m.id}`}
+                    initial={enter}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={still ? undefined : { opacity: 0 }}
+                    transition={{ duration: 0.26, ease: "easeOut" }}
+                    className={`flex w-full flex-col ${m.from === "user" ? "items-end" : "items-start"}`}
+                  >
+                    {m.kind === "card" ? (
+                      <RichCard title={CARD.title} meta={CARD.meta} description={m.text} mediaHeight="short" width="86%" />
+                    ) : (
+                      <MessageBubble from={m.from} ghost={m.kind === "ghost"} status={m.status}>
+                        {m.text}
+                      </MessageBubble>
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              {typing && (
+                <motion.div initial={enter} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="flex w-full flex-col items-start">
+                  <TypingIndicator />
                 </motion.div>
-              ))}
-            </AnimatePresence>
-            {typing && (
-              <motion.div initial={enter} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="flex w-full flex-col items-start">
-                <TypingIndicator />
-              </motion.div>
-            )}
-          </div>
+              )}
+            </div>
+          </ConversationPanel>
           <SuggestionChips
-            wrap
             label="Suggested replies"
             suggestions={chips.map((c, k) => ({ label: c.label, selected: picked === k }))}
             onSelect={(k) => dispatch({ type: "TAP", chip: k, now: still })}
