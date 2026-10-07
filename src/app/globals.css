@@ -17,10 +17,10 @@
   --warn-soft: #fbebd3;
   --shadow: 0 1px 0 rgba(11, 27, 51, 0.04), 0 24px 56px -32px rgba(11, 27, 51, 0.35);
 
-  /* the one shape: a message bubble, three round corners and one square */
-  --r-bubble: 20px 20px 20px 6px;
-  --r-bubble-me: 20px 20px 6px 20px;
-  --r-sm: 12px 12px 12px 4px;
+  /* uniform radii (the asymmetric "bubble" corner was retired Oct 6) */
+  --r-bubble: 16px;
+  --r-bubble-me: 16px;
+  --r-sm: 10px;
 }
 
 @media (prefers-color-scheme: dark) {
