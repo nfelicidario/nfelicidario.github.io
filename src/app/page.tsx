@@ -7,14 +7,14 @@ import { more, origin, recent } from "@/content/timeline";
 
 const tags = [
   "0 → 1",
-  "Founder, 2x",
   "Product strategy",
-  "Shipped to GA",
-  "Production TypeScript",
   "Prototypes over handoffs",
-  "Roadmaps & PRDs",
   "Agentic SDLC",
+  "Production TypeScript",
   "Design systems",
+  "Shipped to GA",
+  "Roadmaps & PRDs",
+  "Founder",
 ];
 
 export default function Home() {

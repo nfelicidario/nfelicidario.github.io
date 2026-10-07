@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { EllipsisVertical, Globe, Newspaper, SquareArrowOutUpRight } from "lucide-react";
+import { ChevronsDownUp, ChevronsUpDown, Globe, Newspaper, SquareArrowOutUpRight } from "lucide-react";
 import type { Milestone } from "@/content/timeline";
 
 type Line = "down" | "both" | "up" | "none";
@@ -117,7 +117,7 @@ function Row({
   );
 
   const cls =
-    "group grid grid-cols-[72px_20px_1fr] gap-x-3 rounded-lg px-2 py-1.5 -mx-2 transition-colors duration-200 hover:bg-raised";
+    "group grid grid-cols-[60px_20px_1fr] gap-x-3 rounded-lg py-1.5 pl-1.5 pr-2 -ml-1.5 -mr-2 transition-colors duration-200 hover:bg-raised";
   const handlers = {
     onMouseEnter: onIntent,
     onMouseLeave: onLeave,
@@ -228,14 +228,12 @@ export function Timeline({
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-[72px_20px_1fr] gap-x-3 px-2 -mx-2">
+      <div className="grid grid-cols-[60px_20px_1fr] gap-x-3 pl-1.5 -ml-1.5">
         <span />
-        <span className="tl-marker self-stretch" data-line={expanded ? "both" : "none"}>
-          {!expanded && (
-            <span className="relative z-10 mt-[5px] text-rule" aria-hidden="true">
-              <EllipsisVertical size={16} strokeWidth={2.5} />
-            </span>
-          )}
+        <span className="tl-marker self-stretch" data-line="none">
+          <span className="relative z-10 mt-[5px] text-muted" aria-hidden="true">
+            {expanded ? <ChevronsDownUp size={16} strokeWidth={2} /> : <ChevronsUpDown size={16} strokeWidth={2} />}
+          </span>
         </span>
         <span>
           <button

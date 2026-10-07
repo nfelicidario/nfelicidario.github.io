@@ -27,7 +27,7 @@ export const recent: Milestone[] = [
     href: "/work/making-the-team-faster/",
   },
   {
-    when: "Q1 2023",
+    when: "Q4 2023",
     what: "Stride raised a $750,000 seed round led by Lightbank.",
     sub: ["Made the deck, prototype, and product video for the raise."],
     links: [
@@ -41,7 +41,7 @@ export const recent: Milestone[] = [
 
 export const more: Milestone[] = [
   {
-    when: "Q3 2020",
+    when: "Q4 2020",
     what: "Completed Capital One's coding bootcamp, then shipped production frontend code there.",
     sub: ["Vue.js and Node.js for a servicing platform used by 1,000+ agents."],
   },
@@ -70,7 +70,7 @@ export const more: Milestone[] = [
     ],
   },
   {
-    when: "Q3 2016",
+    when: "2016",
     what: "Co-founded Step on Poverty, a 501(c)(3), with other high schoolers in Troy, Michigan.",
     sub: [
       "Started after serving as youth advisers for Leadership Troy.",
@@ -89,19 +89,19 @@ export const more: Milestone[] = [
     ],
   },
   {
-    when: "Q2 2015",
+    when: "2015",
     what: "Digital marketing modernization for local businesses, many with no online presence at all.",
     sub: ["It did not last. An early lesson in the gap between a real need and a paying one."],
   },
   {
-    when: "Q1 2015",
+    when: "2015",
     what: "Served as webmaster for two nonprofits.",
     sub: ["Youngest member on both boards."],
   },
 ];
 
 export const origin: Milestone = {
-  when: "Q3 2013",
+  when: "2013",
   what: "Self-taught visual design foundations: fliers, posters, and brand pieces for local nonprofits.",
   sub: ["High school years, 2012 to 2016."],
 };
