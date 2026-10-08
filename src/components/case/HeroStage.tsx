@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useId, useMemo, useState, type ReactNode } from "react";
-import { ChevronLeft, ChevronRight, Images, MousePointerClick, Play, Film } from "lucide-react";
+import { ChevronLeft, ChevronRight, Images, MousePointerClick, Play, Film, Video } from "lucide-react";
 
 /**
  * The case-study hero. Four fidelity tiers of the same story, highest first:
@@ -22,6 +22,8 @@ export type Still = { render: ReactNode; caption: string };
 export type HeroFooterState = {
   steps?: string[];
   current?: number;
+  /** jump to a step; when present and the tier is interactive, the footer shows step arrows */
+  onStep?: (index: number) => void;
   actions?: { label: string; icon?: ReactNode; onClick: () => void; hidden?: boolean }[];
 };
 const HeroFooterContext = createContext<{ set: (s: HeroFooterState | null) => void } | null>(null);
@@ -37,19 +39,22 @@ export type HeroStageProps = {
   interactive: ReactNode;
   autoplay?: ReactNode;
   gif?: { src: string; alt: string };
+  /** a recorded video of the animation tier, with a cursor; optional until recorded */
+  video?: { src: string; poster?: string };
   stills: Still[];
   /** aspect ratio of the stage, e.g. "16 / 9" */
   aspect?: string;
   frame?: boolean;
 };
 
-type Mode = "interactive" | "autoplay" | "gif" | "stills";
+type Mode = "interactive" | "autoplay" | "video" | "gif" | "stills";
 
 export function HeroStage({
   label,
   interactive,
   autoplay,
   gif,
+  video,
   stills,
   aspect = "16 / 9",
   frame = true,
@@ -74,6 +79,7 @@ export function HeroStage({
   const tiers: { key: Mode; icon: ReactNode; title: string; available: boolean }[] = [
     { key: "interactive", icon: <MousePointerClick size={14} />, title: "Interactive", available: true },
     { key: "autoplay", icon: <Play size={14} />, title: "Animation", available: !!autoplay },
+    { key: "video", icon: <Video size={14} />, title: video ? "Video" : "Video, not recorded yet", available: !!video },
     { key: "gif", icon: <Film size={14} />, title: "GIF", available: !!gif },
     { key: "stills", icon: <Images size={14} />, title: "Stills", available: stills.length > 0 },
   ];
@@ -89,6 +95,11 @@ export function HeroStage({
       <div className={`relative w-full ${frame ? card : ""}`} style={{ aspectRatio: aspect }}>
         {mode === "interactive" && <div className="absolute inset-0">{interactive}</div>}
         {mode === "autoplay" && <div className="absolute inset-0">{autoplay ?? interactive}</div>}
+        {mode === "video" && video && (
+          <div className={`absolute inset-0 ${frame ? "" : card}`}>
+            <video src={video.src} poster={video.poster} className="h-full w-full object-cover" autoPlay muted loop playsInline />
+          </div>
+        )}
         {mode === "gif" && gif && (
           <div className={`absolute inset-0 ${frame ? "" : card}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -147,6 +158,64 @@ export function HeroStage({
                 </button>
               ))}
         </span>
+        <span className="flex flex-col items-center justify-center gap-1.5">
+          {showProtoFooter && footer.steps && (
+            <>
+              <span className="flex items-center gap-2" aria-label={`Step ${(footer.current ?? 0) + 1} of ${footer.steps.length}`}>
+                {mode === "interactive" && footer.onStep && (
+                  <button
+                    type="button"
+                    aria-label="Previous step"
+                    disabled={(footer.current ?? 0) <= 0}
+                    onClick={() => footer.onStep?.((footer.current ?? 0) - 1)}
+                    className="rounded-full p-1 text-muted transition-colors hover:bg-raised hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    <ChevronLeft size={14} />
+                  </button>
+                )}
+                <span className="flex items-center gap-1.5" aria-hidden="true">
+                  {footer.steps.map((name, i) => (
+                    <span
+                      key={name}
+                      title={name}
+                      className={`block h-1.5 rounded-full transition-all duration-300 ${
+                        i === footer.current ? "w-4 bg-accent" : "w-1.5 bg-rule"
+                      }`}
+                    />
+                  ))}
+                </span>
+                {mode === "interactive" && footer.onStep && (
+                  <button
+                    type="button"
+                    aria-label="Next step"
+                    disabled={(footer.current ?? 0) >= footer.steps.length - 1}
+                    onClick={() => footer.onStep?.((footer.current ?? 0) + 1)}
+                    className="rounded-full p-1 text-muted transition-colors hover:bg-raised hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    <ChevronRight size={14} />
+                  </button>
+                )}
+              </span>
+              <span className="label text-ink">{footer.steps[footer.current ?? 0]}</span>
+            </>
+          )}
+        </span>
+        <span className="flex items-center gap-1">
+          {showProtoFooter &&
+            footer.actions
+              ?.filter((a) => !a.hidden)
+              .map((a) => (
+                <button
+                  key={a.label}
+                  type="button"
+                  onClick={a.onClick}
+                  className="label inline-flex items-center gap-1 rounded-full px-2 py-1 transition-colors hover:bg-raised hover:text-ink"
+                >
+                  {a.icon}
+                  {a.label}
+                </button>
+              ))}
+        </span>
         <span className="flex items-center justify-center gap-3">
           {showProtoFooter && footer.steps && (
             <span className="flex items-center gap-2" aria-label={`Step ${(footer.current ?? 0) + 1} of ${footer.steps.length}`}>
@@ -167,15 +236,16 @@ export function HeroStage({
         </span>
         <span role="group" aria-label="Fidelity" className="flex items-center justify-end gap-0.5">
           {tiers
-            .filter((t) => t.available)
+            .filter((t) => t.available || t.key === "video")
             .map((t) => (
               <button
                 key={t.key}
                 type="button"
                 title={t.title}
                 aria-pressed={mode === t.key}
+                disabled={!t.available}
                 onClick={() => setMode(t.key)}
-                className={`rounded-full p-1.5 transition-colors ${
+                className={`rounded-full p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${
                   mode === t.key ? "bg-raised text-ink" : "text-muted hover:text-ink"
                 }`}
               >

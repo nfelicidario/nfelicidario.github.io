@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { VibesLogo } from "@/components/VibesLogo";
 import { Artifact, Beat, CaseHero, Hindsight, NextCase, Outcome, Tldr } from "@/components/case/CaseLayout";
 import { Gate } from "@/components/Gate";
 import blob from "@/content/gated/provisioning.json";
@@ -35,6 +36,8 @@ export default function ProvisioningPage() {
     <div className="container-x">
       <CaseHero
         kicker="Vibes · 2026"
+        pov="Operations"
+        brand={<VibesLogo className="h-full w-auto" />}
         title="The user nobody designed for"
         lede="Every RCS agent a customer created still had to be provisioned by hand across ten portals and an inbox. I made our operations team my closest partner, then designed and shipped the customer intake and the internal admin that replaced the inbox."
         meta={[

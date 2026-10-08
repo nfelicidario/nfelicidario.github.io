@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { VibesLogo } from "@/components/VibesLogo";
 import { Artifact, Beat, CaseHero, Hindsight, NextCase, Outcome, Tldr } from "@/components/case/CaseLayout";
 import { IssueHierarchy } from "@/components/work/making-the-team-faster/PlanningFlow";
 import { TeamFasterStage } from "@/components/work/making-the-team-faster/hero/TeamFasterStage";
@@ -14,6 +15,8 @@ export default function MakingTheTeamFaster() {
     <div className="container-x">
       <CaseHero
         kicker="Vibes · Aug 2025 to present"
+        pov="Team"
+        brand={<VibesLogo className="h-full w-auto" />}
         title="Making the team faster"
         lede="Not a product story. A story about changing how an organization plans, builds, and communicates, one team at a time, with no mandate to do any of it."
         meta={[

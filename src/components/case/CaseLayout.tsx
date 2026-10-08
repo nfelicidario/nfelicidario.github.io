@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowLeft, ArrowRight, CalendarRange, Layers, UserRound, Users, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarRange, Eye, Layers, UserRound, Users, type LucideIcon } from "lucide-react";
 
 const META_ICONS: Record<string, LucideIcon> = {
   role: UserRound,
@@ -19,6 +19,8 @@ export function CaseHero({
   meta,
   stage,
   heading,
+  pov,
+  brand,
   artifact,
 }: {
   kicker: string;
@@ -29,21 +31,41 @@ export function CaseHero({
   stage?: ReactNode;
   /** overrides the title and lede block (used by the Toggle Tool to compare headline variants) */
   heading?: ReactNode;
+  /** point of view badge shown top center, e.g. "Customer" */
+  pov?: string;
+  /** replaces the kicker text with a faint brand mark on the right */
+  brand?: ReactNode;
   /** legacy: a side artifact next to the title */
   artifact?: ReactNode;
 }) {
   if (stage) {
     return (
       <section className="mx-auto max-w-6xl pt-6 pb-14 md:pt-8 md:pb-16">
-        <div className="mb-3 flex items-center justify-between gap-4">
+        <div className="mb-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
           <Link
             href="/#work"
-            className="label inline-flex items-center gap-1 text-muted transition-colors hover:text-ink"
+            className="label inline-flex w-fit items-center gap-1 text-muted transition-colors hover:text-ink"
           >
             <ArrowLeft size={14} aria-hidden="true" />
             Work
           </Link>
-          <div className="label text-accent">{kicker}</div>
+          <div className="justify-self-center">
+            {pov && (
+              <span className="label inline-flex items-center gap-1.5 rounded-full border border-rule bg-surface px-2.5 py-1 text-ink">
+                <Eye size={13} aria-hidden="true" className="text-muted" />
+                POV: {pov}
+              </span>
+            )}
+          </div>
+          <div className="justify-self-end">
+            {brand ? (
+              <span className="block h-5 text-muted opacity-50" title={kicker}>
+                {brand}
+              </span>
+            ) : (
+              <div className="label text-accent">{kicker}</div>
+            )}
+          </div>
         </div>
         {stage}
         <div className="mt-14 grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start md:mt-16">
