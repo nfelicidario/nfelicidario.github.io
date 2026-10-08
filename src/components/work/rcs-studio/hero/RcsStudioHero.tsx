@@ -11,6 +11,7 @@ import {
   DemoBanner,
   MessageBubble,
   MessagesHeader,
+  PANEL_PADDING,
   RichCard,
   SuggestionChips,
   Timestamp,
@@ -19,10 +20,13 @@ import {
 } from "@/components/phone";
 import {
   BadgeCheck,
+  BotMessageSquare,
+  Building2,
   Check,
   ChevronDown,
   ChevronRight,
   CircleAlert,
+  ClipboardCheck,
   Clock,
   Info,
   Rocket,
@@ -32,6 +36,27 @@ import {
   Upload,
   X,
 } from "lucide-react";
+import {
+  AGENT,
+  AUTO_OPT_IN,
+  END_CARD,
+  FORM_DEFAULTS,
+  FRAMES,
+  LIVE_CHIPS,
+  OPTIONS,
+  PHONE_COPY,
+  PREFILL,
+  REVIEW_TIMELINE,
+  SIGNUP_SUCCESS,
+  STATUS,
+  STEP_LABELS,
+  YOURS_CHIPS,
+  type Chip,
+  type Field,
+  type Status,
+  type Step,
+  type Values,
+} from "./script";
 
 /**
  * RCS Studio hero: one self-driving story in a 16:9 stage, mock data only, frameless.
@@ -52,44 +77,18 @@ import {
  *
  * Google's agent limits are enforced where a field exists: display name 40, description 100,
  * suggested-reply labels 25, logo 224×224 PNG or JPEG under 50 KB, brand color 4.5:1 on white.
+ *
+ * All demo copy and timings (the agent, the chips and replies, the form values, the frames)
+ * live in ./script.ts so they can be edited without touching the state machine.
  */
 
 /* ---------------------------------------------------------------- limits */
 
-const MAX = { name: 40, description: 100, chip: 25, logoPx: 224, logoBytes: 50 * 1024, contrast: 4.5 } as const;
+const MAX = { name: 40, description: 100, logoPx: 224, logoBytes: 50 * 1024, contrast: 4.5 } as const;
 
 /* ---------------------------------------------------------------- frames */
 
-type Step = "yours" | "signup" | "brand" | "agent" | "campaign" | "submitted" | "live";
-type Frame = { step: Step; phase: string; ms: number; auto?: boolean };
-
-const FRAMES: Frame[] = [
-  { step: "yours", phase: "idle", ms: 900 },
-  { step: "yours", phase: "tap", ms: 800, auto: true },
-  { step: "yours", phase: "replied", ms: 1500 },
-  { step: "yours", phase: "name", ms: 2600 },
-  { step: "yours", phase: "color", ms: 900 },
-  { step: "yours", phase: "logo", ms: 1200 },
-  { step: "yours", phase: "cta", ms: 900 },
-  { step: "signup", phase: "empty", ms: 700 },
-  { step: "signup", phase: "name", ms: 650 },
-  { step: "signup", phase: "email", ms: 650 },
-  { step: "signup", phase: "password", ms: 900 },
-  { step: "signup", phase: "success", ms: 1500, auto: true },
-  { step: "brand", phase: "empty", ms: 600 },
-  { step: "brand", phase: "legalName", ms: 700 },
-  { step: "brand", phase: "website", ms: 1500 },
-  { step: "brand", phase: "contact", ms: 1200 },
-  { step: "agent", phase: "prefilled", ms: 3000 },
-  { step: "campaign", phase: "filled", ms: 1400 },
-  { step: "campaign", phase: "invalid", ms: 1500 },
-  { step: "campaign", phase: "fixed", ms: 1100 },
-  { step: "submitted", phase: "reviewing", ms: 2500, auto: true },
-  { step: "live", phase: "live", ms: 1600 },
-  { step: "live", phase: "tapped", ms: 900, auto: true },
-  { step: "live", phase: "replied", ms: 3800 },
-];
-
+/** FRAMES, the copy, and the timings live in script.ts; the hero only looks frames up */
 const at = (step: Step, phase: string) => FRAMES.findIndex((f) => f.step === step && f.phase === phase);
 
 const F = {
@@ -115,73 +114,41 @@ const F = {
 };
 
 const STEP_ORDER: Step[] = ["yours", "signup", "brand", "agent", "campaign", "submitted", "live"];
-const STEP_LABELS: Record<Step, string> = {
-  yours: "Make it yours",
-  signup: "Sign up",
-  brand: "Brand",
-  agent: "Agent",
-  campaign: "Campaign",
-  submitted: "Review",
-  live: "Live",
-};
 const FOOTER_STEPS = STEP_ORDER.map((st) => STEP_LABELS[st]);
 
-/* ------------------------------------------------------------- mock data */
+/** the three provisioning steps, with the icon each wears in the pane header */
+const PROVISION_STEPS: { step: Step; icon: typeof Building2 }[] = [
+  { step: "brand", icon: Building2 },
+  { step: "agent", icon: BotMessageSquare },
+  { step: "campaign", icon: ClipboardCheck },
+];
 
-type Field =
-  | "agentName"
-  | "color"
-  | "name"
-  | "email"
-  | "password"
-  | "legalName"
-  | "website"
-  | "contact"
-  | "description"
-  | "useCase"
-  | "sample"
-  | "optIn"
-  | "volume";
-type Values = Record<Field, string>;
+/* ------------------------------------------------------------- mock data */
 
 type Logo =
   | { kind: "none" }
   | { kind: "mark" }
-  | { kind: "upload"; src: string; w: number; h: number; bytes: number; name: string };
-
-const DEFAULT_COLOR = "#1F4FE0";
-const AUTO_NAME = "Poblano's Mexican Grill";
-const AUTO_COLOR = "#C2410C";
-
-const MOCK: Values = {
-  agentName: "Nolan's Restaurant",
-  color: DEFAULT_COLOR,
-  name: "Sam Rivera",
-  email: "",
-  password: "burritos-2026",
-  legalName: "",
-  website: "",
-  contact: "",
-  description: "",
-  useCase: "Promotions and offers",
-  sample: "",
-  optIn: "",
-  volume: "Up to 10,000 a month",
-};
-const AUTO_OPT_IN = "Keyword on a web form";
+  | {
+      kind: "upload";
+      src: string;
+      w: number;
+      h: number;
+      bytes: number;
+      name: string;
+    };
 
 /** fields the later steps prefill from the agent name chosen in step 1 */
 function derive(v: Values): Values {
-  const name = v.agentName.trim() || "Your agent";
-  const site = `${slug(name) || "yourbrand"}.example`;
+  const name = v.agentName.trim() || PREFILL.fallbackName;
+  const site = PREFILL.site(slug(name));
   return {
     ...v,
-    email: `sam@${site}`,
-    legalName: `${name} LLC`,
+    email: PREFILL.email(site),
+    legalName: PREFILL.legalName(name),
     website: site,
-    contact: `sam@${site}`,
-    description: `Weekly specials, pickup orders and reminders from ${name}.`.slice(0, MAX.description),
-    sample: `Hi Sam, it's ${name}. The Tuesday Family Box is back this week. Reply BOX to reserve one.`,
+    contact: PREFILL.email(site),
+    description: PREFILL.description(name).slice(0, MAX.description),
+    sample: PREFILL.sample(name),
   };
 }
 
@@ -200,24 +167,6 @@ const FILLED_AT: Record<Field, number> = {
   volume: F.campaign,
   optIn: F.campaignFixed,
 };
-
-const USE_CASES = ["Promotions and offers", "Order updates", "Appointment reminders", "Account alerts"];
-const OPT_INS = ["Keyword on a web form", "Checkbox at checkout", "In-store sign-up", "Reply to an SMS"];
-const VOLUMES = ["Up to 1,000 a month", "Up to 10,000 a month", "Up to 100,000 a month", "More than 100,000 a month"];
-
-type Chip = { label: string; reply: string };
-/** labels are capped at Google's 25 characters */
-const chip = (label: string, reply: string): Chip => ({ label: label.slice(0, MAX.chip), reply });
-const YOURS_CHIPS: Chip[] = [
-  chip("Order for pickup", "Done. Your box will be ready Tuesday at 5:30 pm. Reply CHANGE to pick another time."),
-  chip("What's in it?", "Four entrees, two sides and two house sauces. Feeds four."),
-  chip("Remind me Tuesday", "Will do. I'll text you Tuesday morning."),
-];
-const LIVE_CHIPS: Chip[] = [
-  chip("BOX", "Reserved. One Tuesday Family Box, ready at 5:30 pm. Reply CHANGE to pick another time."),
-  chip("See the menu", "Here's this week's menu. Tap any item to add it to a pickup order."),
-  chip("Not this week", "No problem. I'll check back next Tuesday."),
-];
 
 /* --------------------------------------------------------------- helpers */
 
@@ -274,7 +223,14 @@ type Action =
   | { type: "RESET" };
 
 function initial(i = 0, run = 0): State {
-  return { i, chip: null, liveChip: null, values: { ...MOCK }, logo: { kind: "none" }, run };
+  return {
+    i,
+    chip: null,
+    liveChip: null,
+    values: { ...FORM_DEFAULTS },
+    logo: { kind: "none" },
+    run,
+  };
 }
 
 /** side effects of landing on a frame (autoplay script and prefill) */
@@ -282,8 +238,8 @@ function enter(s: State, i: number): State {
   const f = FRAMES[i];
   const n: State = { ...s, i };
   if (f.step === "yours" && f.phase === "tap" && s.chip === null) n.chip = s.run % YOURS_CHIPS.length;
-  if (f.step === "yours" && f.phase === "color") n.values = { ...n.values, color: AUTO_COLOR };
-  if (f.step === "yours" && f.phase === "logo") n.logo = { kind: "mark" };
+  if (f.step === "yours" && f.phase === "color") n.values = { ...n.values, color: AGENT.color };
+  if (f.step === "yours" && f.phase === "logo") n.logo = { kind: AGENT.logo };
   if (f.step === "signup" && f.phase === "empty") n.values = derive(n.values);
   if (f.step === "live" && !s.values.sample) n.values = derive(n.values);
   if (f.step === "live" && f.phase === "tapped" && s.liveChip === null) n.liveChip = s.run % LIVE_CHIPS.length;
@@ -335,7 +291,11 @@ export function RcsStudioHero({ autoplay = false }: { autoplay?: boolean }) {
       steps: FOOTER_STEPS,
       current: stepIndex,
       actions: [
-        { label: "Replay", icon: <RotateCcw size={12} aria-hidden="true" />, onClick: () => dispatch({ type: "RESET" }) },
+        {
+          label: "Replay",
+          icon: <RotateCcw size={12} aria-hidden="true" />,
+          onClick: () => dispatch({ type: "RESET" }),
+        },
         {
           label: "Skip to live",
           icon: <SkipForward size={12} aria-hidden="true" />,
@@ -360,8 +320,8 @@ export function RcsStudioHero({ autoplay = false }: { autoplay?: boolean }) {
     if (reduced || !autoplay || s.i !== F.yoursName) return;
     let k = 0;
     const t = setInterval(() => {
-      dispatch({ type: "SET", field: "agentName", value: AUTO_NAME.slice(0, k) });
-      if (k >= AUTO_NAME.length) clearInterval(t);
+      dispatch({ type: "SET", field: "agentName", value: AGENT.name.slice(0, k) });
+      if (k >= AGENT.name.length) clearInterval(t);
       k += 1;
     }, 65);
     return () => clearInterval(t);
@@ -379,7 +339,14 @@ function ReducedHero() {
     footer.set({
       steps: FOOTER_STEPS,
       current: STEP_ORDER.length - 1,
-      actions: [{ label: "Replay", icon: <RotateCcw size={12} aria-hidden="true" />, onClick: () => setLiveChip(null), hidden: liveChip === null }],
+      actions: [
+        {
+          label: "Replay",
+          icon: <RotateCcw size={12} aria-hidden="true" />,
+          onClick: () => setLiveChip(null),
+          hidden: liveChip === null,
+        },
+      ],
     });
     return () => footer.set(null);
   }, [footer, liveChip]);
@@ -424,7 +391,7 @@ function still(i: number, overrides: Partial<State> = {}): State {
   const base = initial(i);
   return {
     ...base,
-    values: derive({ ...base.values, agentName: AUTO_NAME, color: AUTO_COLOR }),
+    values: derive({ ...base.values, agentName: AGENT.name, color: AGENT.color }),
     logo: { kind: "mark" },
     chip: 0,
     liveChip: 0,
@@ -481,22 +448,19 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, foc
   const phoneCls = focus === "phone" ? "grid" : "hidden md:grid";
 
   return (
-    <div
-      inert={inert}
-      className={`absolute inset-0 flex items-center justify-center p-3 md:p-4 ${still ? "bg-bg" : ""}`}
-      data-step={step}
-    >
+    <div inert={inert} className={`absolute inset-0 flex items-center justify-center p-3 md:p-4 ${still ? "bg-bg" : ""}`} data-step={step}>
       <motion.div
         layout={!still}
         transition={{ layout: { type: "spring", stiffness: 260, damping: 32 } }}
         className={`bubble relative grid max-h-full w-full grid-rows-[minmax(0,1fr)] overflow-hidden border border-rule bg-surface shadow-[var(--shadow)] ${
-          hasPhone ? "h-full max-w-[1040px] grid-cols-1 md:grid-cols-2" : step === "brand" ? "h-auto max-w-[480px] grid-cols-1" : "h-auto max-w-[400px] grid-cols-1"
+          hasPhone
+            ? "h-full max-w-[1040px] grid-cols-1 md:grid-cols-2"
+            : step === "brand"
+              ? "h-auto max-w-[480px] grid-cols-1"
+              : "h-auto max-w-[400px] grid-cols-1"
         }`}
       >
-        <motion.div
-          layout={still ? false : "position"}
-          className={`${panelCls} min-h-0 min-w-0 flex-col overflow-y-auto px-4 py-4 md:px-6 md:py-6`}
-        >
+        <motion.div layout={still ? false : "position"} className={`${panelCls} min-h-0 min-w-0 flex-col overflow-y-auto px-4 py-4 md:px-6 md:py-6`}>
           <div className="my-auto">{left ?? <FlowPanel s={s} timed={timed} still={still} dispatch={dispatch} />}</div>
         </motion.div>
 
@@ -548,7 +512,7 @@ function FlowPanel({ s, timed, still, dispatch }: PanelProps) {
                 <div className="label">Provisioning</div>
                 <div className="truncate text-[15px] font-semibold text-ink">{s.values.agentName}</div>
               </div>
-              <StatusPill status="Live" />
+              <StatusPill status={STATUS.live} />
             </div>
             <EndCard />
           </>
@@ -570,9 +534,7 @@ function MakeItYours({ s, timed, still, dispatch }: PanelProps) {
     <>
       <div>
         <h3 className="text-[clamp(18px,2vw,24px)] font-bold text-ink">Your brand, inside Messages.</h3>
-        <p className="mt-2 max-w-[36ch] text-[14px] text-body">
-          Name it, drop in a logo, and pick a color. The phone updates as you go.
-        </p>
+        <p className="mt-2 max-w-[36ch] text-[14px] text-body">Name it, drop in a logo, and pick a color. The phone updates as you go.</p>
       </div>
       <form
         className="grid gap-3"
@@ -700,7 +662,7 @@ function LogoField({
               dispatch({ type: "LOGO", logo: { kind: "none" } });
               setProblem(null);
             }}
-            className="inline-flex items-center gap-0.5 text-[11px] font-medium text-muted hover:text-ink"
+            className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-medium text-muted transition-colors duration-150 hover:bg-raised hover:text-ink"
           >
             <X size={11} aria-hidden="true" /> Remove
           </button>
@@ -740,7 +702,9 @@ function LogoField({
         <div className="min-w-0 flex-1 text-[11.5px] leading-snug text-muted">
           <label
             htmlFor={id}
-            className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-rule bg-surface px-2.5 py-1 text-[12px] font-medium text-ink hover:border-accent hover:text-accent"
+            className={`inline-flex items-center gap-1 rounded-full border border-rule bg-surface px-2.5 py-1 text-[12px] font-medium text-ink transition-colors duration-150 ${
+              timed ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-accent hover:bg-accent-soft/40 hover:text-accent"
+            }`}
           >
             <Upload size={12} aria-hidden="true" /> {logo.kind === "none" ? "Upload" : "Replace"}
           </label>
@@ -827,11 +791,11 @@ function ColorField({
         <input
           id={id}
           type="color"
-          value={(normalizeHex(value) ?? DEFAULT_COLOR).toLowerCase()}
+          value={(normalizeHex(value) ?? AGENT.defaultColor).toLowerCase()}
           onChange={(e) => commit(e.target.value)}
           disabled={readOnly}
           aria-describedby={describeId}
-          className={`${box} w-11 cursor-pointer p-1 disabled:cursor-default`}
+          className={`${box} w-11 cursor-pointer p-1 transition-colors duration-150 enabled:hover:border-accent disabled:cursor-not-allowed`}
         />
         <input
           type="text"
@@ -847,11 +811,7 @@ function ColorField({
           className={`${box} num w-28 px-2.5 uppercase`}
         />
       </div>
-      <p
-        id={describeId}
-        aria-live="polite"
-        className={`inline-flex items-center gap-1 text-[11.5px] ${pass ? "text-ok" : "text-warn"}`}
-      >
+      <p id={describeId} aria-live="polite" className={`inline-flex items-center gap-1 text-[11.5px] ${pass ? "text-ok" : "text-warn"}`}>
         {pass ? <Check size={12} aria-hidden="true" /> : <CircleAlert size={12} aria-hidden="true" />}
         <span className="text-muted">On white: {MAX.contrast}:1 required ·</span> currently <span className="num">{ratio.toFixed(1)}:1</span>
         {pass ? "" : ", pick a darker color"}
@@ -871,7 +831,7 @@ function SignUp({ s, timed, still, dispatch }: PanelProps) {
         <p className="mt-1.5 text-[13.5px] text-body">An account keeps your agent while we set it up.</p>
       </div>
       {s.i === F.signupSuccess ? (
-        <Success title="Account created" body="Setting up your workspace." still={still} />
+        <Success title={SIGNUP_SUCCESS.title} body={SIGNUP_SUCCESS.body} still={still} />
       ) : (
         <form
           className="grid gap-3"
@@ -897,7 +857,9 @@ function SignUp({ s, timed, still, dispatch }: PanelProps) {
 function Provision({ s, timed, still, dispatch }: PanelProps) {
   const step = FRAMES[s.i].step;
   const go = (i: number) => dispatch({ type: "GOTO", i });
-  const status = step === "submitted" ? "Submitted" : "Draft";
+  const status: Status = step === "submitted" ? STATUS.submitted : STATUS.draft;
+  const stepAt = PROVISION_STEPS.findIndex((p) => p.step === step);
+  const StepIcon = PROVISION_STEPS[Math.max(stepAt, 0)].icon;
   const optIn = shown(s, timed, "optIn");
   const invalid = s.i === F.campaignInvalid;
   const ratio = contrastOnWhite(s.values.color);
@@ -910,12 +872,24 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="min-w-0">
+      <div className="grid gap-2.5">
+        <div className="flex items-center justify-between gap-2">
           <div className="label">Provisioning</div>
-          <div className="truncate text-[15px] font-semibold text-ink">{s.values.agentName}</div>
+          <StatusPill status={status} />
         </div>
-        <StatusPill status={status} />
+        {stepAt >= 0 ? (
+          <div className="flex items-center gap-2.5">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
+              <StepIcon size={16} aria-hidden="true" />
+            </span>
+            <span className="text-[15px] font-semibold text-ink">{STEP_LABELS[step]}</span>
+            <span className="ml-auto text-[12px] text-muted">
+              Step {stepAt + 1} of {PROVISION_STEPS.length}
+            </span>
+          </div>
+        ) : (
+          <div className="truncate text-[15px] font-semibold text-ink">{s.values.agentName}</div>
+        )}
       </div>
 
       <AnimatePresence mode="wait" initial={false}>
@@ -972,12 +946,7 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
               </p>
               <Field s={s} timed={timed} dispatch={dispatch} field="agentName" label="Display name" maxLength={MAX.name} />
               <LogoField s={s} timed={timed} dispatch={dispatch} compact />
-              <ColorField
-                value={s.values.color}
-                onChange={(v) => dispatch({ type: "SET", field: "color", value: v })}
-                readOnly={timed}
-                describeId={colorId}
-              />
+              <ColorField value={s.values.color} onChange={(v) => dispatch({ type: "SET", field: "color", value: v })} readOnly={timed} describeId={colorId} />
               <Field s={s} timed={timed} dispatch={dispatch} field="description" label="Description" multiline maxLength={MAX.description} />
               <Primary type="submit" still={still} disabled={ratio < MAX.contrast}>
                 Continue
@@ -994,7 +963,7 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
               }}
             >
               <p className="text-[12.5px] text-muted">The promise to carriers: what you&apos;ll send and to whom.</p>
-              <Field s={s} timed={timed} dispatch={dispatch} field="useCase" label="Use case" options={USE_CASES} />
+              <Field s={s} timed={timed} dispatch={dispatch} field="useCase" label="Use case" options={OPTIONS.useCases} />
               <Field s={s} timed={timed} dispatch={dispatch} field="sample" label="Sample message" multiline />
               <Field
                 s={s}
@@ -1002,7 +971,7 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
                 dispatch={dispatch}
                 field="optIn"
                 label="Opt-in method"
-                options={OPT_INS}
+                options={OPTIONS.optIns}
                 placeholder="Choose one"
                 error={invalid ? "Choose how customers opt in. Carriers reject campaigns without one." : undefined}
                 onChange={(v) => {
@@ -1016,7 +985,7 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
                 dispatch={dispatch}
                 field="volume"
                 label="Expected volume"
-                options={VOLUMES}
+                options={OPTIONS.volumes}
                 tooltip="A ballpark is fine. Carriers use it to size your throughput, and you can raise it later."
                 tooltipOpen={timed && s.i === F.campaign}
               />
@@ -1033,12 +1002,12 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
   );
 }
 
-function StatusPill({ status }: { status: "Draft" | "Submitted" | "Live" }) {
-  const cls = status === "Live" ? "bg-ok-soft text-ok" : status === "Submitted" ? "bg-warn-soft text-warn" : "bg-raised text-muted";
+function StatusPill({ status }: { status: Status }) {
+  const cls = status === STATUS.live ? "bg-ok-soft text-ok" : status === STATUS.submitted ? "bg-warn-soft text-warn" : "bg-raised text-muted";
   return (
     <span aria-live="polite" className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11.5px] font-semibold ${cls}`}>
-      {status === "Live" && <BadgeCheck size={13} aria-hidden="true" />}
-      {status === "Submitted" && <Clock size={12} aria-hidden="true" />}
+      {status === STATUS.live && <BadgeCheck size={13} aria-hidden="true" />}
+      {status === STATUS.submitted && <Clock size={12} aria-hidden="true" />}
       <span className="sr-only">Status: </span>
       {status}
     </span>
@@ -1046,11 +1015,7 @@ function StatusPill({ status }: { status: "Draft" | "Submitted" | "Live" }) {
 }
 
 function Timeline({ still }: { still: boolean }) {
-  const rows = [
-    { label: "Submitted", sub: "Just now", state: "done" },
-    { label: "Reviewing", sub: "Carriers verify the brand and campaign", state: "active" },
-    { label: "Live", sub: "Usually one to three weeks", state: "todo" },
-  ] as const;
+  const rows = REVIEW_TIMELINE;
   return (
     <ol className="grid gap-0" aria-label="Review timeline">
       {rows.map((r, k) => (
@@ -1085,9 +1050,9 @@ function EndCard() {
   return (
     <div className="bubble border border-ok/40 bg-ok-soft/60 p-4">
       <div className="inline-flex items-center gap-1.5 text-[15px] font-bold text-ink">
-        <BadgeCheck size={16} aria-hidden="true" className="text-ok" /> Agent live.
+        <BadgeCheck size={16} aria-hidden="true" className="text-ok" /> {END_CARD.title}
       </div>
-      <p className="mt-1 text-[13px] text-body">Average time to provision: one to three weeks.</p>
+      <p className="mt-1 text-[13px] text-body">{END_CARD.body}</p>
     </div>
   );
 }
@@ -1140,7 +1105,7 @@ function Primary({
       aria-describedby={describedBy}
       initial={still ? false : { opacity: 0 }}
       animate={{ opacity: 1, scale: pressed ? 0.96 : 1 }}
-      className={`inline-flex w-fit items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 ${
+      className={`inline-flex w-fit items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-semibold text-white transition-colors duration-150 enabled:hover:bg-[color-mix(in_srgb,var(--accent)_85%,var(--ink))] disabled:cursor-not-allowed disabled:opacity-50 ${
         pressed ? "ring-4 ring-accent-soft" : ""
       }`}
     >
@@ -1210,7 +1175,7 @@ function Field({
               type="button"
               aria-label={`About ${label.toLowerCase()}`}
               aria-describedby={`${id}-tip`}
-              className="grid h-4 w-4 place-items-center rounded-full text-muted hover:text-ink"
+              className="grid h-4 w-4 place-items-center rounded-full text-muted transition-colors duration-150 hover:bg-raised hover:text-ink"
             >
               <Info size={12} aria-hidden="true" />
             </button>
@@ -1299,12 +1264,13 @@ function Field({
 
 type Msg = { id: string; from: "agent" | "user"; kind?: "card" | "ghost"; text: string; status?: BubbleStatus };
 
-const CARD = { title: "Tuesday Family Box", meta: "$32", text: "Four entrees, two sides and two house sauces. Pickup only." };
+const CARD = PHONE_COPY.card;
 
 /**
  * The Android phone, built from the shared kit. Three screens:
- *  - yours and live: a Google Messages thread with the demo banner, the greeting, a rich card,
- *    suggested replies, the tapped reply as a user bubble, the typing indicator, then the agent's answer
+ *  - yours and live: a Google Messages thread on the full-height conversation panel: the demo
+ *    banner, the greeting, a rich card, suggested replies, the tapped reply as a user bubble,
+ *    the typing indicator, then the agent's answer, with the composer pinned under a divider
  *  - brand and agent steps: the agent info screen, filling in as the form does (no banner)
  *  - campaign and submitted: the sample message, or a ghost bubble until it exists
  */
@@ -1314,7 +1280,7 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
   const infoScreen = step === "brand" || step === "agent";
 
   const name = s.values.agentName.trim();
-  const color = normalizeHex(s.values.color) ?? DEFAULT_COLOR;
+  const color = normalizeHex(s.values.color) ?? AGENT.defaultColor;
   const sample = shown(s, timed, "sample");
 
   let messages: Msg[] = [];
@@ -1326,7 +1292,11 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
   if (mode === "yours") {
     const replied = s.i >= F.yoursReplied && s.chip !== null;
     messages = [
-      { id: "greet", from: "agent", text: `Hi Sam, it's ${name || "your agent"}. The Tuesday Family Box is back this week.` },
+      {
+        id: "greet",
+        from: "agent",
+        text: PHONE_COPY.greeting(name || PHONE_COPY.fallbackName),
+      },
       { id: "card", from: "agent", kind: "card", text: CARD.text },
     ];
     if (s.chip !== null) messages.push({ id: "me", from: "user", text: YOURS_CHIPS[s.chip].label, status: replied ? "read" : "delivered" });
@@ -1349,15 +1319,13 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
     chipsEnabled = s.i === F.live;
     picked = s.liveChip;
   } else {
-    messages = sample
-      ? [{ id: "sample", from: "agent", text: sample }]
-      : [{ id: "ghost", from: "agent", kind: "ghost", text: "Your first message shows up here." }];
+    messages = sample ? [{ id: "sample", from: "agent", text: sample }] : [{ id: "ghost", from: "agent", kind: "ghost", text: PHONE_COPY.ghost }];
   }
 
-  const headerName = name || "Your agent";
+  const headerName = name || PREFILL.fallbackName;
   const verified = mode !== "preview";
   /** the badge alone marks a verified agent; the status line only shows before it is */
-  const subtitle = verified ? undefined : step === "submitted" ? "In carrier review" : "Preview";
+  const subtitle = verified ? undefined : step === "submitted" ? PHONE_COPY.subtitle.review : PHONE_COPY.subtitle.preview;
   const logo = (size: string) => <LogoMark logo={s.logo} color={color} name={name} className={`h-full w-full ${size}`} />;
   const enter = still ? false : { opacity: 0, y: 8 };
 
@@ -1373,46 +1341,44 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
           email={shown(s, timed, "contact") || undefined}
         />
       ) : (
-        <>
-          <ConversationPanel>
-            {mode !== "preview" && <DemoBanner />}
-            <div className="flex min-h-0 flex-1 flex-col justify-end gap-2 overflow-hidden" aria-live="polite">
-              <Timestamp>Today · 9:30 AM</Timestamp>
-              <AnimatePresence initial={false}>
-                {messages.map((m) => (
-                  <motion.div
-                    key={`${mode}-${m.id}`}
-                    initial={enter}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={still ? undefined : { opacity: 0 }}
-                    transition={{ duration: 0.26, ease: "easeOut" }}
-                    className={`flex w-full flex-col ${m.from === "user" ? "items-end" : "items-start"}`}
-                  >
-                    {m.kind === "card" ? (
-                      <RichCard title={CARD.title} meta={CARD.meta} description={m.text} mediaHeight="short" width="86%" />
-                    ) : (
-                      <MessageBubble from={m.from} ghost={m.kind === "ghost"} status={m.status}>
-                        {m.text}
-                      </MessageBubble>
-                    )}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-              {typing && (
-                <motion.div initial={enter} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="flex w-full flex-col items-start">
-                  <TypingIndicator />
+        <ConversationPanel composer={<Composer />}>
+          {mode !== "preview" && <DemoBanner />}
+          <div className="flex min-h-0 flex-1 flex-col justify-end gap-2 overflow-hidden" aria-live="polite">
+            <Timestamp>{PHONE_COPY.timestamp}</Timestamp>
+            <AnimatePresence initial={false}>
+              {messages.map((m) => (
+                <motion.div
+                  key={`${mode}-${m.id}`}
+                  initial={enter}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={still ? undefined : { opacity: 0 }}
+                  transition={{ duration: 0.26, ease: "easeOut" }}
+                  className={`flex w-full flex-col ${m.from === "user" ? "items-end" : "items-start"}`}
+                >
+                  {m.kind === "card" ? (
+                    <RichCard title={CARD.title} meta={CARD.meta} description={m.text} mediaHeight="short" width="86%" />
+                  ) : (
+                    <MessageBubble from={m.from} ghost={m.kind === "ghost"} status={m.status}>
+                      {m.text}
+                    </MessageBubble>
+                  )}
                 </motion.div>
-              )}
-            </div>
-            <SuggestionChips
-              label="Suggested replies"
-              suggestions={chips.map((c, k) => ({ label: c.label, selected: picked === k }))}
-              onSelect={(k) => dispatch({ type: "TAP", chip: k, now: still })}
-              disabled={!chipsEnabled}
-            />
-          </ConversationPanel>
-          <Composer />
-        </>
+              ))}
+            </AnimatePresence>
+            {typing && (
+              <motion.div initial={enter} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="flex w-full flex-col items-start">
+                <TypingIndicator />
+              </motion.div>
+            )}
+          </div>
+          <SuggestionChips
+            label="Suggested replies"
+            bleed={PANEL_PADDING}
+            suggestions={chips.map((c, k) => ({ label: c.label, selected: picked === k }))}
+            onSelect={(k) => dispatch({ type: "TAP", chip: k, now: still })}
+            disabled={!chipsEnabled}
+          />
+        </ConversationPanel>
       )}
     </AndroidPhone>
   );

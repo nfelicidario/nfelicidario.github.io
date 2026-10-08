@@ -2,7 +2,7 @@ export { AndroidPhone, PHONE, PHONE_FONT, phoneTokens } from "./AndroidPhone";
 export type { AndroidPhoneProps, PhoneTheme } from "./AndroidPhone";
 export { MessagesHeader } from "./MessagesHeader";
 export type { MessagesHeaderProps } from "./MessagesHeader";
-export { ConversationPanel, PANEL_RADIUS, PANEL_INSET } from "./ConversationPanel";
+export { ConversationPanel, PANEL_RADIUS, PANEL_INSET, PANEL_PADDING } from "./ConversationPanel";
 export type { ConversationPanelProps } from "./ConversationPanel";
 export { DemoBanner, DEMO_BANNER_TEXT } from "./DemoBanner";
 export type { DemoBannerProps } from "./DemoBanner";

@@ -8,7 +8,7 @@ import { AndroidPhone, MessagesHeader, ConversationPanel, DemoBanner, MessageBub
 
 <AndroidPhone brandColor="#1F4FE0" theme="auto" fit="contain">
   <MessagesHeader logo={<Logo />} name="Poblano's Mexican Grill" verified />
-  <ConversationPanel>
+  <ConversationPanel composer={<Composer />}>
     <DemoBanner />
     <div className="flex min-h-0 flex-1 flex-col justify-end gap-2 overflow-hidden">
       <Timestamp>Today · 9:30 AM</Timestamp>
@@ -17,13 +17,12 @@ import { AndroidPhone, MessagesHeader, ConversationPanel, DemoBanner, MessageBub
       <MessageBubble from="user" status="read">Order for pickup</MessageBubble>
       <TypingIndicator />
     </div>
+    <SuggestionChips bleed={PANEL_PADDING} suggestions={[{ label: "Order for pickup" }, { label: "Call us", kind: "dial" }]} onSelect={(i) => ...} />
   </ConversationPanel>
-  <SuggestionChips suggestions={[{ label: "Order for pickup" }, { label: "Call us", kind: "dial" }]} onSelect={(i) => ...} />
-  <Composer />
 </AndroidPhone>
 ```
 
-Layout: the status bar, header, chips, and composer share the screen's darker ground (`--ph-bg`, the Material 3 surface-container tier). The conversation sits in `ConversationPanel`, a lighter rounded panel inset below the header, the way Samsung Messages and M3 surface-container layouts separate chrome from content. `AgentInfo` uses the same panel.
+Layout: the status bar, header, and gesture bar share the screen's darker ground (`--ph-bg`, the Material 3 surface-container tier). The conversation sits in `ConversationPanel`, a lighter panel that is full width, rounded at the top only, and runs to the bottom of the screen above the gesture bar. The thread (banner, messages, chips) scrolls in the panel's upper region; the composer is pinned at the bottom behind a faint divider, so the thread passes beneath it. `AgentInfo` is a lighter inset panel of its own.
 
 ## Components
 
@@ -31,13 +30,13 @@ Layout: the status bar, header, chips, and composer share the screen's darker gr
 | --- | --- |
 | `AndroidPhone` | The Pixel-style frame: thin bezel, 48px corners, centered pill cutout, status bar (time left, signal, wifi, and battery right), and the gesture pill. The screen is laid out at a fixed 360 x 780 logical px and zoomed to fit, so children always render at phone proportions. Props: `brandColor`, `theme` ("light", "dark", or "auto" to follow the site), `width` (CSS px; omit to fill the container), `fit` ("width" or "contain", which also respects the container height), `time`, `label`. Children render inside a flex column; make the thread `flex-1 min-h-0`. |
 | `MessagesHeader` | Back arrow, the logo clipped to a rounded square, the display name with the filled `VerifiedBadge` (16px) when `verified`, an optional `subtitle` status line (for "Preview", never "Verified business"; the badge says that), optional call icon, and overflow. Sits on the darker ground. |
-| `ConversationPanel` | The lighter rounded panel (24px corners, 8px inset) the thread lives in. A flex column with a 10px inner padding: put `DemoBanner` first, then the thread as a `flex-1 min-h-0` column that justifies to the end. Exports `PANEL_RADIUS` and `PANEL_INSET`. |
+| `ConversationPanel` | The lighter panel the thread lives in: full width, 24px top corners, flush with the bottom of the screen. Children render in a 10px-padded flex column: put `DemoBanner` first, then the thread as a `flex-1 min-h-0` column that justifies to the end, then `SuggestionChips`. Pass the composer as `composer`; it sits under a 1px divider (`--ph-outline-variant` at 55%) at the panel's bottom. Exports `PANEL_RADIUS`, `PANEL_INSET` (the `AgentInfo` inset), and `PANEL_PADDING` (10, pass it to the chips as `bleed`). |
 | `DemoBanner` | A faint tonal pill with an info icon at the top of the conversation: "Demo agent. Create an account in RCS Studio to make it live." (`DEMO_BANNER_TEXT`; override with `text`). Small, muted, no border. |
 | `VerifiedBadge` | Google's filled verified mark, the scalloped circle with a check, as an inline SVG. `size` (16 in the header, 20 in AgentInfo), `color` (defaults to `--ph-verified`, Google blue #1A73E8 in light), `label` ("Verified"; pass "" to make it decorative). See the license note below. |
 | `MessageBubble` | One message. `from="agent"` sits left in a tonal container; `from="user"` sits right in the brand color. 28px corners; `tail` (default on) puts the 4px tail corner on the latest bubble. `status` ("sent", "delivered", "read") and `time` render under it. `ghost` draws a dashed placeholder. `Timestamp` is the centered day divider. |
-| `RichCard` | Media on top (`mediaHeight` short 112, medium 168, tall 264), title, optional `meta` (a price), description, and up to four suggestions as text buttons. `RichCardCarousel` lays out 2 to 10 cards at Google's fixed widths (small 180, medium 296). `MediaPlaceholder` is the brand gradient used when no media is given. |
-| `SuggestionChips` | Material 3 outlined chips in one horizontal row above the composer; the row never wraps. `kind` adds the action icon: `dial`, `url`, `location`, `share-location`, `calendar`. `selected` fills the chip; `disabled` dims the rest. Overflow scrolls with the scrollbar hidden: native pan on touch and pen, and click-and-drag with the mouse (pointer capture on pointerdown, `scrollLeft` follows the pointer, scaled for the phone's zoom; a drag over 4px swallows the click that follows so it does not tap a chip). A 32px fade on the right edge shows while there is more to scroll to. Caps at 11 chips and 25 characters per label. |
-| `Composer` | "+" attachment, the pill text field with the "RCS message" placeholder, camera, and gallery icons, and the brand-colored send button once `text` is set. Decorative, nothing focusable. |
+| `RichCard` | Media on top (`mediaHeight` short 112, medium 168, tall 264), title, optional `meta` (a price), description, and up to four suggestions as text buttons (tinted hover, not-allowed cursor when disabled). `RichCardCarousel` lays out 2 to 10 cards at Google's fixed widths (small 180, medium 296). `MediaPlaceholder` is the brand gradient used when no media is given. |
+| `SuggestionChips` | Material 3 outlined chips in one horizontal row at the bottom of the thread; the row never wraps. `kind` adds the action icon: `dial`, `url`, `location`, `share-location`, `calendar`. `selected` fills the chip; `disabled` dims the rest and shows the not-allowed cursor; enabled chips get a tinted hover (150 ms). Overflow scrolls with the scrollbar hidden: native pan on touch and pen, and click-and-drag with the mouse. A plain click always taps the chip: pointer capture is taken only once the mouse has moved more than 4px (capturing on pointerdown would send the click to the row instead of the chip), and only then is the click after release swallowed. `bleed` (pass `PANEL_PADDING`) lets the row run to the panel's edge with matching padding, so chips clip at the edge, under a 32px fade on the right while there is more to scroll to and on the left once scrolled. Caps at 11 chips and 25 characters per label. |
+| `Composer` | "+" attachment, the pill text field with the "RCS message" placeholder, camera, and gallery icons, and the brand-colored send button once `text` is set. Lives inside the panel (`ConversationPanel`'s `composer` prop); the pill and the round button are the off-white `--ph-surface-high`. Decorative, nothing focusable. |
 | `TypingIndicator` | Three bouncing dots in an agent bubble. Static under reduced motion. |
 | `AgentInfo` | The info screen on the lighter panel: 45:14 banner, the logo overlapping it, name with the 20px `VerifiedBadge` when `verified`, description, website, phone, and email rows, and the privacy and terms links. |
 

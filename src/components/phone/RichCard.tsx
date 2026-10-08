@@ -65,34 +65,44 @@ export function RichCard({
           <p style={{ margin: "4px 0 0", fontSize: 14, lineHeight: "19px", color: "var(--ph-on-surface-variant)" }}>{description}</p>
         )}
       </div>
-      {suggestions.slice(0, 4).map((s) => (
-        <button
-          key={s.label}
-          type="button"
-          onClick={s.onSelect}
-          disabled={disabled || !s.onSelect}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 6,
-            height: 44,
-            margin: 0,
-            padding: "0 16px",
-            border: 0,
-            borderTop: "1px solid var(--ph-outline-variant)",
-            background: "transparent",
-            font: "inherit",
-            fontSize: 14,
-            fontWeight: 500,
-            color: "var(--ph-brand-text)",
-            cursor: s.onSelect && !disabled ? "pointer" : "default",
-          }}
-        >
-          {suggestionIcon(s.kind, 16)}
-          {s.label.slice(0, 25)}
-        </button>
-      ))}
+      {suggestions.length > 0 && (
+        <style href="ph-card-action" precedence="default">
+          {"[data-ph-card-action]:not(:disabled):hover{background:color-mix(in srgb,var(--ph-brand) 8%,transparent)}"}
+        </style>
+      )}
+      {suggestions.slice(0, 4).map((s) => {
+        const off = disabled || !s.onSelect;
+        return (
+          <button
+            key={s.label}
+            type="button"
+            data-ph-card-action=""
+            onClick={s.onSelect}
+            disabled={off}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              height: 44,
+              margin: 0,
+              padding: "0 16px",
+              border: 0,
+              borderTop: "1px solid var(--ph-outline-variant)",
+              background: "transparent",
+              font: "inherit",
+              fontSize: 14,
+              fontWeight: 500,
+              color: "var(--ph-brand-text)",
+              cursor: off ? "not-allowed" : "pointer",
+              transition: "background 150ms",
+            }}
+          >
+            {suggestionIcon(s.kind, 16)}
+            {s.label.slice(0, 25)}
+          </button>
+        );
+      })}
     </div>
   );
 }

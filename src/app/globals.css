@@ -102,6 +102,7 @@ h1, h2, h3, h4 {
 }
 p { color: var(--body); }
 ::selection { background: var(--accent-soft); color: var(--ink); }
+button:not(:disabled), [role="button"]:not([aria-disabled="true"]) { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 /* ---------- Utilities ---------- */
