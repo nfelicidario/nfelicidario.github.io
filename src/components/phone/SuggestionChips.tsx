@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { CalendarPlus, ExternalLink, LocateFixed, MapPin, Phone } from "lucide-react";
+import { CalendarPlus, Earth, LocateFixed, MapPin, Phone } from "lucide-react";
 import { useDragScroll } from "./useDragScroll";
 
 /**
@@ -12,13 +12,16 @@ import { useDragScroll } from "./useDragScroll";
  * once the row has been scrolled. `bleed` lets the row clip at its parent's edge instead
  * of at its own padding box.
  * Google allows up to 11 per message, labels up to 25 characters. Actions carry an icon:
- * dial, open URL, view location, share location, create calendar event.
+ * dial, open URL, view location, share location, create calendar event. A reply can carry
+ * an `emoji` as its leading glyph instead.
  */
 export type SuggestionKind = "reply" | "dial" | "url" | "location" | "share-location" | "calendar";
 
 export type Suggestion = {
   label: string;
   kind?: SuggestionKind;
+  /** a leading emoji, in the icon's place (replies only; an action keeps its icon) */
+  emoji?: string;
   selected?: boolean;
 };
 
@@ -38,6 +41,11 @@ export type SuggestionChipsProps = {
 export const MAX_SUGGESTIONS = 11;
 export const MAX_LABEL = 25;
 
+/** Google's 25-character cap, counted in code points so an emoji is never cut in half */
+export function clampLabel(label: string, max = MAX_LABEL): string {
+  return Array.from(label).slice(0, max).join("");
+}
+
 const FADE_WIDTH = 32;
 /** horizontal padding when the row is not bleeding */
 const ROW_PAD_X = 16;
@@ -48,7 +56,7 @@ export function suggestionIcon(kind: SuggestionKind | undefined, size = 18): Rea
     case "dial":
       return <Phone {...p} />;
     case "url":
-      return <ExternalLink {...p} />;
+      return <Earth {...p} />;
     case "location":
       return <MapPin {...p} />;
     case "share-location":
@@ -58,6 +66,15 @@ export function suggestionIcon(kind: SuggestionKind | undefined, size = 18): Rea
     default:
       return null;
   }
+}
+
+/** an emoji sized and aligned like the 18px action icons */
+export function emojiGlyph(emoji: string, size = 16): ReactNode {
+  return (
+    <span aria-hidden="true" style={{ flexShrink: 0, fontSize: size, lineHeight: 1 }}>
+      {emoji}
+    </span>
+  );
 }
 
 export function SuggestionChips({ suggestions, onSelect, disabled = false, label = "Suggestions", bleed = 0 }: SuggestionChipsProps) {
@@ -126,6 +143,7 @@ export function SuggestionChips({ suggestions, onSelect, disabled = false, label
       </style>
       {suggestions.slice(0, MAX_SUGGESTIONS).map((s, i) => {
         const off = disabled || !onSelect;
+        const glyph = s.kind && s.kind !== "reply" ? suggestionIcon(s.kind) : s.emoji ? emojiGlyph(s.emoji) : null;
         return (
           <button
             key={s.label}
@@ -141,7 +159,7 @@ export function SuggestionChips({ suggestions, onSelect, disabled = false, label
               alignItems: "center",
               gap: 6,
               margin: 0,
-              padding: `0 ${s.kind && s.kind !== "reply" ? 14 : 16}px 0 ${s.kind && s.kind !== "reply" ? 10 : 16}px`,
+              padding: `0 ${glyph ? 14 : 16}px 0 ${glyph ? 10 : 16}px`,
               borderRadius: 999,
               border: `1px solid ${s.selected ? "var(--ph-brand)" : "var(--ph-outline-variant)"}`,
               background: s.selected ? "var(--ph-brand-soft)" : "transparent",
@@ -158,8 +176,8 @@ export function SuggestionChips({ suggestions, onSelect, disabled = false, label
               transition: "background 150ms, border-color 150ms, opacity 150ms",
             }}
           >
-            {suggestionIcon(s.kind)}
-            {s.label.slice(0, MAX_LABEL)}
+            {glyph}
+            {clampLabel(s.label)}
           </button>
         );
       })}

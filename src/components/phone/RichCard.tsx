@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import { suggestionIcon, type SuggestionKind } from "./SuggestionChips";
+import { clampLabel, suggestionIcon, type SuggestionKind } from "./SuggestionChips";
 import { useDragScroll } from "./useDragScroll";
 
 /**
@@ -23,7 +23,7 @@ export type RichCardProps = {
   title: string;
   /** a string, or a few lines of your own */
   description?: ReactNode;
-  /** anything; a brand gradient placeholder renders when omitted */
+  /** anything (an illustration, an <img>); a brand gradient placeholder renders when omitted */
   media?: ReactNode;
   mediaHeight?: "short" | "medium" | "tall";
   /** small text at the right of the title, e.g. a price */
@@ -131,7 +131,7 @@ export function RichCard({
                       {icon}
                     </span>
                   )}
-                  <span style={{ minWidth: 0, overflowWrap: "anywhere" }}>{s.label.slice(0, 25)}</span>
+                  <span style={{ minWidth: 0, overflowWrap: "anywhere" }}>{clampLabel(s.label)}</span>
                   {s.overlay}
                 </button>
               );

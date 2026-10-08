@@ -2,6 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import { GESTURE_BAR_H } from "./AndroidPhone";
+import { BANNER_HEIGHT } from "./DemoBanner";
 
 /**
  * The lighter panel the conversation sits in: full width, rounded at the top only, and
@@ -31,8 +32,8 @@ export const PANEL_INSET = 8;
 export const PANEL_PADDING = 10;
 /** how far down the floating banner sits from the panel's top */
 export const BANNER_TOP = 8;
-/** top padding for a scroller under a floating `DemoBanner` (its 24px pill, the margin above, and a gap below) */
-export const BANNER_CLEARANCE = BANNER_TOP + 24 + 8;
+/** top padding for a scroller under a floating `DemoBanner` (its two-line note, the margin above, and a gap below) */
+export const BANNER_CLEARANCE = BANNER_TOP + BANNER_HEIGHT + 8;
 
 export function ConversationPanel({ children, banner, composer, style }: ConversationPanelProps) {
   return (

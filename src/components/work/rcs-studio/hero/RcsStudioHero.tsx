@@ -58,6 +58,7 @@ import {
   type Step,
   type Values,
 } from "./script";
+import { CardMedia } from "./art";
 
 /**
  * RCS Studio hero: one self-driving story in a 16:9 stage, mock data only, frameless.
@@ -79,15 +80,19 @@ import {
  * Google's agent limits are enforced where a field exists: display name 40, description 100,
  * suggestion labels 25. The logo hint says 224×224 PNG or JPEG; any image is accepted.
  *
- * The thread (demo and live) is one ordering flow: opener, a carousel of three deal cards,
- * two action chips, the viewer taps a card's button, an upsell card, the viewer taps
- * "Yes, and checkout" (or "No thanks"), and an order confirmation card with two chips. Each
- * thread's progress is a `Thread` in state: the deal picked, then whether the add-on was taken.
+ * The thread (demo and live) is one ordering flow: opener (naming the business), a carousel
+ * of three deal cards with drawn art (./art.tsx, or the owner's photos), two action chips,
+ * the viewer taps a card's button, an upsell card, the viewer taps "Yes, and checkout" (or
+ * "No thanks"), and an order confirmation card with two chips. Each thread's progress is a
+ * `Thread` in state: the deal picked, then whether the add-on was taken.
  *
  * The happy path (HAPPY_PATH in script.ts) names the one control to click at each moment.
  * A capture-phase click handler on the prototype root compares every click against it: a
  * click on that control, on any form control or label, or on a control marked `data-control`
- * (Replay, the color swatch, the tooltip) passes; anything else pulses the current target.
+ * (Replay, the color swatch, the tooltip, the cards, the chips under the confirmation)
+ * passes; anything else pulses the current target. The two chips under the carousel are
+ * deliberately not marked, so tapping "Find location" or "View full menu" pulses the card
+ * buttons (every card's button carries the same `card-cta` ring).
  *
  * All demo copy and timings (the agent, the chips and replies, the form values, the frames)
  * live in ./script.ts so they can be edited without touching the state machine.
@@ -623,7 +628,15 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, foc
           <div className="my-auto">{left ?? <FlowPanel s={s} timed={timed} still={still} dispatch={dispatch} />}</div>
         </motion.div>
 
-        <AnimatePresence initial={false} mode="popLayout">
+        {/*
+          No `initial={false}` here, on purpose. Motion's `PresenceChild` memoizes its context on
+          presence alone, so the `initial: false` an AnimatePresence hands out on its first
+          render stays in the phone column's context for as long as the column is present, and
+          every motion element that mounts inside it (the typing dots' loop, each bubble's
+          fade-in) is told to skip its mount animation and sits at its final keyframe. The
+          column fades in once on first paint instead, alongside the panel.
+        */}
+        <AnimatePresence mode="popLayout">
           {hasPhone && (
             <motion.div
               key="phone"
@@ -1459,7 +1472,7 @@ function threadMessages(t: Thread, i: number, at: ThreadFrames, opener: string):
   if (t.deal !== null) messages.push({ id: "pick", from: "user", text: DEALS[t.deal].reply, status: upsellOut ? "read" : "delivered" });
   if (upsellOut) messages.push({ id: "upsell", from: "agent", kind: "upsell" });
   if (t.addon !== null)
-    messages.push({ id: "answer", from: "user", text: t.addon ? PHONE_COPY.upsell.yes : PHONE_COPY.upsell.no, status: confirmedOut ? "read" : "delivered" });
+    messages.push({ id: "answer", from: "user", text: t.addon ? PHONE_COPY.upsell.yesReply : PHONE_COPY.upsell.noReply, status: confirmedOut ? "read" : "delivered" });
   if (confirmedOut) messages.push({ id: "confirmation", from: "agent", kind: "confirmation" }, { id: "after", from: "agent", kind: "after-chips" });
   const typing = at.typing.includes(i) || (t.deal !== null && !upsellOut) || (t.addon !== null && !confirmedOut);
   return { messages, typing };
@@ -1471,10 +1484,11 @@ const noAction = () => {};
  * The Android phone, built from the shared kit. Three screens:
  *  - yours and live: a Google Messages thread on the full-height conversation panel. The
  *    thread opens from the top like a new business thread: the agent intro (logo, name and
- *    badge, description, divider), the day divider, then typing, the opener, typing, the deal
- *    carousel, and the two action chips under it. A card's button sends the user's reply (right,
- *    brand color), then typing, then the upsell card; "Yes, and checkout" sends the next reply,
- *    typing, and the confirmation card with its chips. The demo banner floats over the top of
+ *    badge, description, divider), the day divider, then typing, the opener (naming the
+ *    business as it is typed), typing, the deal carousel, and the two action chips right
+ *    behind it. A card's button sends the user's reply (right, brand color), then typing, then
+ *    the upsell card; "Yes, and checkout" sends the next reply, typing, and the confirmation
+ *    card with its chips. The demo banner floats over the top of
  *    the column; the column scrolls edge to edge and keeps the newest content in view; the
  *    composer is pinned under a divider.
  *  - brand and agent steps: the agent details screen, filling in as the form does
@@ -1500,7 +1514,7 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
 
   if (mode === "yours") {
     thread = s.yours;
-    ({ messages, typing } = threadMessages(thread, s.i, THREAD_FRAMES.yours, PHONE_COPY.opener));
+    ({ messages, typing } = threadMessages(thread, s.i, THREAD_FRAMES.yours, PHONE_COPY.opener(name)));
     canPick = s.i >= F.yoursChips && thread.deal === null;
     canCheckout = s.i >= F.yoursUpsell && thread.deal !== null && thread.addon === null;
   } else if (mode === "live") {
@@ -1562,6 +1576,7 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
                 title: d.title,
                 meta: money(d.price),
                 description: d.text,
+                media: <CardMedia art={d.media.art} photo={d.media.photo} />,
                 mediaHeight: "short",
                 suggestions: [
                   {
@@ -1576,8 +1591,13 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
         );
       case "chips":
         return (
-          <div className="w-full" data-control="">
-            {/* real actions (open a map, open the menu), inert in the prototype, and never dimmed: they stay in place after the pick */}
+          <div className="w-full">
+            {/*
+              real actions (open a map, open the menu), inert in the prototype, and never dimmed:
+              they stay in place after the pick. Not `data-control`: they are not the happy
+              path, so a tap on either pulses the card buttons (or, after the pick, the next
+              thing to tap) through the root's capture handler.
+            */}
             <SuggestionChips label="Suggested actions" bleed={PANEL_PADDING} suggestions={PHONE_COPY.dealChips} onSelect={noAction} />
           </div>
         );
@@ -1588,6 +1608,7 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
               title={PHONE_COPY.upsell.title}
               meta={`+${money(PHONE_COPY.upsell.price)}`}
               description={PHONE_COPY.upsell.text}
+              media={<CardMedia art={PHONE_COPY.upsell.media.art} photo={PHONE_COPY.upsell.media.photo} />}
               mediaHeight="short"
               disabled={!canCheckout}
               suggestions={[
@@ -1607,6 +1628,7 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
             width="92%"
             title={PHONE_COPY.confirmation.title(PHONE_COPY.confirmation.orderNumber)}
             meta={money(total)}
+            media={<CardMedia art={PHONE_COPY.confirmation.media.art} photo={PHONE_COPY.confirmation.media.photo} />}
             mediaHeight="short"
             description={
               <ul className="m-0 list-none p-0">
