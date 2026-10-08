@@ -648,37 +648,43 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, foc
 
 type PanelProps = { s: State; timed: boolean; still: boolean; dispatch: Dispatch<Action> };
 
+/**
+ * The pane is keyed by the step's group and fades in when the group changes. It is
+ * deliberately not wrapped in `AnimatePresence mode="wait"`: that mode keeps rendering the old
+ * pane and mounts the new one only after Motion's exit-completion handshake re-renders the
+ * presence from a promise callback, and a footer jump (GOTO to a step start from outside the
+ * hero) could leave the pane stuck on "Demo RCS" while `data-step` and the phone, which read
+ * state directly, moved on. With no exit gate, every state renders its pane on the same
+ * render as the root and the phone.
+ */
 function FlowPanel({ s, timed, still, dispatch }: PanelProps) {
   const step = FRAMES[s.i].step;
   const group = step === "yours" ? "yours" : step === "signup" ? "signup" : step === "live" ? "live" : "provision";
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={group}
-        initial={still ? false : { opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={still ? undefined : { opacity: 0, y: -8 }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
-        className="grid max-w-[440px] gap-4"
-      >
-        {group === "yours" && <DemoRcs s={s} timed={timed} still={still} dispatch={dispatch} />}
-        {group === "signup" && <SignUp s={s} timed={timed} still={still} dispatch={dispatch} />}
-        {group === "provision" && <Provision s={s} timed={timed} still={still} dispatch={dispatch} />}
-        {group === "live" && (
-          <>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="min-w-0">
-                <div className="label">Provisioning</div>
-                <div className="truncate text-[15px] font-semibold text-ink">{s.values.agentName}</div>
-              </div>
-              <StatusPill status={STATUS.live} />
+    <motion.div
+      key={group}
+      initial={still ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="grid max-w-[440px] gap-4"
+    >
+      {group === "yours" && <DemoRcs s={s} timed={timed} still={still} dispatch={dispatch} />}
+      {group === "signup" && <SignUp s={s} timed={timed} still={still} dispatch={dispatch} />}
+      {group === "provision" && <Provision s={s} timed={timed} still={still} dispatch={dispatch} />}
+      {group === "live" && (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="min-w-0">
+              <div className="label">Provisioning</div>
+              <div className="truncate text-[15px] font-semibold text-ink">{s.values.agentName}</div>
             </div>
-            <EndCard />
-          </>
-        )}
-      </motion.div>
-    </AnimatePresence>
+            <StatusPill status={STATUS.live} />
+          </div>
+          <EndCard />
+        </>
+      )}
+    </motion.div>
   );
 }
 
@@ -1031,119 +1037,117 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
         )}
       </div>
 
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={step}
-          initial={still ? false : { opacity: 0, x: 10 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={still ? undefined : { opacity: 0, x: -10 }}
-          transition={{ duration: 0.22, ease: "easeOut" }}
-          className="grid gap-3"
-        >
-          {step === "brand" && (
-            <form
-              className="grid gap-3"
-              onSubmit={(e) => {
-                e.preventDefault();
-                go(F.agent);
-              }}
-            >
-              <p className="text-[12.5px] text-muted">The company behind the agent.</p>
-              <Field s={s} timed={timed} dispatch={dispatch} field="legalName" label="Legal name" />
-              <Field
-                s={s}
-                timed={timed}
-                dispatch={dispatch}
-                field="website"
-                label="Website"
-                hint={
-                  shown(s, timed, "website") ? (
-                    <span className="inline-flex items-center gap-1 text-accent">
-                      <Sparkles size={12} aria-hidden="true" /> We&apos;ll prefill the rest from this site.
-                    </span>
-                  ) : undefined
-                }
-              />
-              <Field s={s} timed={timed} dispatch={dispatch} field="contact" label="Contact email" type="email" />
-              <div className="flex justify-end">
-                <Primary type="submit" still={still} target="continue">
-                  Continue
-                </Primary>
-              </div>
-            </form>
-          )}
+      {/* keyed by step, entrance only: no exit gate, for the same reason as FlowPanel */}
+      <motion.div
+        key={step}
+        initial={still ? false : { opacity: 0, x: 10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.22, ease: "easeOut" }}
+        className="grid gap-3"
+      >
+        {step === "brand" && (
+          <form
+            className="grid gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              go(F.agent);
+            }}
+          >
+            <p className="text-[12.5px] text-muted">The company behind the agent.</p>
+            <Field s={s} timed={timed} dispatch={dispatch} field="legalName" label="Legal name" />
+            <Field
+              s={s}
+              timed={timed}
+              dispatch={dispatch}
+              field="website"
+              label="Website"
+              hint={
+                shown(s, timed, "website") ? (
+                  <span className="inline-flex items-center gap-1 text-accent">
+                    <Sparkles size={12} aria-hidden="true" /> We&apos;ll prefill the rest from this site.
+                  </span>
+                ) : undefined
+              }
+            />
+            <Field s={s} timed={timed} dispatch={dispatch} field="contact" label="Contact email" type="email" />
+            <div className="flex justify-end">
+              <Primary type="submit" still={still} target="continue">
+                Continue
+              </Primary>
+            </div>
+          </form>
+        )}
 
-          {step === "agent" && (
-            <form
-              className="grid gap-3"
-              onSubmit={(e) => {
-                e.preventDefault();
-                go(F.campaign);
-              }}
-            >
-              <p className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-1 text-[12px] text-ink">
-                <Sparkles size={12} aria-hidden="true" className="text-accent" />
-                Prefilled from step 1 and {s.values.website}. Check it and continue.
-              </p>
-              <Field s={s} timed={timed} dispatch={dispatch} field="agentName" label="Display name" maxLength={MAX.name} />
-              <LogoField s={s} timed={timed} dispatch={dispatch} compact />
-              <ColorField value={s.values.color} onChange={(v) => dispatch({ type: "SET", field: "color", value: v })} readOnly={timed} />
-              <Field s={s} timed={timed} dispatch={dispatch} field="description" label="Description" multiline maxLength={MAX.description} />
-              <div className="flex justify-end">
-                <Primary type="submit" still={still} target="continue">
-                  Continue
-                </Primary>
-              </div>
-            </form>
-          )}
+        {step === "agent" && (
+          <form
+            className="grid gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              go(F.campaign);
+            }}
+          >
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-1 text-[12px] text-ink">
+              <Sparkles size={12} aria-hidden="true" className="text-accent" />
+              Prefilled from step 1 and {s.values.website}. Check it and continue.
+            </p>
+            <Field s={s} timed={timed} dispatch={dispatch} field="agentName" label="Display name" maxLength={MAX.name} />
+            <LogoField s={s} timed={timed} dispatch={dispatch} compact />
+            <ColorField value={s.values.color} onChange={(v) => dispatch({ type: "SET", field: "color", value: v })} readOnly={timed} />
+            <Field s={s} timed={timed} dispatch={dispatch} field="description" label="Description" multiline maxLength={MAX.description} />
+            <div className="flex justify-end">
+              <Primary type="submit" still={still} target="continue">
+                Continue
+              </Primary>
+            </div>
+          </form>
+        )}
 
-          {step === "campaign" && (
-            <form
-              className="grid gap-3"
-              onSubmit={(e) => {
-                e.preventDefault();
-                submitCampaign();
+        {step === "campaign" && (
+          <form
+            className="grid gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              submitCampaign();
+            }}
+          >
+            <p className="text-[12.5px] text-muted">The promise to carriers: what you&apos;ll send and to whom.</p>
+            <Field s={s} timed={timed} dispatch={dispatch} field="useCase" label="Use case" options={OPTIONS.useCases} />
+            <Field s={s} timed={timed} dispatch={dispatch} field="sample" label="Sample message" multiline />
+            <Field
+              s={s}
+              timed={timed}
+              dispatch={dispatch}
+              field="optIn"
+              label="Opt-in method"
+              options={OPTIONS.optIns}
+              placeholder="Choose one"
+              target="opt-in"
+              error={invalid ? "Choose how customers opt in. Carriers reject campaigns without one." : undefined}
+              onChange={(v) => {
+                dispatch({ type: "SET", field: "optIn", value: v });
+                if (invalid) go(F.campaignFixed);
               }}
-            >
-              <p className="text-[12.5px] text-muted">The promise to carriers: what you&apos;ll send and to whom.</p>
-              <Field s={s} timed={timed} dispatch={dispatch} field="useCase" label="Use case" options={OPTIONS.useCases} />
-              <Field s={s} timed={timed} dispatch={dispatch} field="sample" label="Sample message" multiline />
-              <Field
-                s={s}
-                timed={timed}
-                dispatch={dispatch}
-                field="optIn"
-                label="Opt-in method"
-                options={OPTIONS.optIns}
-                placeholder="Choose one"
-                target="opt-in"
-                error={invalid ? "Choose how customers opt in. Carriers reject campaigns without one." : undefined}
-                onChange={(v) => {
-                  dispatch({ type: "SET", field: "optIn", value: v });
-                  if (invalid) go(F.campaignFixed);
-                }}
-              />
-              <Field
-                s={s}
-                timed={timed}
-                dispatch={dispatch}
-                field="volume"
-                label="Expected volume"
-                options={OPTIONS.volumes}
-                tooltip="A ballpark is fine. Carriers use it to size your throughput, and you can raise it later."
-                tooltipOpen={timed && s.i === F.campaign}
-              />
-              <div className="flex justify-end">
-                <Primary type="submit" still={still} target="submit">
-                  Submit for review
-                </Primary>
-              </div>
-            </form>
-          )}
+            />
+            <Field
+              s={s}
+              timed={timed}
+              dispatch={dispatch}
+              field="volume"
+              label="Expected volume"
+              options={OPTIONS.volumes}
+              tooltip="A ballpark is fine. Carriers use it to size your throughput, and you can raise it later."
+              tooltipOpen={timed && s.i === F.campaign}
+            />
+            <div className="flex justify-end">
+              <Primary type="submit" still={still} target="submit">
+                Submit for review
+              </Primary>
+            </div>
+          </form>
+        )}
 
-          {step === "submitted" && <Timeline still={still} />}
-        </motion.div>
-      </AnimatePresence>
+        {step === "submitted" && <Timeline still={still} />}
+      </motion.div>
     </>
   );
 }
