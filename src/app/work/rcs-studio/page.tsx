@@ -90,15 +90,15 @@ export default function Page() {
       <Tldr
         items={[
           "Vibes' first customer-facing, self-serve product in a decade, and the first thing the company ever put on the public internet.",
-          "The founding thesis was wrong. I learned that from beta customers and repositioned the product around provisioning instead of flow building.",
+          "The founding bet was that provisioning would take care of itself. Customers showed me it was the whole first step, so I repositioned the product around it before beta.",
           "Now the portal for every RCS agent Vibes provisions: 450-plus, in one to three weeks against months for competitors.",
-          "It proved self-serve works at Vibes. I'm now working with the head of product on a company-wide self-serve entry point.",
+          "It proved customers would sign up and try things on their own. I'm now working with the head of product on a company-wide self-serve entry point.",
         ]}
       />
 
       <Beat
-        chapter="Chapter 1 · The bet"
-        title="A hackathon project with a thesis"
+        chapter="Chapter 1"
+        title="The bet"
         artifact={
           <Artifact label="A lot of firsts for a twenty-year B2B company">
             <ul className="grid gap-2">
@@ -114,20 +114,16 @@ export default function Page() {
         }
       >
         <p>
-          RCS is the successor to SMS: branded senders, rich cards, carousels, suggested replies. Vibes
-          believed developers would be the ones to prove it, so a hackathon project became RCS Studio, a
-          self-serve platform where any developer could sign up and build RCS message flows.
+          RCS is the successor to SMS: branded senders, rich cards, carousels, suggested replies. The bet was that an industry shift to RCS was coming on its own, every brand would soon have an agent, and all of them would need a builder to use its rich features. So a hackathon project became RCS Studio, a self-serve platform where any developer could sign up and build RCS message flows.
         </p>
         <p>
-          For a company that had sold B2B through a sales team for twenty years, this was a lot of firsts. I
-          joined in August 2025 to take over daily ownership from the head of design, and was running it
-          independently by my third month.
+          For a company that had sold B2B through a sales team for twenty years, this was a lot of firsts. I joined in August 2025 to take over daily ownership from the head of design, and was running it independently by my third month.
         </p>
       </Beat>
 
       <Beat
-        chapter="Chapter 2 · What the market said"
-        title="Nobody arrived wanting to build a flow"
+        chapter="Chapter 2"
+        title="The question everyone asked"
         reverse
         artifact={
           <Artifact label="Thesis vs. reality" pill="Abstracted">
@@ -136,15 +132,10 @@ export default function Page() {
         }
       >
         <p>
-          The thesis didn&apos;t survive contact with customers. I ran a partner beta with two companies who got
-          hands-on support in exchange for interviews, and read everything else we could get: sign-up data,
-          support tickets, and what sales and account teams were hearing on calls.
+          There was no single moment. The signal accumulated: early customer interviews, a lot of sales calls, usage data from early customers and self-serve users, and the competitive analysis I ran once the pattern was clear. Every conversation began with &ldquo;What is RCS?&rdquo; and &ldquo;How do I get started?&rdquo; Nobody arrived wanting to build a flow.
         </p>
         <p>
-          Every conversation started the same way: &ldquo;What is RCS?&rdquo; and &ldquo;How do I get
-          started?&rdquo; Getting started meant provisioning, a brand and agent registered, verified, and
-          approved by each carrier, and it all happened over email across weeks. The flow builder answered a
-          question nobody was asking yet.
+          Getting started meant provisioning: a brand and agent registered, verified, and approved by each carrier, over weeks of email. RCS was so new that the plumbing had to come first. We had built the second step of the product and skipped the first.
         </p>
       </Beat>
 
@@ -178,8 +169,8 @@ export default function Page() {
       </Beat>
 
       <Beat
-        chapter="Chapter 4 · The pushback"
-        title="&ldquo;What are we even building here?&rdquo;"
+        chapter="Chapter 4"
+        title="Making the case"
         reverse
         artifact={
           <Artifact label="The reframe that aligned the team">
@@ -199,20 +190,16 @@ export default function Page() {
         }
       >
         <p>
-          The engineering manager pushed back, and leadership&apos;s vision was still to push the boundaries of
-          RCS. A provisioning platform looked like a detour into operations tooling.
+          The engineering manager pushed back, and leadership&apos;s vision was still to push the boundaries of RCS. A provisioning platform looked like a detour into operations tooling.
         </p>
         <p>
-          I didn&apos;t argue it. I built a proof of concept of the provisioning flow, put it in front of our
-          operations team, and brought their reaction back. Then I made the strategic case: a flow builder
-          competes with one feature of the incumbents, while a provisioning platform competes with the
-          incumbents themselves.
+          I didn&apos;t argue it. I built a proof of concept of the provisioning flow, put it in front of our operations team, and brought their reaction back. That reaction is what moved the engineering manager. He was clear-eyed that a company our size would not out-build the big messaging incumbents, but we could be the fastest at the part everyone struggles with, because we understood it best. A flow builder competes with one feature of the incumbents. A provisioning platform competes on the thing customers actually get stuck on.
         </p>
       </Beat>
 
       <Beat
-        chapter="Chapter 5 · Simplifying the builder"
-        title="It made sense if you&apos;d built it"
+        chapter="Chapter 5"
+        title="The builder, demoted and simplified"
         artifact={
           <Artifact label="The builder, before and after" pill="Abstract shapes">
             <Simplify />
@@ -220,19 +207,16 @@ export default function Page() {
         }
       >
         <p>
-          The original builder was called the state builder, and internal interviews showed consistent
-          confusion. Most beta users didn&apos;t use it correctly or at all, drop-off clustered inside it, and
-          intake questions were mostly &ldquo;how does this work.&rdquo;
+          The builder stayed, but as the second step, and a second step can&apos;t be the hardest part of the product. Internal interviews showed consistent confusion with the original state builder. Most beta users didn&apos;t use it correctly or at all, drop-off clustered inside it, and intake questions were mostly &ldquo;how does this work.&rdquo;
         </p>
         <p>
-          I cut most of the optionality from the default path and moved advanced capability behind progressive
-          disclosure. Three steps got people to a working flow; everything else stayed one click away.
+          I cut most of the optionality from the default path and moved advanced capability behind progressive disclosure, so three steps got people to a working flow. Today the builder is mostly a demo engine, with a handful of power users, and making it easier is still open work.
         </p>
       </Beat>
 
       <Beat
-        chapter="Chapter 6 · Finding the look"
-        title="The design system was built for a different product"
+        chapter="Chapter 6"
+        title="A look for different users"
         reverse
         artifact={
           <Artifact label="Type, spacing, color" pill="Abstract tiles">
@@ -241,22 +225,16 @@ export default function Page() {
         }
       >
         <p>
-          RCS Studio inherited a design system built for a marketing platform: large type, generous spacing,
-          and a primary color plus several secondary colors used freely. For a dense builder and a multi-step
-          provisioning flow it didn&apos;t work, so we drifted toward a smaller type scale, tighter spacing, and
-          color reserved for calls to action.
+          The inherited design system was built for a marketing product: large type, generous spacing, and a primary color plus several secondary colors used freely. A multi-step form for someone who has never heard of carrier approval needed a smaller scale, tighter spacing, and color reserved for the next step. The impetus was user feedback, internal and external; the liberties I took to answer it went past the existing system.
         </p>
         <p>
-          The drift got noticed, and the concern about two products diverging was fair. I reviewed each change
-          with the head of design and fed what landed back into the shared system, and several of those
-          components were adopted. What came out of it is the direction the company&apos;s next-generation
-          products are now being designed on.
+          The drift got noticed, and the concern about two products diverging was fair. I reviewed each change with the head of design and fed what landed back into the shared system. Customers and sales described the result as elegant and modern, and that direction is what the company&apos;s next-generation products are now being designed on.
         </p>
       </Beat>
 
       <Beat
-        chapter="Chapter 7 · What I shipped"
-        title="Figma docs, then production code"
+        chapter="Chapter 7"
+        title="What it proved"
         artifact={
           <Artifact label="How the work changed shape">
             <div className="grid gap-3 sm:grid-cols-2">
@@ -281,14 +259,10 @@ export default function Page() {
         }
       >
         <p>
-          For the first seven months I worked the way most product designers do: a Figma design doc for nearly
-          every change, broken into epics and stories, with a roadmap the product organization still uses for
-          executive reviews. For beta I owned the landing page end to end, including copy and the legal pages.
+          For the first seven months I worked the way most product designers do: a Figma design doc for nearly every change, broken into epics and stories, with a roadmap the product organization still uses for executive reviews. From March 2026 I shipped production TypeScript alongside the engineers: sign-up, sign-in, and the customer-facing provisioning flows.
         </p>
         <p>
-          In March 2026 we got Claude Code. From then on I shipped production TypeScript alongside the
-          engineers: the sign-up and sign-in experience, customer-facing provisioning flows, and most of the
-          internal admin.
+          We gated the last step on purpose. Anyone could sign up and spin up an agent in Test Mode, and launching it meant a conversation with sales. Some did exactly that. Others got an agent into Test Mode and never booked the call, which told us the self-serve path worked and where it still leaked.
         </p>
       </Beat>
 
@@ -302,11 +276,9 @@ export default function Page() {
       >
         <p>
           RCS Studio is now the portal for every RCS agent Vibes provisions. More importantly, it proved that
-          self-serve works here: leads come in, try things, and convert without a sales call first.
-        </p>
-        <p>
-          That changed the company&apos;s direction. I&apos;m now working with the head of product on a
-          company-wide self-serve entry point.
+          customers would sign up and get an agent running on their own, something the company had never
+          seen. That changed its direction, and I&apos;m now working with the head of product on a company-wide
+          self-serve entry point.
         </p>
       </Outcome>
 
