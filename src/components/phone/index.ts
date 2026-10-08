@@ -12,7 +12,7 @@ export { MessageBubble, Timestamp, BUBBLE_RADIUS, BUBBLE_TAIL } from "./MessageB
 export type { MessageBubbleProps, BubbleStatus } from "./MessageBubble";
 export { RichCard, RichCardCarousel, MediaPlaceholder, MEDIA_HEIGHT, CARD_RADIUS } from "./RichCard";
 export type { RichCardProps, CardSuggestion } from "./RichCard";
-export { SuggestionChips, suggestionIcon, emojiGlyph, clampLabel, MAX_SUGGESTIONS, MAX_LABEL } from "./SuggestionChips";
+export { SuggestionChips, suggestionIcon, emojiGlyph, clampLabel, MAX_SUGGESTIONS, MAX_LABEL, CHIP_HEIGHT } from "./SuggestionChips";
 export type { Suggestion, SuggestionKind, SuggestionChipsProps } from "./SuggestionChips";
 export { useDragScroll, DRAG_THRESHOLD } from "./useDragScroll";
 export { Composer } from "./Composer";

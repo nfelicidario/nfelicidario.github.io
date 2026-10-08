@@ -80,7 +80,7 @@ export function MessageBubble({ from, children, tail = true, status, time, ghost
           {time}
           {time && status ? " · " : null}
           {status === "read" ? (
-            <CheckCheck size={13} aria-hidden="true" style={{ color: "var(--ph-brand-text)" }} />
+            <CheckCheck size={13} aria-hidden="true" style={{ color: "var(--ph-on-surface)" }} />
           ) : status ? (
             <Check size={13} aria-hidden="true" />
           ) : null}

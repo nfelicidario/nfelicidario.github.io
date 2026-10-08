@@ -5,10 +5,10 @@ import { Camera, Image as ImageIcon, Plus, SendHorizontal } from "lucide-react";
 /**
  * The Google Messages composer: attachment "+", a pill text field whose placeholder reads
  * "RCS message" when the thread is RCS capable ("Text message" for SMS), camera and gallery
- * icons, and the brand-colored send button once there is text. It sits inside the
- * conversation panel (pass it as `ConversationPanel`'s `composer`), so the pill and the round
- * button are the off-white `--ph-surface-high` on the panel's white. Decorative; nothing is
- * focusable.
+ * icons, and a neutral send button (dark circle, light arrow) once there is text. It sits
+ * inside the conversation panel (pass it as `ConversationPanel`'s `composer`), so the pill and
+ * the round button are the off-white `--ph-surface-high` on the panel's white. Decorative;
+ * nothing is focusable.
  */
 export type ComposerProps = {
   placeholder?: string;
@@ -56,7 +56,7 @@ export function Composer({ placeholder = "RCS message", text = "" }: ComposerPro
         )}
       </span>
       {text && (
-        <span style={{ ...round, background: "var(--ph-brand)", color: "var(--ph-on-brand)" }}>
+        <span style={{ ...round, background: "var(--ph-on-surface)", color: "var(--ph-surface)" }}>
           <SendHorizontal size={20} />
         </span>
       )}

@@ -7,13 +7,14 @@ import type { ArtKey } from "./script";
  * The card art for the RCS Studio hero: five small vector illustrations drawn as one set, so
  * the deal cards, the upsell, and the order confirmation read like one photo shoot.
  *
- * The duotone system, derived from the phone's brand color (`--ph-brand`):
- *  - key: the brand color itself, for the subject's main mass (a patty, a jug, a carton)
- *  - deep: the brand mixed toward ink, for lids, stems, straws, and other small accents
- *  - tint: the brand mixed toward white, for buns, cups, and bags
- *  - pale: a fainter tint, for ground shadows and secondary shapes
+ * The duotone system is a fixed warm neutral palette. It does not read the phone's brand
+ * color, so the art looks the same whatever color the viewer picks:
+ *  - key: a muted ochre, for the subject's main mass (a patty, a jug, a carton)
+ *  - deep: a warm umber, for lids, stems, straws, and other small accents
+ *  - tint: a warm sand, for buns, cups, and bags
+ *  - pale: a fainter warm gray, for ground shadows and secondary shapes
  *  - light: an off-white, for cream, cheese, highlights, and the receipt
- *  - ground: an off-white warmed a few percent toward the brand
+ *  - ground: a warm off-white
  * Only circles, ellipses, rounded rectangles, and a few soft paths; no text inside the art.
  *
  * Every illustration shares one viewBox, `ART_W` x `ART_H` (320 x 112, the short card media
@@ -30,12 +31,12 @@ export const ART_W = 320;
 export const ART_H = 112;
 
 const TONES = {
-  "--art-key": "var(--ph-brand)",
-  "--art-deep": "color-mix(in srgb, var(--ph-brand) 68%, #1b1c1f)",
-  "--art-tint": "color-mix(in srgb, var(--ph-brand) 30%, #ffffff)",
-  "--art-pale": "color-mix(in srgb, var(--ph-brand) 13%, #ffffff)",
+  "--art-key": "#c2944f",
+  "--art-deep": "#6e5436",
+  "--art-tint": "#e6d3b3",
+  "--art-pale": "#ebe4d8",
   "--art-light": "#fffdf8",
-  "--art-ground": "color-mix(in srgb, var(--ph-brand) 7%, #fffcf6)",
+  "--art-ground": "#f6f1e8",
 } as CSSProperties;
 
 function Frame({ children }: { children: ReactNode }) {

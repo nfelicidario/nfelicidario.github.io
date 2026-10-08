@@ -6,10 +6,11 @@ import { useDragScroll } from "./useDragScroll";
 
 /**
  * An RBM rich card: media on top, title, description, then up to four suggestions as
- * full-width rows inside the card, the way Google Messages draws them: a lighter rounded row
- * on the card's tonal ground, the action's icon in a small circle at the left, label left-aligned.
- * Media heights follow Google's spec: short 112, medium 168, tall 264 dp. A standalone vertical
- * card spans the screen width minus the 16 dp margins.
+ * full-width rows inside the card, the way Google Messages draws them: a white card with a
+ * neutral 1 px outline, each action a white rounded row with a gray outline and dark text,
+ * the action's icon in a small tonal circle at the left, label left-aligned. Nothing here reads
+ * the brand color. Media heights follow Google's spec: short 112, medium 168, tall 264 dp. A
+ * standalone vertical card spans the screen width minus the 16 dp margins.
  */
 export type CardSuggestion = {
   label: string;
@@ -23,7 +24,7 @@ export type RichCardProps = {
   title: string;
   /** a string, or a few lines of your own */
   description?: ReactNode;
-  /** anything (an illustration, an <img>); a brand gradient placeholder renders when omitted */
+  /** anything (an illustration, an <img>); a neutral gradient placeholder renders when omitted */
   media?: ReactNode;
   mediaHeight?: "short" | "medium" | "tall";
   /** small text at the right of the title, e.g. a price */
@@ -60,7 +61,8 @@ export function RichCard({
         maxWidth: "100%",
         overflow: "hidden",
         borderRadius: CARD_RADIUS,
-        background: "var(--ph-surface-high)",
+        border: "1px solid var(--ph-outline-variant)",
+        background: "var(--ph-surface)",
         color: "var(--ph-on-surface)",
         ...style,
       }}
@@ -80,7 +82,7 @@ export function RichCard({
       {actions.length > 0 && (
         <>
           <style href="ph-card-action" precedence="default">
-            {"[data-ph-card-action]:not(:disabled):hover{background:color-mix(in srgb,var(--ph-brand) 8%,var(--ph-surface))}"}
+            {"[data-ph-card-action]:not(:disabled):hover{background:var(--ph-surface-low);border-color:var(--ph-outline)}"}
           </style>
           <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "0 10px 10px" }}>
             {actions.map((s) => {
@@ -100,8 +102,8 @@ export function RichCard({
                     gap: 10,
                     minHeight: 44,
                     margin: 0,
-                    padding: icon ? "6px 14px 6px 8px" : "6px 14px",
-                    border: 0,
+                    padding: icon ? "5px 13px 5px 7px" : "5px 13px",
+                    border: "1px solid var(--ph-outline-variant)",
                     borderRadius: 16,
                     background: "var(--ph-surface)",
                     font: "inherit",
@@ -111,7 +113,7 @@ export function RichCard({
                     textAlign: "left",
                     color: "var(--ph-on-surface)",
                     cursor: off ? "not-allowed" : "pointer",
-                    transition: "background 150ms",
+                    transition: "background 150ms, border-color 150ms",
                   }}
                 >
                   {icon && (
@@ -143,7 +145,7 @@ export function RichCard({
   );
 }
 
-/** a brand-tinted gradient standing in for a photo; pass `seed` to vary the angle per card */
+/** a neutral gray gradient standing in for a photo; pass `seed` to vary the angle per card, or `style` to override it */
 export function MediaPlaceholder({ seed = 0, style }: { seed?: number; style?: CSSProperties }) {
   const angle = 135 + ((seed * 70) % 180);
   return (
@@ -151,7 +153,7 @@ export function MediaPlaceholder({ seed = 0, style }: { seed?: number; style?: C
       style={{
         width: "100%",
         height: "100%",
-        background: `linear-gradient(${angle}deg, var(--ph-brand) 0%, color-mix(in srgb, var(--ph-brand) 55%, var(--ph-bg)) 55%, var(--ph-surface-high) 100%)`,
+        background: `linear-gradient(${angle}deg, var(--ph-outline-variant) 0%, var(--ph-surface-high) 55%, var(--ph-surface-low) 100%)`,
         ...style,
       }}
     />

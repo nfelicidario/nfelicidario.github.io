@@ -9,11 +9,13 @@ import { BatteryFull, Signal, Wifi } from "lucide-react";
  * proportions whatever the frame's on-page width. `zoom` (not `transform`) keeps layout,
  * hit testing, and motion layout animations honest.
  *
- * Colors are phone-local CSS variables derived from `brandColor` (Material 3 roles: surface,
- * surface containers, on-surface, outline), with light and dark variants. The screen ground
- * (`--ph-bg`) is the surface-container tier that the status bar, header, chips, and composer
- * share; `ConversationPanel` and `AgentInfo` sit on it as a lighter `--ph-surface` panel.
- * Nothing here reads the site's Tailwind tokens, so the mockup looks the same on any page.
+ * Colors are phone-local CSS variables (Material 3 roles: surface, surface containers,
+ * on-surface, outline), with light and dark variants. The surfaces are fixed neutrals;
+ * `brandColor` reaches exactly three things: the hero band on the agent details screen, the
+ * verified badge, and the user's reply bubbles. The screen ground (`--ph-bg`) is the
+ * surface-container tier that the status bar, header, and composer share; `ConversationPanel`
+ * and `AgentInfo` sit on it as a lighter `--ph-surface` panel. Nothing here reads the site's
+ * Tailwind tokens, so the mockup looks the same on any page.
  */
 
 export const PHONE = {
@@ -32,7 +34,7 @@ export type PhoneTheme = "light" | "dark" | "auto";
 
 export type AndroidPhoneProps = {
   children: ReactNode;
-  /** #RRGGBB. Header accents, user bubbles, chip labels, and the surface tint derive from it. */
+  /** #RRGGBB. Colors the agent details hero band, the verified badge, and the user's reply bubbles; nothing else. */
   brandColor?: string;
   /** "auto" follows the site's data-theme attribute, then prefers-color-scheme. */
   theme?: PhoneTheme;
@@ -47,23 +49,22 @@ export type AndroidPhoneProps = {
   className?: string;
 };
 
-/** phone-local tokens for one theme */
+/**
+ * Phone-local tokens for one theme. The surfaces are fixed neutral grays (no tint toward the
+ * brand), so the brand color shows only where a component reads `--ph-brand` directly.
+ */
 export function phoneTokens(brand: string, theme: "light" | "dark"): CSSProperties {
-  const mix = (pct: number, base: string) => `color-mix(in srgb, ${brand} ${pct}%, ${base})`;
   const light = {
     "--ph-brand": brand,
     "--ph-on-brand": "#ffffff",
-    "--ph-brand-text": brand,
-    "--ph-brand-soft": mix(14, "#ffffff"),
-    "--ph-bg": mix(5, "#eceef2"),
-    "--ph-surface": mix(2, "#ffffff"),
-    "--ph-surface-low": mix(6, "#ffffff"),
-    "--ph-surface-high": mix(11, "#ffffff"),
+    "--ph-bg": "#eceef2",
+    "--ph-surface": "#ffffff",
+    "--ph-surface-low": "#f5f6f8",
+    "--ph-surface-high": "#e8e9ed",
     "--ph-on-surface": "#1b1c1f",
     "--ph-on-surface-variant": "#45474d",
     "--ph-outline": "#76777d",
     "--ph-outline-variant": "#c7c8cf",
-    "--ph-verified": "#1a73e8",
     "--ph-frame": "#1b1d22",
     "--ph-frame-edge": "#3d4049",
     "--ph-cutout": "#07080b",
@@ -71,17 +72,14 @@ export function phoneTokens(brand: string, theme: "light" | "dark"): CSSProperti
   const dark = {
     "--ph-brand": brand,
     "--ph-on-brand": "#ffffff",
-    "--ph-brand-text": mix(55, "#ffffff"),
-    "--ph-brand-soft": mix(26, "#1a1c21"),
-    "--ph-bg": mix(6, "#0e1014"),
-    "--ph-surface": mix(8, "#1b1d22"),
-    "--ph-surface-low": mix(11, "#24262b"),
-    "--ph-surface-high": mix(13, "#2a2c31"),
+    "--ph-bg": "#0e1014",
+    "--ph-surface": "#1b1d22",
+    "--ph-surface-low": "#24262b",
+    "--ph-surface-high": "#2c2e34",
     "--ph-on-surface": "#e3e2e8",
     "--ph-on-surface-variant": "#c5c6cd",
     "--ph-outline": "#8f9097",
     "--ph-outline-variant": "#45474d",
-    "--ph-verified": "#8ab4f8",
     "--ph-frame": "#1b1d22",
     "--ph-frame-edge": "#3d4049",
     "--ph-cutout": "#07080b",
