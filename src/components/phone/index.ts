@@ -17,6 +17,9 @@ export type { Suggestion, SuggestionKind, SuggestionChipsProps } from "./Suggest
 export { Composer } from "./Composer";
 export type { ComposerProps } from "./Composer";
 export { TypingIndicator } from "./TypingIndicator";
+export type { TypingIndicatorProps } from "./TypingIndicator";
+export { ThreadIntro, ThreadNotice, INTRO_LOGO_RADIUS } from "./ThreadIntro";
+export type { ThreadIntroProps } from "./ThreadIntro";
 export { AgentInfo } from "./AgentInfo";
 export type { AgentInfoProps } from "./AgentInfo";
 export { GESTURE_BAR_H } from "./AndroidPhone";

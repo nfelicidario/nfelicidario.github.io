@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useReducer, useState, type Dispatch, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useId, useReducer, useRef, useState, type Dispatch, type MouseEvent, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useHeroFooter } from "@/components/case/HeroStage";
 import {
@@ -14,6 +14,8 @@ import {
   PANEL_PADDING,
   RichCard,
   SuggestionChips,
+  ThreadIntro,
+  ThreadNotice,
   Timestamp,
   TypingIndicator,
   type BubbleStatus,
@@ -40,6 +42,7 @@ import {
   END_CARD,
   FORM_DEFAULTS,
   FRAMES,
+  HAPPY_PATH,
   LIVE_CHIPS,
   OPTIONS,
   PHONE_COPY,
@@ -51,6 +54,7 @@ import {
   YOURS_CHIPS,
   type Chip,
   type Field,
+  type HappyMoment,
   type Status,
   type Step,
   type Values,
@@ -76,6 +80,11 @@ import {
  * Google's agent limits are enforced where a field exists: display name 40, description 100,
  * suggested-reply labels 25. The logo hint says 224×224 PNG or JPEG; any image is accepted.
  *
+ * The happy path (HAPPY_PATH in script.ts) names the one control to click at each moment.
+ * A capture-phase click handler on the prototype root compares every click against it: a
+ * click on that control, on any form control or label, or on a control marked `data-control`
+ * (Replay, the color swatch, the tooltip) passes; anything else pulses the current target.
+ *
  * All demo copy and timings (the agent, the chips and replies, the form values, the frames)
  * live in ./script.ts so they can be edited without touching the state machine.
  */
@@ -86,6 +95,21 @@ const MAX = { name: 40, description: 100 } as const;
 
 /** one form row: every field in a form shares this border, radius, and type size */
 const ROW = "bubble-sm border text-[13px] text-ink";
+
+/**
+ * Scoped CSS that the Tailwind layer cannot win against the site's unlayered `:focus-visible`
+ * rule: a focused input gets one 1.5 px portfolio-blue outline drawn over its border (no second
+ * ring); a row that wraps controls (`data-row`) draws that same outline instead of the control
+ * inside it; and the happy-path pulse, two pulses of a 2 px outline in 1.2 s.
+ */
+const HERO_CSS =
+  "[data-rcs-hero] :is(input,select,textarea):focus-visible{outline:1.5px solid var(--accent);outline-offset:-1px}" +
+  "[data-rcs-hero] [data-row]:has(:focus-visible){outline:1.5px solid var(--accent);outline-offset:-1px}" +
+  "[data-rcs-hero] [data-row] :is(input,select,textarea):focus-visible{outline:none}" +
+  "@keyframes rcs-hint{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 0 2px var(--accent)}}";
+
+/** how long the happy-path pulse shows, in ms (two pulses) */
+const HINT_MS = 1200;
 /** row height and padding: 44 px in the demo form, 36 px in the denser provisioning forms */
 const rowSize = (tall?: boolean) => (tall ? "h-11 px-3" : "h-9 px-2.5");
 
@@ -95,7 +119,13 @@ const rowSize = (tall?: boolean) => (tall ? "h-11 px-3" : "h-9 px-2.5");
 const at = (step: Step, phase: string) => FRAMES.findIndex((f) => f.step === step && f.phase === phase);
 
 const F = {
-  yours: at("yours", "idle"),
+  /** the first frame of the thread: the agent is typing */
+  yours: at("yours", "typing1"),
+  yoursGreeting: at("yours", "greeting"),
+  yoursTyping2: at("yours", "typing2"),
+  yoursCard: at("yours", "card"),
+  /** the chips are out; the viewer can tap */
+  yoursChips: at("yours", "chips"),
   yoursTapped: at("yours", "tap"),
   yoursReplied: at("yours", "replied"),
   yoursName: at("yours", "name"),
@@ -118,6 +148,8 @@ const F = {
 
 const STEP_ORDER: Step[] = ["yours", "signup", "brand", "agent", "campaign", "submitted", "live"];
 const FOOTER_STEPS = STEP_ORDER.map((st) => STEP_LABELS[st]);
+/** the first frame of each step, for the footer's step arrows */
+const STEP_START = STEP_ORDER.map((st) => FRAMES.findIndex((f) => f.step === st));
 
 /** the three provisioning steps, with the icon each wears in the pane header */
 const PROVISION_STEPS: { step: Step; icon: typeof Building2 }[] = [
@@ -200,7 +232,7 @@ type Action =
   | { type: "TAP"; chip: number; now?: boolean }
   | { type: "SET"; field: Field; value: string }
   | { type: "LOGO"; logo: Logo }
-  /** the form's own Replay: back to the greeting and card, chips tappable again, fields kept */
+  /** the form's own Replay: the thread plays again from the top, fields kept */
   | { type: "RESET_THREAD" }
   | { type: "RESET" };
 
@@ -219,6 +251,9 @@ function initial(i = 0, run = 0): State {
 function enter(s: State, i: number): State {
   const f = FRAMES[i];
   const n: State = { ...s, i };
+  // landing on the top of a thread (Replay, the footer's step arrows) starts it untapped
+  if (f.step === "yours" && f.phase === "typing1") n.chip = null;
+  if (f.step === "live" && f.phase === "live") n.liveChip = null;
   if (f.step === "yours" && f.phase === "tap" && s.chip === null) n.chip = s.run % YOURS_CHIPS.length;
   if (f.step === "yours" && f.phase === "color") n.values = { ...n.values, color: AGENT.color };
   if (f.step === "yours" && f.phase === "logo") n.logo = { kind: AGENT.logo };
@@ -237,7 +272,7 @@ function reducer(s: State, a: Action): State {
       return enter(s, a.i);
     case "TAP": {
       const step = FRAMES[s.i].step;
-      if (step === "yours" && s.chip === null) return { ...s, chip: a.chip, i: a.now ? F.yoursReplied : F.yoursTapped };
+      if (step === "yours" && s.i >= F.yoursChips && s.chip === null) return { ...s, chip: a.chip, i: a.now ? F.yoursReplied : F.yoursTapped };
       if (s.i === F.live) return { ...s, liveChip: a.chip, i: a.now ? F.liveReplied : F.liveTapped };
       return s;
     }
@@ -275,6 +310,10 @@ export function RcsStudioHero({ autoplay = false }: { autoplay?: boolean }) {
     footer.set({
       steps: FOOTER_STEPS,
       current: stepIndex,
+      onStep: (k) => {
+        const i = STEP_START[k];
+        if (i !== undefined && i >= 0) dispatch({ type: "GOTO", i });
+      },
       actions: [
         {
           label: "Replay",
@@ -407,6 +446,54 @@ export const rcsStudioStills: { render: ReactNode; caption: string }[] = [
   },
 ];
 
+/* ------------------------------------------------------------ happy path */
+
+type Target = HappyMoment["target"];
+type Hint = { id: Target; nonce: number } | null;
+const HintContext = createContext<Hint>(null);
+
+/** the one control to click next, from the state; null while the story moves on its own */
+function happyTarget(s: State): Target | null {
+  switch (FRAMES[s.i].step) {
+    case "yours":
+      if (s.i < F.yoursChips) return null;
+      return s.chip === null ? "chip" : "make-live";
+    case "signup":
+      return s.i === F.signupSuccess ? null : "create-account";
+    case "brand":
+    case "agent":
+      return "continue";
+    case "campaign":
+      return s.values.optIn ? "submit" : "opt-in";
+    case "submitted":
+      return null;
+    case "live":
+      return s.i === F.live && s.liveChip === null ? "chip" : null;
+  }
+}
+
+/** matches a click against the controls that never trigger the hint */
+const LEGIT = "input, select, textarea, label, [data-control]";
+
+/**
+ * The happy-path pulse. Render it inside a `relative` element that carries `data-target={id}`;
+ * it shows only while that id is the hinted one. The nonce as key restarts the animation on
+ * every new hint. Reduced motion: a static outline for the same time.
+ */
+function HintRing({ id, className = "inset-0 rounded-[inherit]" }: { id: Target; className?: string }) {
+  const hint = useContext(HintContext);
+  const reduced = useReducedMotion();
+  if (!hint || hint.id !== id) return null;
+  return (
+    <span
+      key={hint.nonce}
+      aria-hidden="true"
+      className={`pointer-events-none absolute ${className}`}
+      style={reduced ? { boxShadow: "0 0 0 2px var(--accent)" } : { animation: `rcs-hint ${HINT_MS / 2}ms ease-in-out 2` }}
+    />
+  );
+}
+
 /* ------------------------------------------------------------------ view */
 
 type ViewProps = {
@@ -431,9 +518,48 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, foc
   const hasPhone = step !== "signup" && step !== "brand";
   const panelCls = focus === "phone" ? "hidden md:flex" : "flex";
   const phoneCls = focus === "phone" ? "grid" : "hidden md:grid";
+  const interactive = !still && !inert;
+
+  /** the happy-path hint: which target pulses, and a nonce so a repeat click pulses again */
+  const [hint, setHint] = useState<Hint>(null);
+  useEffect(() => {
+    if (!hint) return;
+    const t = setTimeout(() => setHint(null), HINT_MS);
+    return () => clearTimeout(t);
+  }, [hint]);
+  const moment = hint ? HAPPY_PATH.find((m) => m.step === step && m.target === hint.id) : undefined;
+
+  /**
+   * Capture phase, so it sees every click first: a click on the current target, on a form
+   * control or its label, or on a `data-control` passes; anything else pulses the target.
+   */
+  function onClickCapture(e: MouseEvent<HTMLDivElement>) {
+    if (!interactive) return;
+    const id = happyTarget(s);
+    if (!id) return;
+    const el = e.target instanceof Element ? e.target : null;
+    if (!el) return;
+    if (el.closest(`[data-target="${id}"]`) || el.closest(LEGIT)) return;
+    setHint({ id, nonce: Date.now() });
+  }
 
   return (
-    <div inert={inert} className={`absolute inset-0 flex items-center justify-center p-3 md:p-4 ${still ? "bg-bg" : ""}`} data-step={step}>
+    <HintContext.Provider value={interactive ? hint : null}>
+    <div
+      inert={inert}
+      className={`absolute inset-0 flex items-center justify-center p-3 md:p-4 ${still ? "bg-bg" : ""}`}
+      data-step={step}
+      data-rcs-hero=""
+      onClickCapture={interactive ? onClickCapture : undefined}
+    >
+      <style href="rcs-hero" precedence="default">
+        {HERO_CSS}
+      </style>
+      {interactive && (
+        <span className="sr-only" aria-live="polite">
+          {hint && moment ? `Next: ${moment.clicks}.` : ""}
+        </span>
+      )}
       <motion.div
         layout={!still}
         transition={{ layout: { type: "spring", stiffness: 260, damping: 32 } }}
@@ -466,6 +592,7 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, foc
         </AnimatePresence>
       </motion.div>
     </div>
+    </HintContext.Provider>
   );
 }
 
@@ -548,7 +675,7 @@ function DemoRcs({ s, timed, still, dispatch }: PanelProps) {
           <Secondary still={still} onClick={() => dispatch({ type: "RESET_THREAD" })} icon={<RotateCcw size={14} aria-hidden="true" />}>
             Replay
           </Secondary>
-          <Primary type="submit" still={still} pressed={pressed} icon={<Rocket size={14} aria-hidden="true" />}>
+          <Primary type="submit" still={still} pressed={pressed} target="make-live" icon={<Rocket size={14} aria-hidden="true" />}>
             Make it live
           </Primary>
         </div>
@@ -557,10 +684,15 @@ function DemoRcs({ s, timed, still, dispatch }: PanelProps) {
   );
 }
 
-/** the logo slot: uploaded image, generated mark, or a monogram on the brand color */
+/**
+ * The logo slot, as a mask: a square with rounded corners (pass the size and radius in
+ * `className`), `overflow: hidden`, and no background, so a transparent PNG stays transparent,
+ * a round logo shows as a circle, and a square image gets its corners rounded. The image sits
+ * inside with `object-fit: contain`. With no logo, the brand-color square with the monogram.
+ */
 function LogoMark({ logo, color, name, className = "" }: { logo: Logo; color: string; name: string; className?: string }) {
   return (
-    <span aria-hidden="true" className={`grid shrink-0 place-items-center overflow-hidden bg-white ${className}`}>
+    <span aria-hidden="true" className={`grid aspect-square shrink-0 place-items-center overflow-hidden bg-transparent ${className}`}>
       {logo.kind === "upload" ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={logo.src} alt="" className="h-full w-full object-contain" />
@@ -658,7 +790,8 @@ function LogoField({
           setDrag(false);
           load(e.dataTransfer.files[0]);
         }}
-        className={`${ROW} ${rowSize(tall)} flex items-center gap-2.5 border-dashed transition-colors has-[:focus-visible]:border-accent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent-soft ${
+        data-row=""
+        className={`${ROW} ${rowSize(tall)} flex items-center gap-2.5 border-dashed transition-colors ${
           drag || highlight ? "border-accent bg-accent-soft/40 ring-2 ring-accent-soft" : "border-rule bg-bg"
         }`}
       >
@@ -670,7 +803,7 @@ function LogoField({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
-            <LogoMark logo={logo} color={s.values.color} name={s.values.agentName} className={`${tall ? "h-7 w-7" : "h-6 w-6"} rounded-md border border-rule text-[11px]`} />
+            <LogoMark logo={logo} color={s.values.color} name={s.values.agentName} className={`${tall ? "h-7 w-7" : "h-6 w-6"} rounded-md text-[11px]`} />
           </motion.div>
         </AnimatePresence>
         <label
@@ -698,7 +831,12 @@ function LogoField({
   );
 }
 
-/** the brand color: one form row with the native swatch at the left and the hex beside it */
+/**
+ * The brand color: one form row with a round swatch at the left that opens the native color
+ * picker (an invisible `<input type="color">` sits over it), a subtle divider, then the hex
+ * text input. Both stay in sync: typing a valid hex recolors the swatch, picking recolors the
+ * text. The row draws the single focus outline for whichever input has focus.
+ */
 function ColorField({
   value,
   onChange,
@@ -726,25 +864,38 @@ function ColorField({
     if (hex) onChange(hex);
   }
 
+  const swatch = normalizeHex(value) ?? AGENT.defaultColor;
+
   return (
     <div className="grid gap-1">
       <label htmlFor={id} className="label text-[10.5px]">
         Brand color
       </label>
       <div
-        className={`${ROW} ${rowSize(tall)} flex items-center gap-2.5 bg-bg transition-colors has-[:focus-visible]:border-accent ${
+        data-row=""
+        className={`${ROW} ${rowSize(tall)} flex items-center gap-2.5 bg-bg transition-colors ${
           highlight ? "border-accent ring-2 ring-accent-soft" : "border-rule"
         }`}
       >
+        <span
+          data-control=""
+          className={`relative shrink-0 rounded-full shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--ink)_18%,transparent)] transition-[background] duration-150 ${
+            tall ? "h-7 w-7" : "h-6 w-6"
+          }`}
+          style={{ background: swatch }}
+        >
+          <input
+            type="color"
+            aria-label="Pick a brand color"
+            value={swatch.toLowerCase()}
+            onChange={(e) => commit(e.target.value)}
+            disabled={readOnly}
+            className="absolute inset-0 h-full w-full cursor-pointer rounded-full opacity-0 disabled:cursor-not-allowed"
+          />
+        </span>
+        <span aria-hidden="true" className="h-5 w-px shrink-0 bg-rule" />
         <input
           id={id}
-          type="color"
-          value={(normalizeHex(value) ?? AGENT.defaultColor).toLowerCase()}
-          onChange={(e) => commit(e.target.value)}
-          disabled={readOnly}
-          className="h-6 w-6 shrink-0 cursor-pointer appearance-none rounded-md border-0 bg-transparent p-0 disabled:cursor-not-allowed [&::-moz-color-swatch]:rounded-md [&::-moz-color-swatch]:border-0 [&::-webkit-color-swatch]:rounded-md [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0"
-        />
-        <input
           type="text"
           aria-label="Brand color hex"
           value={draft}
@@ -783,9 +934,11 @@ function SignUp({ s, timed, still, dispatch }: PanelProps) {
           <Field s={s} timed={timed} dispatch={dispatch} field="name" label="Name" />
           <Field s={s} timed={timed} dispatch={dispatch} field="email" label="Work email" type="email" />
           <Field s={s} timed={timed} dispatch={dispatch} field="password" label="Password" type="password" />
-          <Primary type="submit" still={still}>
-            Create account
-          </Primary>
+          <div className="flex justify-end">
+            <Primary type="submit" still={still} target="create-account">
+              Create account
+            </Primary>
+          </div>
         </form>
       )}
     </>
@@ -864,9 +1017,11 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
                 }
               />
               <Field s={s} timed={timed} dispatch={dispatch} field="contact" label="Contact email" type="email" />
-              <Primary type="submit" still={still}>
-                Continue
-              </Primary>
+              <div className="flex justify-end">
+                <Primary type="submit" still={still} target="continue">
+                  Continue
+                </Primary>
+              </div>
             </form>
           )}
 
@@ -886,9 +1041,11 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
               <LogoField s={s} timed={timed} dispatch={dispatch} compact />
               <ColorField value={s.values.color} onChange={(v) => dispatch({ type: "SET", field: "color", value: v })} readOnly={timed} />
               <Field s={s} timed={timed} dispatch={dispatch} field="description" label="Description" multiline maxLength={MAX.description} />
-              <Primary type="submit" still={still}>
-                Continue
-              </Primary>
+              <div className="flex justify-end">
+                <Primary type="submit" still={still} target="continue">
+                  Continue
+                </Primary>
+              </div>
             </form>
           )}
 
@@ -911,6 +1068,7 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
                 label="Opt-in method"
                 options={OPTIONS.optIns}
                 placeholder="Choose one"
+                target="opt-in"
                 error={invalid ? "Choose how customers opt in. Carriers reject campaigns without one." : undefined}
                 onChange={(v) => {
                   dispatch({ type: "SET", field: "optIn", value: v });
@@ -927,9 +1085,11 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
                 tooltip="A ballpark is fine. Carriers use it to size your throughput, and you can raise it later."
                 tooltipOpen={timed && s.i === F.campaign}
               />
-              <Primary type="submit" still={still}>
-                Submit for review
-              </Primary>
+              <div className="flex justify-end">
+                <Primary type="submit" still={still} target="submit">
+                  Submit for review
+                </Primary>
+              </div>
             </form>
           )}
 
@@ -1022,6 +1182,7 @@ function Primary({
   disabled,
   pressed,
   icon,
+  target,
 }: {
   children: ReactNode;
   onClick?: () => void;
@@ -1031,6 +1192,8 @@ function Primary({
   /** autoplay: show the button as if being pressed */
   pressed?: boolean;
   icon?: ReactNode;
+  /** the happy-path id when this button is the thing to click next */
+  target?: Target;
 }) {
   return (
     <motion.button
@@ -1038,15 +1201,17 @@ function Primary({
       onClick={onClick}
       disabled={disabled}
       aria-disabled={disabled || undefined}
+      data-target={target}
       initial={still ? false : { opacity: 0 }}
       animate={{ opacity: 1, scale: pressed ? 0.96 : 1 }}
-      className={`inline-flex w-fit items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-semibold text-white transition-colors duration-150 enabled:hover:bg-[color-mix(in_srgb,var(--accent)_85%,var(--ink))] disabled:cursor-not-allowed disabled:opacity-50 ${
+      className={`relative inline-flex w-fit items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-semibold text-white transition-colors duration-150 enabled:hover:bg-[color-mix(in_srgb,var(--accent)_85%,var(--ink))] disabled:cursor-not-allowed disabled:opacity-50 ${
         pressed ? "ring-4 ring-accent-soft" : ""
       }`}
     >
       {icon}
       {children}
       {!icon && <ChevronRight size={14} aria-hidden="true" />}
+      {target && <HintRing id={target} />}
     </motion.button>
   );
 }
@@ -1056,6 +1221,7 @@ function Secondary({ children, onClick, still, icon }: { children: ReactNode; on
   return (
     <motion.button
       type="button"
+      data-control=""
       onClick={onClick}
       initial={still ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -1087,6 +1253,7 @@ function Field({
   tall,
   highlight,
   onChange,
+  target,
 }: {
   s: State;
   timed: boolean;
@@ -1107,12 +1274,15 @@ function Field({
   tall?: boolean;
   highlight?: boolean;
   onChange?: (v: string) => void;
+  /** the happy-path id when this field is the thing to use next */
+  target?: Target;
 }) {
   const id = useId();
   const value = shown(s, timed, field);
   const active = highlight ?? (timed && s.i === FILLED_AT[field]);
   const set = onChange ?? ((v: string) => dispatch({ type: "SET", field, value: maxLength ? v.slice(0, maxLength) : v }));
-  const box = `${ROW} w-full bg-bg outline-none placeholder:text-muted/70 focus-visible:border-accent ${
+  /** focus draws one 1.5 px accent outline (HERO_CSS); the autoplay highlight is the soft ring */
+  const box = `${ROW} w-full bg-bg placeholder:text-muted/70 ${
     error ? "border-warn" : active ? "border-accent ring-2 ring-accent-soft" : "border-rule"
   }`;
   const describedBy = [error ? `${id}-err` : null, hint ? `${id}-hint` : null].filter(Boolean).join(" ") || undefined;
@@ -1127,6 +1297,7 @@ function Field({
           <span className="group relative inline-flex">
             <button
               type="button"
+              data-control=""
               aria-label={`About ${label.toLowerCase()}`}
               aria-describedby={`${id}-tip`}
               className="grid h-4 w-4 place-items-center rounded-full text-muted transition-colors duration-150 hover:bg-raised hover:text-ink"
@@ -1152,7 +1323,7 @@ function Field({
         )}
       </div>
       {options ? (
-        <div className="relative">
+        <div className="relative bubble-sm" data-target={target}>
           <select
             id={id}
             value={value}
@@ -1173,6 +1344,7 @@ function Field({
             ))}
           </select>
           <ChevronDown size={14} aria-hidden="true" className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-muted" />
+          {target && <HintRing id={target} />}
         </div>
       ) : multiline ? (
         <textarea
@@ -1216,15 +1388,19 @@ function Field({
 
 /* ----------------------------------------------------------------- phone */
 
-type Msg = { id: string; from: "agent" | "user"; kind?: "card" | "ghost"; text: string; status?: BubbleStatus };
+type Msg = { id: string; from: "agent" | "user"; kind?: "card" | "ghost" | "chips"; text: string; status?: BubbleStatus };
 
 const CARD = PHONE_COPY.card;
 
 /**
  * The Android phone, built from the shared kit. Three screens:
- *  - yours and live: a Google Messages thread on the full-height conversation panel: the demo
- *    banner, the greeting, a rich card, suggested replies, the tapped reply as a user bubble,
- *    the typing indicator, then the agent's answer, with the composer pinned under a divider
+ *  - yours and live: a Google Messages thread on the full-height conversation panel. The
+ *    thread opens from the top like a new business thread: the demo banner, the agent intro
+ *    (logo, name and badge, description, divider), the day divider, the "RCS for Business"
+ *    notice, then typing, the greeting, typing, the rich card, and the suggested replies
+ *    inline under the card. A tapped chip stays where it is, selected; the user's bubble
+ *    renders below the row on the right, then typing, then the agent's answer. The column
+ *    scrolls and keeps the newest content in view; the composer is pinned under a divider.
  *  - brand and agent steps: the agent info screen, filling in as the form does (no banner)
  *  - campaign and submitted: the sample message, or a ghost bubble until it exists
  */
@@ -1232,12 +1408,14 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
   const step = FRAMES[s.i].step;
   const mode = step === "yours" ? "yours" : step === "live" ? "live" : "preview";
   const infoScreen = step === "brand" || step === "agent";
+  const reduced = useReducedMotion();
+  const scroller = useRef<HTMLDivElement>(null);
 
   const name = s.values.agentName.trim();
   const color = normalizeHex(s.values.color) ?? AGENT.defaultColor;
   const sample = shown(s, timed, "sample");
 
-  let messages: Msg[] = [];
+  const messages: Msg[] = [];
   let chips: Chip[] = [];
   let chipsEnabled = false;
   let picked: number | null = null;
@@ -1245,27 +1423,23 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
 
   if (mode === "yours") {
     const replied = s.i >= F.yoursReplied && s.chip !== null;
-    messages = [
-      {
-        id: "greet",
-        from: "agent",
-        text: PHONE_COPY.greeting(name || PHONE_COPY.fallbackName),
-      },
-      { id: "card", from: "agent", kind: "card", text: CARD.text },
-    ];
+    if (s.i >= F.yoursGreeting) messages.push({ id: "greet", from: "agent", text: PHONE_COPY.greeting(name || PHONE_COPY.fallbackName) });
+    if (s.i >= F.yoursCard) messages.push({ id: "card", from: "agent", kind: "card", text: CARD.text });
+    if (s.i >= F.yoursChips) messages.push({ id: "chips", from: "agent", kind: "chips", text: "" });
     if (s.chip !== null) messages.push({ id: "me", from: "user", text: YOURS_CHIPS[s.chip].label, status: replied ? "read" : "delivered" });
     if (replied) messages.push({ id: "reply", from: "agent", text: YOURS_CHIPS[s.chip as number].reply });
-    typing = s.chip !== null && !replied;
+    typing = s.i === F.yours || s.i === F.yoursTyping2 || (s.chip !== null && !replied);
     chips = YOURS_CHIPS;
-    chipsEnabled = s.chip === null;
+    chipsEnabled = s.i >= F.yoursChips && s.chip === null;
     picked = s.chip;
   } else if (mode === "live") {
     const tapped = s.i >= F.liveTapped && s.liveChip !== null;
     const replied = s.i >= F.liveReplied && s.liveChip !== null;
-    messages = [
+    messages.push(
       { id: "greet", from: "agent", text: s.values.sample },
       { id: "card", from: "agent", kind: "card", text: CARD.text },
-    ];
+      { id: "chips", from: "agent", kind: "chips", text: "" },
+    );
     if (tapped) messages.push({ id: "me", from: "user", text: LIVE_CHIPS[s.liveChip as number].label, status: replied ? "read" : "delivered" });
     if (replied) messages.push({ id: "reply", from: "agent", text: LIVE_CHIPS[s.liveChip as number].reply });
     typing = tapped && !replied;
@@ -1273,15 +1447,25 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
     chipsEnabled = s.i === F.live;
     picked = s.liveChip;
   } else {
-    messages = sample ? [{ id: "sample", from: "agent", text: sample }] : [{ id: "ghost", from: "agent", kind: "ghost", text: PHONE_COPY.ghost }];
+    messages.push(sample ? { id: "sample", from: "agent", text: sample } : { id: "ghost", from: "agent", kind: "ghost", text: PHONE_COPY.ghost });
   }
 
   const headerName = name || PREFILL.fallbackName;
   const verified = mode !== "preview";
   /** the badge alone marks a verified agent; the status line only shows before it is */
   const subtitle = verified ? undefined : step === "submitted" ? PHONE_COPY.subtitle.review : PHONE_COPY.subtitle.preview;
+  /** the intro's one-liner: the agent description once it exists, else the prefill it will get */
+  const intro = (s.values.description || PREFILL.description(headerName)).slice(0, MAX.description);
   const logo = (size: string) => <LogoMark logo={s.logo} color={color} name={name} className={`h-full w-full ${size}`} />;
   const enter = still ? false : { opacity: 0, y: 8 };
+
+  /** keep the newest content in view as the thread grows */
+  const count = messages.length + (typing ? 1 : 0);
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: still || reduced ? "auto" : "smooth" });
+  }, [count, mode, still, reduced]);
 
   return (
     <AndroidPhone brandColor={color} theme="auto" fit="contain" label="Phone preview">
@@ -1297,8 +1481,17 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
       ) : (
         <ConversationPanel composer={<Composer />}>
           {mode !== "preview" && <DemoBanner />}
-          <div className="flex min-h-0 flex-1 flex-col justify-end gap-2 overflow-hidden" aria-live="polite">
+          {/* bleeds by the panel padding so the chip row can run to the panel's edge */}
+          <div
+            ref={scroller}
+            data-ph-scroller=""
+            aria-live="polite"
+            className="flex min-h-0 flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto"
+            style={{ margin: `0 -${PANEL_PADDING}px`, padding: `0 ${PANEL_PADDING}px 4px`, scrollbarWidth: "none" }}
+          >
+            <ThreadIntro logo={logo("text-[40px]")} name={headerName} description={intro} verified={verified} />
             <Timestamp>{PHONE_COPY.timestamp}</Timestamp>
+            <ThreadNotice>{PHONE_COPY.notice}</ThreadNotice>
             <AnimatePresence initial={false}>
               {messages.map((m) => (
                 <motion.div
@@ -1307,10 +1500,21 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
                   animate={{ opacity: 1, y: 0 }}
                   exit={still ? undefined : { opacity: 0 }}
                   transition={{ duration: 0.26, ease: "easeOut" }}
-                  className={`flex w-full flex-col ${m.from === "user" ? "items-end" : "items-start"}`}
+                  className={`flex w-full shrink-0 flex-col ${m.from === "user" ? "items-end" : "items-start"}`}
                 >
                   {m.kind === "card" ? (
                     <RichCard title={CARD.title} meta={CARD.meta} description={m.text} mediaHeight="short" width="86%" />
+                  ) : m.kind === "chips" ? (
+                    <div className="relative w-full" data-target="chip" data-control="">
+                      <SuggestionChips
+                        label="Suggested replies"
+                        bleed={PANEL_PADDING}
+                        suggestions={chips.map((c, k) => ({ label: c.label, selected: picked === k }))}
+                        onSelect={(k) => dispatch({ type: "TAP", chip: k, now: still })}
+                        disabled={!chipsEnabled}
+                      />
+                      <HintRing id="chip" className="inset-y-0 -inset-x-1 rounded-2xl" />
+                    </div>
                   ) : (
                     <MessageBubble from={m.from} ghost={m.kind === "ghost"} status={m.status}>
                       {m.text}
@@ -1320,18 +1524,11 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
               ))}
             </AnimatePresence>
             {typing && (
-              <motion.div initial={enter} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="flex w-full flex-col items-start">
-                <TypingIndicator />
+              <motion.div initial={enter} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="flex w-full shrink-0 flex-col items-start">
+                <TypingIndicator logo={logo("text-[10px]")} />
               </motion.div>
             )}
           </div>
-          <SuggestionChips
-            label="Suggested replies"
-            bleed={PANEL_PADDING}
-            suggestions={chips.map((c, k) => ({ label: c.label, selected: picked === k }))}
-            onSelect={(k) => dispatch({ type: "TAP", chip: k, now: still })}
-            disabled={!chipsEnabled}
-          />
         </ConversationPanel>
       )}
     </AndroidPhone>

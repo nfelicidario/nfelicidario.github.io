@@ -1,4 +1,24 @@
 /**
+ * THE HAPPY PATH, in plain words (one line per step: what the viewer sees, then what they click)
+ *
+ *  1. Demo RCS. The phone opens a new thread: the agent's logo, name, and description at the
+ *     top, the date, "This is an RCS for Business chat.", the agent typing, a greeting, typing
+ *     again, a rich card, then three suggested replies under the card. CLICK any suggested reply.
+ *  2. Demo RCS, replied. The reply shows on the right in the brand color and the agent answers.
+ *     The name, logo, and brand color fields update the phone live. CLICK "Make it live".
+ *  3. Sign up. A short form: name, work email, password. CLICK "Create account".
+ *  4. Brand. Legal name, website, and contact email, prefilled from step 1. CLICK "Continue".
+ *  5. Agent. Display name, logo, color, and description, with Google's limits. CLICK "Continue".
+ *  6. Campaign. Use case, sample message, opt-in method, and volume. PICK an opt-in method,
+ *     then CLICK "Submit for review". (Submitting without an opt-in shows the carrier error.)
+ *  7. Review. The timeline runs on its own; nothing to click.
+ *  8. Live. The same thread from the real agent, verified. CLICK a chip to see it answer.
+ *
+ * Clicking anything else inside the prototype pulses a blue outline on the next thing to
+ * click. Form fields, Replay, the color swatch, and the chip row never trigger the pulse.
+ *
+ * ----------------------------------------------------------------------------------------
+ *
  * The RCS Studio hero's demo script: every line of copy and every timing the prototype
  * plays, in one place. The hero imports from here, so editing this file is enough.
  *
@@ -35,6 +55,8 @@ export const AGENT = {
 export const PHONE_COPY = {
   /** the day divider above the first message */
   timestamp: "Today · 9:30 AM",
+  /** the muted notice under the date on a new business thread */
+  notice: "This is an RCS for Business chat.",
   /** the agent's opening line in step 1; `name` is the agent name typed so far */
   greeting: (name: string) => `Hi Sam, it's ${name}. The Tuesday Family Box is back this week.`,
   /** used in the greeting before a name has been typed */
@@ -180,8 +202,15 @@ export type Frame = { step: Step; phase: string; ms: number; auto?: boolean };
  * `auto` frames advance by themselves in interactive mode as well.
  */
 export const FRAMES: Frame[] = [
-  // step 1: the demo thread; the viewer taps a chip, then names, colors, and logos the agent
-  { step: "yours", phase: "idle", ms: 900 },
+  // step 1: the thread opens from the top (agent info, date, notice), the agent types, greets,
+  // types again, sends the card, then offers chips; the viewer taps one, then names, colors,
+  // and logos the agent. The five opening frames are `auto` so the thread plays itself in
+  // interactive mode too (and again after the form's Replay).
+  { step: "yours", phase: "typing1", ms: 900, auto: true },
+  { step: "yours", phase: "greeting", ms: 450, auto: true },
+  { step: "yours", phase: "typing2", ms: 700, auto: true },
+  { step: "yours", phase: "card", ms: 500, auto: true },
+  { step: "yours", phase: "chips", ms: 900 },
   { step: "yours", phase: "tap", ms: 800, auto: true },
   { step: "yours", phase: "replied", ms: 1500 },
   { step: "yours", phase: "name", ms: 2600 },
@@ -211,4 +240,33 @@ export const FRAMES: Frame[] = [
   { step: "live", phase: "live", ms: 1600 },
   { step: "live", phase: "tapped", ms: 900, auto: true },
   { step: "live", phase: "replied", ms: 3800 },
+];
+
+/* --------------------------------------------------------- happy path */
+
+/**
+ * The one thing to click at each moment, in story order. `target` is the id the hero puts
+ * on that control (`data-target`); when the viewer clicks anything else inside the prototype,
+ * the control with the current target pulses. Which moment is current is decided by the hero
+ * from its state (see `happyTarget` there); this list is the order and the copy.
+ */
+export type HappyMoment = {
+  step: Step;
+  /** the `data-target` id of the control */
+  target: "chip" | "make-live" | "create-account" | "continue" | "opt-in" | "submit";
+  /** what the viewer sees */
+  sees: string;
+  /** what the viewer clicks */
+  clicks: string;
+};
+
+export const HAPPY_PATH: HappyMoment[] = [
+  { step: "yours", target: "chip", sees: "The agent greets Sam, sends a rich card, and offers suggested replies.", clicks: "Tap any suggested reply" },
+  { step: "yours", target: "make-live", sees: "The reply lands and the agent answers. Name, logo, and color update the phone.", clicks: "Press Make it live" },
+  { step: "signup", target: "create-account", sees: "A short sign-up form.", clicks: "Press Create account" },
+  { step: "brand", target: "continue", sees: "The brand, prefilled from step 1.", clicks: "Press Continue" },
+  { step: "agent", target: "continue", sees: "The agent, prefilled, with Google's limits inline.", clicks: "Press Continue" },
+  { step: "campaign", target: "opt-in", sees: "The campaign form; the opt-in method is still empty.", clicks: "Pick an opt-in method" },
+  { step: "campaign", target: "submit", sees: "The campaign form, complete.", clicks: "Press Submit for review" },
+  { step: "live", target: "chip", sees: "The same thread from the live, verified agent.", clicks: "Tap a chip" },
 ];

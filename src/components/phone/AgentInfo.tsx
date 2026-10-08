@@ -8,7 +8,7 @@ import { PANEL_INSET, PANEL_RADIUS } from "./ConversationPanel";
 
 /**
  * The agent info screen a user reaches from the conversation header: hero banner (45:14),
- * the logo overlapping it as a rounded square, display name with the filled verified badge,
+ * the logo overlapping it, masked to a rounded square on no background, display name with the filled verified badge,
  * the 100-char description, then website, phone, and email rows, with the privacy and terms
  * links. Rendered on the same lighter inset panel as the conversation.
  */
@@ -58,7 +58,7 @@ export function AgentInfo({ logo, name, description, verified = false, banner, w
             overflow: "hidden",
             placeItems: "center",
             borderRadius: 16,
-            background: "#ffffff",
+            background: "transparent",
             boxShadow: "0 0 0 3px var(--ph-surface)",
           }}
         >

@@ -5,13 +5,14 @@ import { ArrowLeft, EllipsisVertical, Phone } from "lucide-react";
 import { VerifiedBadge } from "./VerifiedBadge";
 
 /**
- * Google Messages conversation top bar for an RBM agent: back arrow, the agent logo as a
- * rounded square, display name with the filled verified badge, an optional call icon, and
- * overflow. It sits on the screen's darker ground (surface container); the conversation
+ * Google Messages conversation top bar for an RBM agent: back arrow, the agent logo masked
+ * to a rounded square (no background behind it, so a transparent PNG stays transparent and a
+ * round logo stays round), display name with the filled verified badge, an optional call
+ * icon, and overflow. It sits on the screen's darker ground (surface container); the conversation
  * panel below it is the lighter surface.
  */
 export type MessagesHeaderProps = {
-  /** anything 1:1; it is clipped to a rounded square */
+  /** anything 1:1; it is masked to a rounded square on no background */
   logo: ReactNode;
   name: string;
   /** the filled check badge after the name; no subtitle, the badge says it */
@@ -48,7 +49,7 @@ export function MessagesHeader({ logo, name, verified = false, subtitle, call = 
           overflow: "hidden",
           placeItems: "center",
           borderRadius: 9,
-          background: "#ffffff",
+          background: "transparent",
         }}
       >
         {logo}
