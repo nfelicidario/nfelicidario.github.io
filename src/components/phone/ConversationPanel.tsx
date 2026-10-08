@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import { GESTURE_BAR_H } from "./AndroidPhone";
 
 /**
  * The lighter panel the conversation sits in: full width, rounded at the top only, and
@@ -55,6 +56,7 @@ export function ConversationPanel({ children, composer, style }: ConversationPan
         <div
           style={{
             flexShrink: 0,
+            paddingBottom: GESTURE_BAR_H - 6,
             borderTop: "1px solid color-mix(in srgb, var(--ph-outline-variant) 55%, transparent)",
           }}
         >

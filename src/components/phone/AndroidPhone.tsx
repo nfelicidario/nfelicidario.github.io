@@ -201,6 +201,7 @@ export function AndroidPhone({
           >
             <StatusBar time={time} />
             <div style={{ position: "relative", display: "flex", minHeight: 0, flex: 1, flexDirection: "column" }}>{children}</div>
+            {/* overlays the bottom of whatever screen is showing, so panels can run to the edge */}
             <GestureBar />
           </div>
         </div>
@@ -259,9 +260,15 @@ function StatusBar({ time }: { time: string }) {
   );
 }
 
+/** height of the gesture area; screens that run to the bottom pad by this much */
+export const GESTURE_BAR_H = 22;
+
 function GestureBar() {
   return (
-    <div aria-hidden="true" style={{ display: "grid", height: 22, flexShrink: 0, placeItems: "center" }}>
+    <div
+      aria-hidden="true"
+      style={{ position: "absolute", left: 0, right: 0, bottom: 0, display: "grid", height: GESTURE_BAR_H, placeItems: "center", pointerEvents: "none" }}
+    >
       <span style={{ width: 110, height: 4, borderRadius: 999, background: "var(--ph-on-surface)", opacity: 0.75 }} />
     </div>
   );
