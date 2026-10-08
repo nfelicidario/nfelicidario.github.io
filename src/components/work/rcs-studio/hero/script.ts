@@ -9,7 +9,7 @@
  *    frame, in milliseconds). `auto` marks the frames that advance on their own in
  *    interactive mode too (a reply arriving), so leave it where it is.
  *  - Keep the agent name under 40 characters and descriptions under 100 (Google's limits).
- *  - The brand color is #RRGGBB and must pass 4.5:1 on white; the hero blocks the CTA otherwise.
+ *  - The brand color is #RRGGBB. Any color is accepted; the demo form does not check contrast.
  *  - Mock data only: invented businesses, people, and numbers. Nothing from a real customer.
  */
 
@@ -21,7 +21,7 @@ import { MAX_LABEL } from "@/components/phone";
 export const AGENT = {
   /** the name autoplay types into the agent name field */
   name: "Poblano's Mexican Grill",
-  /** the brand color autoplay picks; must pass 4.5:1 on white */
+  /** the brand color autoplay picks */
   color: "#C2410C",
   /** the color the form starts on before anyone picks one */
   defaultColor: "#1F4FE0",
@@ -163,7 +163,7 @@ export const END_CARD = { title: "Agent live.", body: "Average time to provision
 export type Step = "yours" | "signup" | "brand" | "agent" | "campaign" | "submitted" | "live";
 
 export const STEP_LABELS: Record<Step, string> = {
-  yours: "Make it yours",
+  yours: "Demo RCS",
   signup: "Sign up",
   brand: "Brand",
   agent: "Agent",

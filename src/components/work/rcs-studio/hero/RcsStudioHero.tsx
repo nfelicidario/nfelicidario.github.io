@@ -33,8 +33,6 @@ import {
   RotateCcw,
   SkipForward,
   Sparkles,
-  Upload,
-  X,
 } from "lucide-react";
 import {
   AGENT,
@@ -60,10 +58,10 @@ import {
 
 /**
  * RCS Studio hero: one self-driving story in a 16:9 stage, mock data only, frameless.
- * Journey: make it yours → sign up → provision (brand, agent, campaign) → submit → live.
+ * Journey: demo RCS → sign up → provision (brand, agent, campaign) → submit → live.
  *
  * Each phase draws its own card on the page ground:
- *  - make it yours, provisioning, submitted, live: a 50/50 card (panel left, Android phone right
+ *  - demo RCS, provisioning, submitted, live: a 50/50 card (panel left, Android phone right
  *    on a tinted pane), stacking below 768px
  *  - sign up: a narrow centered card, no phone
  * The card animates its size between phases with a layout transition.
@@ -76,7 +74,7 @@ import {
  * `HeroView` is purely presentational, so the stills render it in fixed states with no timers.
  *
  * Google's agent limits are enforced where a field exists: display name 40, description 100,
- * suggested-reply labels 25, logo 224×224 PNG or JPEG under 50 KB, brand color 4.5:1 on white.
+ * suggested-reply labels 25. The logo hint says 224×224 PNG or JPEG; any image is accepted.
  *
  * All demo copy and timings (the agent, the chips and replies, the form values, the frames)
  * live in ./script.ts so they can be edited without touching the state machine.
@@ -84,7 +82,12 @@ import {
 
 /* ---------------------------------------------------------------- limits */
 
-const MAX = { name: 40, description: 100, logoPx: 224, logoBytes: 50 * 1024, contrast: 4.5 } as const;
+const MAX = { name: 40, description: 100 } as const;
+
+/** one form row: every field in a form shares this border, radius, and type size */
+const ROW = "bubble-sm border text-[13px] text-ink";
+/** row height and padding: 44 px in the demo form, 36 px in the denser provisioning forms */
+const rowSize = (tall?: boolean) => (tall ? "h-11 px-3" : "h-9 px-2.5");
 
 /* ---------------------------------------------------------------- frames */
 
@@ -183,32 +186,9 @@ function monogram(name: string) {
     .toUpperCase();
 }
 
-function parseHex(hex: string): [number, number, number] | null {
-  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
-  if (!m) return null;
-  const n = parseInt(m[1], 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-
 function normalizeHex(hex: string) {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
   return m ? `#${m[1].toUpperCase()}` : null;
-}
-
-/** WCAG 2 relative luminance → contrast ratio against white */
-function contrastOnWhite(hex: string) {
-  const rgb = parseHex(hex);
-  if (!rgb) return 1;
-  const [r, g, b] = rgb.map((c) => {
-    const s = c / 255;
-    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
-  });
-  const l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return 1.05 / (l + 0.05);
-}
-
-function kb(bytes: number) {
-  return `${Math.round(bytes / 1024)} KB`;
 }
 
 /* ----------------------------------------------------------- state machine */
@@ -220,6 +200,8 @@ type Action =
   | { type: "TAP"; chip: number; now?: boolean }
   | { type: "SET"; field: Field; value: string }
   | { type: "LOGO"; logo: Logo }
+  /** the form's own Replay: back to the greeting and card, chips tappable again, fields kept */
+  | { type: "RESET_THREAD" }
   | { type: "RESET" };
 
 function initial(i = 0, run = 0): State {
@@ -263,6 +245,9 @@ function reducer(s: State, a: Action): State {
       return { ...s, values: { ...s.values, [a.field]: a.value } };
     case "LOGO":
       return { ...s, logo: a.logo };
+    case "RESET_THREAD":
+      if (FRAMES[s.i].step !== "yours") return s;
+      return { ...s, chip: null, i: F.yours };
     case "RESET":
       return initial(0, s.run + 1);
   }
@@ -402,7 +387,7 @@ function still(i: number, overrides: Partial<State> = {}): State {
 export const rcsStudioStills: { render: ReactNode; caption: string }[] = [
   {
     render: <HeroView s={still(F.yoursReplied)} timed still focus="phone" />,
-    caption: "Make it yours: name, logo, and brand color, previewed live on the phone.",
+    caption: "Demo RCS: name, logo, and brand color, previewed live on the phone.",
   },
   {
     render: <HeroView s={still(F.signupFilled)} timed still focus="panel" />,
@@ -502,7 +487,7 @@ function FlowPanel({ s, timed, still, dispatch }: PanelProps) {
         transition={{ duration: 0.25, ease: "easeOut" }}
         className="grid max-w-[440px] gap-4"
       >
-        {group === "yours" && <MakeItYours s={s} timed={timed} still={still} dispatch={dispatch} />}
+        {group === "yours" && <DemoRcs s={s} timed={timed} still={still} dispatch={dispatch} />}
         {group === "signup" && <SignUp s={s} timed={timed} still={still} dispatch={dispatch} />}
         {group === "provision" && <Provision s={s} timed={timed} still={still} dispatch={dispatch} />}
         {group === "live" && (
@@ -522,25 +507,22 @@ function FlowPanel({ s, timed, still, dispatch }: PanelProps) {
   );
 }
 
-/* ------------------------------------------------------ 1. make it yours */
+/* ------------------------------------------------------------- 1. demo RCS */
 
-function MakeItYours({ s, timed, still, dispatch }: PanelProps) {
-  const ctaId = useId();
-  const ratio = contrastOnWhite(s.values.color);
-  const pass = ratio >= MAX.contrast;
+function DemoRcs({ s, timed, still, dispatch }: PanelProps) {
   const pressed = timed && s.i === F.yoursCta;
 
   return (
     <>
       <div>
-        <h3 className="text-[clamp(18px,2vw,24px)] font-bold text-ink">Your brand, inside Messages.</h3>
-        <p className="mt-2 max-w-[36ch] text-[14px] text-body">Name it, drop in a logo, and pick a color. The phone updates as you go.</p>
+        <h3 className="text-[clamp(18px,2vw,24px)] font-bold text-ink">{STEP_LABELS.yours}</h3>
+        <p className="mt-2 max-w-[36ch] text-[14px] text-body">See what your RCS agent would look like.</p>
       </div>
       <form
-        className="grid gap-3"
+        className="grid gap-4"
         onSubmit={(e) => {
           e.preventDefault();
-          if (pass) dispatch({ type: "GOTO", i: F.signup });
+          dispatch({ type: "GOTO", i: F.signup });
         }}
       >
         <Field
@@ -548,22 +530,28 @@ function MakeItYours({ s, timed, still, dispatch }: PanelProps) {
           timed={timed}
           dispatch={dispatch}
           field="agentName"
-          label="Agent name"
+          label="Business name"
           maxLength={MAX.name}
+          tall
           highlight={timed && s.i === F.yoursName}
           placeholder="What customers will see"
         />
-        <LogoField s={s} timed={timed} dispatch={dispatch} highlight={timed && s.i === F.yoursLogo} />
+        <LogoField s={s} timed={timed} dispatch={dispatch} tall highlight={timed && s.i === F.yoursLogo} />
         <ColorField
           value={s.values.color}
           onChange={(v) => dispatch({ type: "SET", field: "color", value: v })}
           readOnly={timed}
+          tall
           highlight={timed && s.i === F.yoursColor}
-          describeId={ctaId}
         />
-        <Primary type="submit" still={still} disabled={!pass} pressed={pressed} icon={<Rocket size={14} aria-hidden="true" />} describedBy={ctaId}>
-          Make it live
-        </Primary>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Secondary still={still} onClick={() => dispatch({ type: "RESET_THREAD" })} icon={<RotateCcw size={14} aria-hidden="true" />}>
+            Replay
+          </Secondary>
+          <Primary type="submit" still={still} pressed={pressed} icon={<Rocket size={14} aria-hidden="true" />}>
+            Make it live
+          </Primary>
+        </div>
       </form>
     </>
   );
@@ -603,31 +591,32 @@ function GeneratedMark({ color }: { color: string }) {
   );
 }
 
+/**
+ * The logo drop zone: one form row like the others, with a small preview at the left and a
+ * link-styled prompt. Any image is accepted as is (Google's 224×224 rule is only a hint).
+ */
 function LogoField({
   s,
   timed,
   dispatch,
   highlight,
+  tall,
   compact,
 }: {
   s: State;
   timed: boolean;
   dispatch: Dispatch<Action>;
   highlight?: boolean;
+  tall?: boolean;
+  /** the provisioning step: the hint says the logo came from step 1 */
   compact?: boolean;
 }) {
   const id = useId();
   const [drag, setDrag] = useState(false);
-  const [problem, setProblem] = useState<string | null>(null);
   const logo = s.logo;
 
   function load(file: File | undefined) {
-    if (!file) return;
-    if (file.type !== "image/png" && file.type !== "image/jpeg") {
-      setProblem("PNG or JPEG only.");
-      return;
-    }
-    setProblem(null);
+    if (!file || !file.type.startsWith("image/")) return;
     const reader = new FileReader();
     reader.onload = () => {
       const src = typeof reader.result === "string" ? reader.result : "";
@@ -635,19 +624,12 @@ function LogoField({
       const img = new Image();
       img.onload = () =>
         dispatch({ type: "LOGO", logo: { kind: "upload", src, w: img.naturalWidth, h: img.naturalHeight, bytes: file.size, name: file.name } });
-      img.onerror = () => setProblem("That file could not be read as an image.");
       img.src = src;
     };
     reader.readAsDataURL(file);
   }
 
-  const warnings: string[] = [];
-  if (logo.kind === "upload") {
-    if (logo.bytes > MAX.logoBytes) warnings.push(`${kb(logo.bytes)}, over Google's 50 KB. Compress it before launch.`);
-    if (logo.w !== logo.h) warnings.push(`${logo.w}×${logo.h}, not square. It will be letterboxed on white.`);
-    else if (logo.w !== MAX.logoPx) warnings.push(`${logo.w}×${logo.h}. Google resizes it to 224×224.`);
-  }
-  const box = compact ? "h-14 w-14" : "h-22 w-22";
+  const prompt = drag ? "Drop it here" : logo.kind === "upload" ? "Replace or drop a file" : "Upload or drop a file";
 
   return (
     <div className="grid gap-1">
@@ -655,18 +637,15 @@ function LogoField({
         <label htmlFor={id} className="label text-[10.5px]">
           Logo
         </label>
-        {logo.kind !== "none" && !timed && (
-          <button
-            type="button"
-            onClick={() => {
-              dispatch({ type: "LOGO", logo: { kind: "none" } });
-              setProblem(null);
-            }}
-            className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-medium text-muted transition-colors duration-150 hover:bg-raised hover:text-ink"
-          >
-            <X size={11} aria-hidden="true" /> Remove
-          </button>
-        )}
+        <span id={`${id}-rule`} className="text-[10.5px] text-muted">
+          {compact ? (
+            <span className="inline-flex items-center gap-1 text-accent">
+              <Sparkles size={11} aria-hidden="true" /> From step 1
+            </span>
+          ) : (
+            "224×224 · PNG or JPEG"
+          )}
+        </span>
       </div>
       <div
         onDragOver={(e) => {
@@ -679,7 +658,7 @@ function LogoField({
           setDrag(false);
           load(e.dataTransfer.files[0]);
         }}
-        className={`bubble-sm relative flex items-center gap-3 border border-dashed p-2 transition-colors has-[:focus-visible]:border-accent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent-soft ${
+        className={`${ROW} ${rowSize(tall)} flex items-center gap-2.5 border-dashed transition-colors has-[:focus-visible]:border-accent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent-soft ${
           drag || highlight ? "border-accent bg-accent-soft/40 ring-2 ring-accent-soft" : "border-rule bg-bg"
         }`}
       >
@@ -691,77 +670,47 @@ function LogoField({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
-            <LogoMark
-              logo={logo}
-              color={s.values.color}
-              name={s.values.agentName}
-              className={`${box} bubble-sm border border-rule ${compact ? "text-[16px]" : "text-[26px]"}`}
-            />
+            <LogoMark logo={logo} color={s.values.color} name={s.values.agentName} className={`${tall ? "h-7 w-7" : "h-6 w-6"} rounded-md border border-rule text-[11px]`} />
           </motion.div>
         </AnimatePresence>
-        <div className="min-w-0 flex-1 text-[11.5px] leading-snug text-muted">
-          <label
-            htmlFor={id}
-            className={`inline-flex items-center gap-1 rounded-full border border-rule bg-surface px-2.5 py-1 text-[12px] font-medium text-ink transition-colors duration-150 ${
-              timed ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-accent hover:bg-accent-soft/40 hover:text-accent"
-            }`}
-          >
-            <Upload size={12} aria-hidden="true" /> {logo.kind === "none" ? "Upload" : "Replace"}
-          </label>
-          <input
-            id={id}
-            type="file"
-            accept="image/png,image/jpeg"
-            className="sr-only"
-            disabled={timed}
-            aria-describedby={`${id}-rule`}
-            onChange={(e) => {
-              load(e.target.files?.[0]);
-              e.target.value = "";
-            }}
-          />
-          <p id={`${id}-rule`} className="mt-1">
-            {compact ? (
-              <span className="inline-flex items-center gap-1 text-accent">
-                <Sparkles size={11} aria-hidden="true" /> From step 1 · 224×224
-              </span>
-            ) : (
-              <>
-                {drag ? "Drop it here." : "or drop a file here."} <br />
-                224×224 · PNG or JPEG · under 50 KB
-              </>
-            )}
-          </p>
-        </div>
-      </div>
-      <div aria-live="polite" className="grid gap-0.5">
-        {problem && (
-          <p role="alert" className="inline-flex items-center gap-1 text-[11.5px] text-warn">
-            <CircleAlert size={12} aria-hidden="true" /> {problem}
-          </p>
-        )}
-        {warnings.map((w) => (
-          <p key={w} className="inline-flex items-start gap-1 text-[11.5px] text-warn">
-            <CircleAlert size={12} aria-hidden="true" className="mt-0.5 shrink-0" /> {w}
-          </p>
-        ))}
+        <label
+          htmlFor={id}
+          className={`min-w-0 truncate font-medium text-accent underline-offset-2 transition-colors duration-150 ${
+            timed ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:underline"
+          }`}
+        >
+          {prompt}
+        </label>
+        <input
+          id={id}
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          disabled={timed}
+          aria-describedby={`${id}-rule`}
+          onChange={(e) => {
+            load(e.target.files?.[0]);
+            e.target.value = "";
+          }}
+        />
       </div>
     </div>
   );
 }
 
+/** the brand color: one form row with the native swatch at the left and the hex beside it */
 function ColorField({
   value,
   onChange,
   readOnly,
   highlight,
-  describeId,
+  tall,
 }: {
   value: string;
   onChange: (hex: string) => void;
   readOnly: boolean;
   highlight?: boolean;
-  describeId: string;
+  tall?: boolean;
 }) {
   const id = useId();
   const [draft, setDraft] = useState(value);
@@ -770,11 +719,6 @@ function ColorField({
     setSeen(value);
     setDraft(value);
   }
-  const ratio = contrastOnWhite(value);
-  const pass = ratio >= MAX.contrast;
-  const box = `bubble-sm h-9 border bg-bg text-[13px] text-ink outline-none focus-visible:border-accent ${
-    highlight ? "border-accent ring-2 ring-accent-soft" : pass ? "border-rule" : "border-warn"
-  }`;
 
   function commit(raw: string) {
     setDraft(raw);
@@ -787,15 +731,18 @@ function ColorField({
       <label htmlFor={id} className="label text-[10.5px]">
         Brand color
       </label>
-      <div className="flex items-center gap-2">
+      <div
+        className={`${ROW} ${rowSize(tall)} flex items-center gap-2.5 bg-bg transition-colors has-[:focus-visible]:border-accent ${
+          highlight ? "border-accent ring-2 ring-accent-soft" : "border-rule"
+        }`}
+      >
         <input
           id={id}
           type="color"
           value={(normalizeHex(value) ?? AGENT.defaultColor).toLowerCase()}
           onChange={(e) => commit(e.target.value)}
           disabled={readOnly}
-          aria-describedby={describeId}
-          className={`${box} w-11 cursor-pointer p-1 transition-colors duration-150 enabled:hover:border-accent disabled:cursor-not-allowed`}
+          className="h-6 w-6 shrink-0 cursor-pointer appearance-none rounded-md border-0 bg-transparent p-0 disabled:cursor-not-allowed [&::-moz-color-swatch]:rounded-md [&::-moz-color-swatch]:border-0 [&::-webkit-color-swatch]:rounded-md [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0"
         />
         <input
           type="text"
@@ -806,16 +753,9 @@ function ColorField({
           maxLength={7}
           spellCheck={false}
           autoComplete="off"
-          aria-invalid={pass ? undefined : true}
-          aria-describedby={describeId}
-          className={`${box} num w-28 px-2.5 uppercase`}
+          className="num min-w-0 flex-1 bg-transparent uppercase outline-none"
         />
       </div>
-      <p id={describeId} aria-live="polite" className={`inline-flex items-center gap-1 text-[11.5px] ${pass ? "text-ok" : "text-warn"}`}>
-        {pass ? <Check size={12} aria-hidden="true" /> : <CircleAlert size={12} aria-hidden="true" />}
-        <span className="text-muted">On white: {MAX.contrast}:1 required ·</span> currently <span className="num">{ratio.toFixed(1)}:1</span>
-        {pass ? "" : ", pick a darker color"}
-      </p>
     </div>
   );
 }
@@ -862,8 +802,6 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
   const StepIcon = PROVISION_STEPS[Math.max(stepAt, 0)].icon;
   const optIn = shown(s, timed, "optIn");
   const invalid = s.i === F.campaignInvalid;
-  const ratio = contrastOnWhite(s.values.color);
-  const colorId = useId();
 
   function submitCampaign() {
     if (!optIn) go(F.campaignInvalid);
@@ -946,9 +884,9 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
               </p>
               <Field s={s} timed={timed} dispatch={dispatch} field="agentName" label="Display name" maxLength={MAX.name} />
               <LogoField s={s} timed={timed} dispatch={dispatch} compact />
-              <ColorField value={s.values.color} onChange={(v) => dispatch({ type: "SET", field: "color", value: v })} readOnly={timed} describeId={colorId} />
+              <ColorField value={s.values.color} onChange={(v) => dispatch({ type: "SET", field: "color", value: v })} readOnly={timed} />
               <Field s={s} timed={timed} dispatch={dispatch} field="description" label="Description" multiline maxLength={MAX.description} />
-              <Primary type="submit" still={still} disabled={ratio < MAX.contrast}>
+              <Primary type="submit" still={still}>
                 Continue
               </Primary>
             </form>
@@ -1084,7 +1022,6 @@ function Primary({
   disabled,
   pressed,
   icon,
-  describedBy,
 }: {
   children: ReactNode;
   onClick?: () => void;
@@ -1094,7 +1031,6 @@ function Primary({
   /** autoplay: show the button as if being pressed */
   pressed?: boolean;
   icon?: ReactNode;
-  describedBy?: string;
 }) {
   return (
     <motion.button
@@ -1102,7 +1038,6 @@ function Primary({
       onClick={onClick}
       disabled={disabled}
       aria-disabled={disabled || undefined}
-      aria-describedby={describedBy}
       initial={still ? false : { opacity: 0 }}
       animate={{ opacity: 1, scale: pressed ? 0.96 : 1 }}
       className={`inline-flex w-fit items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-semibold text-white transition-colors duration-150 enabled:hover:bg-[color-mix(in_srgb,var(--accent)_85%,var(--ink))] disabled:cursor-not-allowed disabled:opacity-50 ${
@@ -1112,6 +1047,22 @@ function Primary({
       {icon}
       {children}
       {!icon && <ChevronRight size={14} aria-hidden="true" />}
+    </motion.button>
+  );
+}
+
+/** the quiet companion to Primary, same height, for actions that do not advance the story */
+function Secondary({ children, onClick, still, icon }: { children: ReactNode; onClick: () => void; still: boolean; icon?: ReactNode }) {
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      initial={still ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="inline-flex w-fit items-center gap-1.5 rounded-full border border-rule bg-surface px-4 py-[7px] text-[13px] font-semibold text-ink transition-colors duration-150 hover:border-accent hover:text-accent"
+    >
+      {icon}
+      {children}
     </motion.button>
   );
 }
@@ -1133,6 +1084,7 @@ function Field({
   tooltip,
   tooltipOpen,
   maxLength,
+  tall,
   highlight,
   onChange,
 }: {
@@ -1151,6 +1103,8 @@ function Field({
   tooltipOpen?: boolean;
   /** Google's character limit, shown as a live counter */
   maxLength?: number;
+  /** the 44 px row of the demo form (provisioning forms use the denser 36 px row) */
+  tall?: boolean;
   highlight?: boolean;
   onChange?: (v: string) => void;
 }) {
@@ -1158,7 +1112,7 @@ function Field({
   const value = shown(s, timed, field);
   const active = highlight ?? (timed && s.i === FILLED_AT[field]);
   const set = onChange ?? ((v: string) => dispatch({ type: "SET", field, value: maxLength ? v.slice(0, maxLength) : v }));
-  const box = `bubble-sm w-full border bg-bg px-2.5 text-[13px] text-ink outline-none placeholder:text-muted/70 focus-visible:border-accent ${
+  const box = `${ROW} w-full bg-bg outline-none placeholder:text-muted/70 focus-visible:border-accent ${
     error ? "border-warn" : active ? "border-accent ring-2 ring-accent-soft" : "border-rule"
   }`;
   const describedBy = [error ? `${id}-err` : null, hint ? `${id}-hint` : null].filter(Boolean).join(" ") || undefined;
@@ -1205,7 +1159,7 @@ function Field({
             onChange={(e) => set(e.target.value)}
             aria-invalid={error ? true : undefined}
             aria-describedby={describedBy}
-            className={`${box} h-9 appearance-none pr-8`}
+            className={`${box} ${rowSize(tall)} appearance-none pr-8`}
           >
             {placeholder && (
               <option value="" disabled>
@@ -1229,7 +1183,7 @@ function Field({
           rows={2}
           maxLength={maxLength}
           aria-describedby={describedBy}
-          className={`${box} resize-none py-1.5 leading-snug`}
+          className={`${box} resize-none px-2.5 py-1.5 leading-snug`}
         />
       ) : (
         <input
@@ -1243,7 +1197,7 @@ function Field({
           autoComplete="off"
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
-          className={`${box} h-9`}
+          className={`${box} ${rowSize(tall)}`}
         />
       )}
       {error && (
