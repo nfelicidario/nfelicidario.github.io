@@ -152,7 +152,7 @@ export const OLD_STEPS: OldStep[] = [
 
 /** the three collapsed branches under the RCS one */
 export const STUBS: { name: string; note: string; tag: string }[] = [
-  { name: "TFN", note: "9 steps, similar shape", tag: "coming" },
+  { name: "TFN", note: "Similar shape, to be mapped", tag: "coming" },
   { name: "10DLC", note: "Similar shape, to be mapped", tag: "coming" },
   { name: "Short Code", note: "Similar shape, to be mapped", tag: "coming" },
 ];
