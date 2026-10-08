@@ -200,40 +200,6 @@ export function HeroStage({
             </>
           )}
         </span>
-        <span className="flex items-center gap-1">
-          {showProtoFooter &&
-            footer.actions
-              ?.filter((a) => !a.hidden)
-              .map((a) => (
-                <button
-                  key={a.label}
-                  type="button"
-                  onClick={a.onClick}
-                  className="label inline-flex items-center gap-1 rounded-full px-2 py-1 transition-colors hover:bg-raised hover:text-ink"
-                >
-                  {a.icon}
-                  {a.label}
-                </button>
-              ))}
-        </span>
-        <span className="flex items-center justify-center gap-3">
-          {showProtoFooter && footer.steps && (
-            <span className="flex items-center gap-2" aria-label={`Step ${(footer.current ?? 0) + 1} of ${footer.steps.length}`}>
-              <span className="flex items-center gap-1.5" aria-hidden="true">
-                {footer.steps.map((name, i) => (
-                  <span
-                    key={name}
-                    title={name}
-                    className={`block h-1.5 rounded-full transition-all duration-300 ${
-                      i === footer.current ? "w-4 bg-accent" : "w-1.5 bg-rule"
-                    }`}
-                  />
-                ))}
-              </span>
-              <span className="label text-ink">{footer.steps[footer.current ?? 0]}</span>
-            </span>
-          )}
-        </span>
         <span role="group" aria-label="Fidelity" className="flex items-center justify-end gap-0.5">
           {tiers
             .filter((t) => t.available || t.key === "video")
