@@ -6,6 +6,7 @@ import { useHeroFooter } from "@/components/case/HeroStage";
 import {
   AgentInfo,
   AndroidPhone,
+  BANNER_CLEARANCE,
   Composer,
   ConversationPanel,
   DemoBanner,
@@ -13,9 +14,9 @@ import {
   MessagesHeader,
   PANEL_PADDING,
   RichCard,
+  RichCardCarousel,
   SuggestionChips,
   ThreadIntro,
-  ThreadNotice,
   Timestamp,
   TypingIndicator,
   type BubbleStatus,
@@ -43,7 +44,6 @@ import {
   FORM_DEFAULTS,
   FRAMES,
   HAPPY_PATH,
-  LIVE_CHIPS,
   OPTIONS,
   PHONE_COPY,
   PREFILL,
@@ -51,8 +51,7 @@ import {
   SIGNUP_SUCCESS,
   STATUS,
   STEP_LABELS,
-  YOURS_CHIPS,
-  type Chip,
+  money,
   type Field,
   type HappyMoment,
   type Status,
@@ -78,7 +77,12 @@ import {
  * `HeroView` is purely presentational, so the stills render it in fixed states with no timers.
  *
  * Google's agent limits are enforced where a field exists: display name 40, description 100,
- * suggested-reply labels 25. The logo hint says 224×224 PNG or JPEG; any image is accepted.
+ * suggestion labels 25. The logo hint says 224×224 PNG or JPEG; any image is accepted.
+ *
+ * The thread (demo and live) is one ordering flow: opener, a carousel of three deal cards,
+ * two action chips, the viewer taps a card's button, an upsell card, the viewer taps
+ * "Yes, and checkout" (or "No thanks"), and an order confirmation card with two chips. Each
+ * thread's progress is a `Thread` in state: the deal picked, then whether the add-on was taken.
  *
  * The happy path (HAPPY_PATH in script.ts) names the one control to click at each moment.
  * A capture-phase click handler on the prototype root compares every click against it: a
@@ -112,6 +116,8 @@ const HERO_CSS =
 const HINT_MS = 1200;
 /** row height and padding: 44 px in the demo form, 36 px in the denser provisioning forms */
 const rowSize = (tall?: boolean) => (tall ? "h-11 px-3" : "h-9 px-2.5");
+/** the two-to-three-line textarea rows (description, sample message); the demo form's logo zone matches it */
+const MULTI_H = "h-14";
 
 /* ---------------------------------------------------------------- frames */
 
@@ -121,13 +127,16 @@ const at = (step: Step, phase: string) => FRAMES.findIndex((f) => f.step === ste
 const F = {
   /** the first frame of the thread: the agent is typing */
   yours: at("yours", "typing1"),
-  yoursGreeting: at("yours", "greeting"),
+  yoursOpener: at("yours", "opener"),
   yoursTyping2: at("yours", "typing2"),
-  yoursCard: at("yours", "card"),
-  /** the chips are out; the viewer can tap */
+  yoursCarousel: at("yours", "carousel"),
+  /** the chips are out; the viewer can tap a card's button */
   yoursChips: at("yours", "chips"),
   yoursTapped: at("yours", "tap"),
-  yoursReplied: at("yours", "replied"),
+  /** the upsell card is out; the viewer can check out */
+  yoursUpsell: at("yours", "upsell"),
+  yoursCheckout: at("yours", "checkout"),
+  yoursConfirmed: at("yours", "confirmed"),
   yoursName: at("yours", "name"),
   yoursColor: at("yours", "color"),
   yoursLogo: at("yours", "logo"),
@@ -143,7 +152,19 @@ const F = {
   submitted: at("submitted", "reviewing"),
   live: at("live", "live"),
   liveTapped: at("live", "tapped"),
-  liveReplied: at("live", "replied"),
+  liveUpsell: at("live", "upsell"),
+  liveCheckout: at("live", "checkout"),
+  liveConfirmed: at("live", "confirmed"),
+};
+
+/**
+ * The frames that reveal each part of a thread, per mode. The demo thread builds up over its
+ * opening frames; the live thread shows the opener, carousel, and chips at once.
+ */
+type ThreadFrames = { opener: number; carousel: number; chips: number; upsell: number; confirmed: number; typing: number[] };
+const THREAD_FRAMES: Record<"yours" | "live", ThreadFrames> = {
+  yours: { opener: F.yoursOpener, carousel: F.yoursCarousel, chips: F.yoursChips, upsell: F.yoursUpsell, confirmed: F.yoursConfirmed, typing: [F.yours, F.yoursTyping2] },
+  live: { opener: F.live, carousel: F.live, chips: F.live, upsell: F.liveUpsell, confirmed: F.liveConfirmed, typing: [] },
 };
 
 const STEP_ORDER: Step[] = ["yours", "signup", "brand", "agent", "campaign", "submitted", "live"];
@@ -225,11 +246,18 @@ function normalizeHex(hex: string) {
 
 /* ----------------------------------------------------------- state machine */
 
-type State = { i: number; chip: number | null; liveChip: number | null; values: Values; logo: Logo; run: number };
+/** one thread's progress: the deal card tapped (index), then whether the add-on was taken */
+type Thread = { deal: number | null; addon: boolean | null };
+const UNTAPPED: Thread = { deal: null, addon: null };
+
+type State = { i: number; yours: Thread; live: Thread; values: Values; logo: Logo; run: number };
 type Action =
   | { type: "NEXT" }
   | { type: "GOTO"; i: number }
-  | { type: "TAP"; chip: number; now?: boolean }
+  /** a card's "Get this deal" */
+  | { type: "TAP"; deal: number; now?: boolean }
+  /** the upsell's "Yes, and checkout" (addon true) or "No thanks" (false) */
+  | { type: "CHECKOUT"; addon: boolean; now?: boolean }
   | { type: "SET"; field: Field; value: string }
   | { type: "LOGO"; logo: Logo }
   /** the form's own Replay: the thread plays again from the top, fields kept */
@@ -239,27 +267,32 @@ type Action =
 function initial(i = 0, run = 0): State {
   return {
     i,
-    chip: null,
-    liveChip: null,
+    yours: UNTAPPED,
+    live: UNTAPPED,
     values: { ...FORM_DEFAULTS },
     logo: { kind: "none" },
     run,
   };
 }
 
+const DEALS = PHONE_COPY.deals;
+
 /** side effects of landing on a frame (autoplay script and prefill) */
 function enter(s: State, i: number): State {
   const f = FRAMES[i];
   const n: State = { ...s, i };
   // landing on the top of a thread (Replay, the footer's step arrows) starts it untapped
-  if (f.step === "yours" && f.phase === "typing1") n.chip = null;
-  if (f.step === "live" && f.phase === "live") n.liveChip = null;
-  if (f.step === "yours" && f.phase === "tap" && s.chip === null) n.chip = s.run % YOURS_CHIPS.length;
+  if (f.step === "yours" && f.phase === "typing1") n.yours = UNTAPPED;
+  if (f.step === "live" && f.phase === "live") n.live = UNTAPPED;
+  // autoplay picks a different deal each run, and always takes the add-on
+  if (f.step === "yours" && f.phase === "tap" && s.yours.deal === null) n.yours = { deal: s.run % DEALS.length, addon: null };
+  if (f.step === "yours" && f.phase === "checkout" && s.yours.addon === null) n.yours = { ...n.yours, addon: true };
+  if (f.step === "live" && f.phase === "tapped" && s.live.deal === null) n.live = { deal: s.run % DEALS.length, addon: null };
+  if (f.step === "live" && f.phase === "checkout" && s.live.addon === null) n.live = { ...n.live, addon: true };
   if (f.step === "yours" && f.phase === "color") n.values = { ...n.values, color: AGENT.color };
   if (f.step === "yours" && f.phase === "logo") n.logo = { kind: AGENT.logo };
   if (f.step === "signup" && f.phase === "empty") n.values = derive(n.values);
   if (f.step === "live" && !s.values.sample) n.values = derive(n.values);
-  if (f.step === "live" && f.phase === "tapped" && s.liveChip === null) n.liveChip = s.run % LIVE_CHIPS.length;
   return n;
 }
 
@@ -272,8 +305,17 @@ function reducer(s: State, a: Action): State {
       return enter(s, a.i);
     case "TAP": {
       const step = FRAMES[s.i].step;
-      if (step === "yours" && s.i >= F.yoursChips && s.chip === null) return { ...s, chip: a.chip, i: a.now ? F.yoursReplied : F.yoursTapped };
-      if (s.i === F.live) return { ...s, liveChip: a.chip, i: a.now ? F.liveReplied : F.liveTapped };
+      if (step === "yours" && s.i >= F.yoursChips && s.yours.deal === null)
+        return { ...s, yours: { deal: a.deal, addon: null }, i: a.now ? F.yoursUpsell : F.yoursTapped };
+      if (s.i === F.live) return { ...s, live: { deal: a.deal, addon: null }, i: a.now ? F.liveUpsell : F.liveTapped };
+      return s;
+    }
+    case "CHECKOUT": {
+      const step = FRAMES[s.i].step;
+      if (step === "yours" && s.i >= F.yoursUpsell && s.yours.deal !== null && s.yours.addon === null)
+        return { ...s, yours: { ...s.yours, addon: a.addon }, i: a.now ? F.yoursConfirmed : F.yoursCheckout };
+      if (s.i === F.liveUpsell && s.live.addon === null)
+        return { ...s, live: { ...s.live, addon: a.addon }, i: a.now ? F.liveConfirmed : F.liveCheckout };
       return s;
     }
     case "SET":
@@ -282,7 +324,7 @@ function reducer(s: State, a: Action): State {
       return { ...s, logo: a.logo };
     case "RESET_THREAD":
       if (FRAMES[s.i].step !== "yours") return s;
-      return { ...s, chip: null, i: F.yours };
+      return { ...s, yours: UNTAPPED, i: F.yours };
     case "RESET":
       return initial(0, s.run + 1);
   }
@@ -357,7 +399,7 @@ export function RcsStudioHero({ autoplay = false }: { autoplay?: boolean }) {
 
 /** reduced motion: no timers; final state plus a step list, phone still tappable */
 function ReducedHero() {
-  const [liveChip, setLiveChip] = useState<number | null>(null);
+  const [live, setLive] = useState<Thread>(UNTAPPED);
   const footer = useHeroFooter();
   useEffect(() => {
     footer.set({
@@ -367,18 +409,20 @@ function ReducedHero() {
         {
           label: "Replay",
           icon: <RotateCcw size={12} aria-hidden="true" />,
-          onClick: () => setLiveChip(null),
-          hidden: liveChip === null,
+          onClick: () => setLive(UNTAPPED),
+          hidden: live.deal === null,
         },
       ],
     });
     return () => footer.set(null);
-  }, [footer, liveChip]);
+  }, [footer, live]);
   const base = initial();
-  const s: State = { ...base, values: derive(base.values), i: liveChip === null ? F.live : F.liveReplied, liveChip };
+  const i = live.deal === null ? F.live : live.addon === null ? F.liveUpsell : F.liveConfirmed;
+  const s: State = { ...base, values: derive(base.values), i, live };
   const dispatch: Dispatch<Action> = (a) => {
-    if (a.type === "TAP") setLiveChip(a.chip);
-    if (a.type === "RESET") setLiveChip(null);
+    if (a.type === "TAP") setLive({ deal: a.deal, addon: null });
+    if (a.type === "CHECKOUT") setLive((t) => ({ ...t, addon: a.addon }));
+    if (a.type === "RESET") setLive(UNTAPPED);
   };
   return (
     <HeroView
@@ -417,15 +461,15 @@ function still(i: number, overrides: Partial<State> = {}): State {
     ...base,
     values: derive({ ...base.values, agentName: AGENT.name, color: AGENT.color }),
     logo: { kind: "mark" },
-    chip: 0,
-    liveChip: 0,
+    yours: { deal: 1, addon: true },
+    live: { deal: 1, addon: true },
     ...overrides,
   };
 }
 
 export const rcsStudioStills: { render: ReactNode; caption: string }[] = [
   {
-    render: <HeroView s={still(F.yoursReplied)} timed still focus="phone" />,
+    render: <HeroView s={still(F.yoursConfirmed)} timed still focus="phone" />,
     caption: "Demo RCS: name, logo, and brand color, previewed live on the phone.",
   },
   {
@@ -441,7 +485,7 @@ export const rcsStudioStills: { render: ReactNode; caption: string }[] = [
     caption: "Submitted. Carrier review stands in for one to three weeks.",
   },
   {
-    render: <HeroView s={still(F.liveReplied)} timed still focus="phone" />,
+    render: <HeroView s={still(F.liveConfirmed)} timed still focus="phone" />,
     caption: "Live: the same conversation, now from your own agent.",
   },
 ];
@@ -457,7 +501,9 @@ function happyTarget(s: State): Target | null {
   switch (FRAMES[s.i].step) {
     case "yours":
       if (s.i < F.yoursChips) return null;
-      return s.chip === null ? "chip" : "make-live";
+      if (s.yours.deal === null) return "card-cta";
+      if (s.i < F.yoursUpsell) return null;
+      return s.yours.addon === null ? "checkout" : "make-live";
     case "signup":
       return s.i === F.signupSuccess ? null : "create-account";
     case "brand":
@@ -468,7 +514,9 @@ function happyTarget(s: State): Target | null {
     case "submitted":
       return null;
     case "live":
-      return s.i === F.live && s.liveChip === null ? "chip" : null;
+      if (s.i === F.live && s.live.deal === null) return "card-cta";
+      if (s.i === F.liveUpsell && s.live.addon === null) return "checkout";
+      return null;
   }
 }
 
@@ -791,7 +839,7 @@ function LogoField({
           load(e.dataTransfer.files[0]);
         }}
         data-row=""
-        className={`${ROW} ${rowSize(tall)} flex items-center gap-2.5 border-dashed transition-colors ${
+        className={`${ROW} ${tall ? `${MULTI_H} px-3` : rowSize()} flex items-center gap-3 border-dashed transition-colors ${
           drag || highlight ? "border-accent bg-accent-soft/40 ring-2 ring-accent-soft" : "border-rule bg-bg"
         }`}
       >
@@ -803,7 +851,7 @@ function LogoField({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
-            <LogoMark logo={logo} color={s.values.color} name={s.values.agentName} className={`${tall ? "h-7 w-7" : "h-6 w-6"} rounded-md text-[11px]`} />
+            <LogoMark logo={logo} color={s.values.color} name={s.values.agentName} className={`${tall ? "h-9 w-9 rounded-lg text-[13px]" : "h-6 w-6 rounded-md text-[11px]"}`} />
           </motion.div>
         </AnimatePresence>
         <label
@@ -1355,7 +1403,7 @@ function Field({
           rows={2}
           maxLength={maxLength}
           aria-describedby={describedBy}
-          className={`${box} resize-none px-2.5 py-1.5 leading-snug`}
+          className={`${box} ${MULTI_H} resize-none px-2.5 py-2 leading-snug`}
         />
       ) : (
         <input
@@ -1388,20 +1436,44 @@ function Field({
 
 /* ----------------------------------------------------------------- phone */
 
-type Msg = { id: string; from: "agent" | "user"; kind?: "card" | "ghost" | "chips"; text: string; status?: BubbleStatus };
+type Msg = {
+  id: string;
+  from: "agent" | "user";
+  kind?: "text" | "ghost" | "carousel" | "chips" | "upsell" | "confirmation" | "after-chips";
+  text?: string;
+  status?: BubbleStatus;
+};
 
-const CARD = PHONE_COPY.card;
+/** the ordering flow as a list of messages, from one thread's state at frame `i` */
+function threadMessages(t: Thread, i: number, at: ThreadFrames, opener: string): { messages: Msg[]; typing: boolean } {
+  const messages: Msg[] = [];
+  const upsellOut = i >= at.upsell && t.deal !== null;
+  const confirmedOut = i >= at.confirmed && t.addon !== null;
+  if (i >= at.opener) messages.push({ id: "opener", from: "agent", text: opener });
+  if (i >= at.carousel) messages.push({ id: "carousel", from: "agent", kind: "carousel" });
+  if (i >= at.chips) messages.push({ id: "chips", from: "agent", kind: "chips" });
+  if (t.deal !== null) messages.push({ id: "pick", from: "user", text: DEALS[t.deal].reply, status: upsellOut ? "read" : "delivered" });
+  if (upsellOut) messages.push({ id: "upsell", from: "agent", kind: "upsell" });
+  if (t.addon !== null)
+    messages.push({ id: "answer", from: "user", text: t.addon ? PHONE_COPY.upsell.yes : PHONE_COPY.upsell.no, status: confirmedOut ? "read" : "delivered" });
+  if (confirmedOut) messages.push({ id: "confirmation", from: "agent", kind: "confirmation" }, { id: "after", from: "agent", kind: "after-chips" });
+  const typing = at.typing.includes(i) || (t.deal !== null && !upsellOut) || (t.addon !== null && !confirmedOut);
+  return { messages, typing };
+}
+
+const noAction = () => {};
 
 /**
  * The Android phone, built from the shared kit. Three screens:
  *  - yours and live: a Google Messages thread on the full-height conversation panel. The
- *    thread opens from the top like a new business thread: the demo banner, the agent intro
- *    (logo, name and badge, description, divider), the day divider, the "RCS for Business"
- *    notice, then typing, the greeting, typing, the rich card, and the suggested replies
- *    inline under the card. A tapped chip stays where it is, selected; the user's bubble
- *    renders below the row on the right, then typing, then the agent's answer. The column
- *    scrolls and keeps the newest content in view; the composer is pinned under a divider.
- *  - brand and agent steps: the agent info screen, filling in as the form does (no banner)
+ *    thread opens from the top like a new business thread: the agent intro (logo, name and
+ *    badge, description, divider), the day divider, then typing, the opener, typing, the deal
+ *    carousel, and the two action chips under it. A card's button sends the user's reply (right,
+ *    brand color), then typing, then the upsell card; "Yes, and checkout" sends the next reply,
+ *    typing, and the confirmation card with its chips. The demo banner floats over the top of
+ *    the column; the column scrolls edge to edge and keeps the newest content in view; the
+ *    composer is pinned under a divider.
+ *  - brand and agent steps: the agent details screen, filling in as the form does
  *  - campaign and submitted: the sample message, or a ghost bubble until it exists
  */
 function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still: boolean; dispatch: Dispatch<Action> }) {
@@ -1415,37 +1487,23 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
   const color = normalizeHex(s.values.color) ?? AGENT.defaultColor;
   const sample = shown(s, timed, "sample");
 
-  const messages: Msg[] = [];
-  let chips: Chip[] = [];
-  let chipsEnabled = false;
-  let picked: number | null = null;
+  let messages: Msg[] = [];
   let typing = false;
+  let thread: Thread = UNTAPPED;
+  /** the card buttons and chips are live only while the thread waits on the viewer */
+  let canPick = false;
+  let canCheckout = false;
 
   if (mode === "yours") {
-    const replied = s.i >= F.yoursReplied && s.chip !== null;
-    if (s.i >= F.yoursGreeting) messages.push({ id: "greet", from: "agent", text: PHONE_COPY.greeting(name || PHONE_COPY.fallbackName) });
-    if (s.i >= F.yoursCard) messages.push({ id: "card", from: "agent", kind: "card", text: CARD.text });
-    if (s.i >= F.yoursChips) messages.push({ id: "chips", from: "agent", kind: "chips", text: "" });
-    if (s.chip !== null) messages.push({ id: "me", from: "user", text: YOURS_CHIPS[s.chip].label, status: replied ? "read" : "delivered" });
-    if (replied) messages.push({ id: "reply", from: "agent", text: YOURS_CHIPS[s.chip as number].reply });
-    typing = s.i === F.yours || s.i === F.yoursTyping2 || (s.chip !== null && !replied);
-    chips = YOURS_CHIPS;
-    chipsEnabled = s.i >= F.yoursChips && s.chip === null;
-    picked = s.chip;
+    thread = s.yours;
+    ({ messages, typing } = threadMessages(thread, s.i, THREAD_FRAMES.yours, PHONE_COPY.opener));
+    canPick = s.i >= F.yoursChips && thread.deal === null;
+    canCheckout = s.i >= F.yoursUpsell && thread.deal !== null && thread.addon === null;
   } else if (mode === "live") {
-    const tapped = s.i >= F.liveTapped && s.liveChip !== null;
-    const replied = s.i >= F.liveReplied && s.liveChip !== null;
-    messages.push(
-      { id: "greet", from: "agent", text: s.values.sample },
-      { id: "card", from: "agent", kind: "card", text: CARD.text },
-      { id: "chips", from: "agent", kind: "chips", text: "" },
-    );
-    if (tapped) messages.push({ id: "me", from: "user", text: LIVE_CHIPS[s.liveChip as number].label, status: replied ? "read" : "delivered" });
-    if (replied) messages.push({ id: "reply", from: "agent", text: LIVE_CHIPS[s.liveChip as number].reply });
-    typing = tapped && !replied;
-    chips = LIVE_CHIPS;
-    chipsEnabled = s.i === F.live;
-    picked = s.liveChip;
+    thread = s.live;
+    ({ messages, typing } = threadMessages(thread, s.i, THREAD_FRAMES.live, s.values.sample));
+    canPick = s.i === F.live && thread.deal === null;
+    canCheckout = s.i === F.liveUpsell && thread.addon === null;
   } else {
     messages.push(sample ? { id: "sample", from: "agent", text: sample } : { id: "ghost", from: "agent", kind: "ghost", text: PHONE_COPY.ghost });
   }
@@ -1458,6 +1516,8 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
   const intro = (s.values.description || PREFILL.description(headerName)).slice(0, MAX.description);
   const logo = (size: string) => <LogoMark logo={s.logo} color={color} name={name} className={`h-full w-full ${size}`} />;
   const enter = still ? false : { opacity: 0, y: 8 };
+  const deal = thread.deal !== null ? DEALS[thread.deal] : null;
+  const total = deal ? deal.price + (thread.addon ? PHONE_COPY.upsell.price : 0) : 0;
 
   /** keep the newest content in view as the thread grows */
   const count = messages.length + (typing ? 1 : 0);
@@ -1467,70 +1527,143 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
     el.scrollTo({ top: el.scrollHeight, behavior: still || reduced ? "auto" : "smooth" });
   }, [count, mode, still, reduced]);
 
-  return (
-    <AndroidPhone brandColor={color} theme="auto" fit="contain" label="Phone preview">
-      <MessagesHeader logo={logo("text-[15px]")} name={headerName} verified={verified} subtitle={subtitle} />
-      {infoScreen ? (
+  if (infoScreen) {
+    return (
+      <AndroidPhone brandColor={color} theme="auto" fit="contain" label="Phone preview">
         <AgentInfo
           logo={logo("text-[28px]")}
           name={headerName}
           description={shown(s, timed, "description") || undefined}
           website={shown(s, timed, "website") || undefined}
           email={shown(s, timed, "contact") || undefined}
+          placeholders={PHONE_COPY.info}
         />
-      ) : (
-        <ConversationPanel composer={<Composer />}>
-          {mode !== "preview" && <DemoBanner />}
-          {/* bleeds by the panel padding so the chip row can run to the panel's edge */}
-          <div
-            ref={scroller}
-            data-ph-scroller=""
-            aria-live="polite"
-            className="flex min-h-0 flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto"
-            style={{ margin: `0 -${PANEL_PADDING}px`, padding: `0 ${PANEL_PADDING}px 4px`, scrollbarWidth: "none" }}
-          >
-            <ThreadIntro logo={logo("text-[40px]")} name={headerName} description={intro} verified={verified} />
-            <Timestamp>{PHONE_COPY.timestamp}</Timestamp>
-            <ThreadNotice>{PHONE_COPY.notice}</ThreadNotice>
-            <AnimatePresence initial={false}>
-              {messages.map((m) => (
-                <motion.div
-                  key={`${mode}-${m.id}`}
-                  initial={enter}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={still ? undefined : { opacity: 0 }}
-                  transition={{ duration: 0.26, ease: "easeOut" }}
-                  className={`flex w-full shrink-0 flex-col ${m.from === "user" ? "items-end" : "items-start"}`}
-                >
-                  {m.kind === "card" ? (
-                    <RichCard title={CARD.title} meta={CARD.meta} description={m.text} mediaHeight="short" width="86%" />
-                  ) : m.kind === "chips" ? (
-                    <div className="relative w-full" data-target="chip" data-control="">
-                      <SuggestionChips
-                        label="Suggested replies"
-                        bleed={PANEL_PADDING}
-                        suggestions={chips.map((c, k) => ({ label: c.label, selected: picked === k }))}
-                        onSelect={(k) => dispatch({ type: "TAP", chip: k, now: still })}
-                        disabled={!chipsEnabled}
-                      />
-                      <HintRing id="chip" className="inset-y-0 -inset-x-1 rounded-2xl" />
-                    </div>
-                  ) : (
-                    <MessageBubble from={m.from} ghost={m.kind === "ghost"} status={m.status}>
-                      {m.text}
-                    </MessageBubble>
-                  )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-            {typing && (
-              <motion.div initial={enter} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="flex w-full shrink-0 flex-col items-start">
-                <TypingIndicator logo={logo("text-[10px]")} />
-              </motion.div>
-            )}
+      </AndroidPhone>
+    );
+  }
+
+  const banner = mode !== "preview";
+
+  function render(m: Msg) {
+    switch (m.kind) {
+      case "carousel":
+        return (
+          <div className="relative w-full" data-target="card-cta" data-control="">
+            <RichCardCarousel
+              label="This week's deals"
+              bleed={PANEL_PADDING}
+              cardWidth="72%"
+              disabled={!canPick}
+              cards={DEALS.map((d, k) => ({
+                title: d.title,
+                meta: money(d.price),
+                description: d.text,
+                mediaHeight: "short",
+                suggestions: [
+                  {
+                    label: d.cta,
+                    onSelect: canPick ? () => dispatch({ type: "TAP", deal: k, now: still }) : undefined,
+                    overlay: <HintRing id="card-cta" />,
+                  },
+                ],
+              }))}
+            />
           </div>
-        </ConversationPanel>
-      )}
+        );
+      case "chips":
+        return (
+          <div className="w-full" data-control="">
+            {/* real actions (open a map, open the menu), inert in the prototype, and never dimmed: they stay in place after the pick */}
+            <SuggestionChips label="Suggested actions" bleed={PANEL_PADDING} suggestions={PHONE_COPY.dealChips} onSelect={noAction} />
+          </div>
+        );
+      case "upsell":
+        return (
+          <div className="w-[92%]" data-target="checkout" data-control="">
+            <RichCard
+              title={PHONE_COPY.upsell.title}
+              meta={`+${money(PHONE_COPY.upsell.price)}`}
+              description={PHONE_COPY.upsell.text}
+              mediaHeight="short"
+              disabled={!canCheckout}
+              suggestions={[
+                {
+                  label: PHONE_COPY.upsell.yes,
+                  onSelect: canCheckout ? () => dispatch({ type: "CHECKOUT", addon: true, now: still }) : undefined,
+                  overlay: <HintRing id="checkout" />,
+                },
+                { label: PHONE_COPY.upsell.no, onSelect: canCheckout ? () => dispatch({ type: "CHECKOUT", addon: false, now: still }) : undefined },
+              ]}
+            />
+          </div>
+        );
+      case "confirmation":
+        return (
+          <RichCard
+            width="92%"
+            title={PHONE_COPY.confirmation.title(PHONE_COPY.confirmation.orderNumber)}
+            meta={money(total)}
+            mediaHeight="short"
+            description={
+              <ul className="m-0 list-none p-0">
+                {deal && <li>{deal.title}</li>}
+                {thread.addon && <li>{PHONE_COPY.confirmation.addon}</li>}
+                <li>{PHONE_COPY.confirmation.pickup}</li>
+              </ul>
+            }
+            suggestions={[{ label: PHONE_COPY.confirmation.track, kind: "url", onSelect: noAction }]}
+          />
+        );
+      case "after-chips":
+        return (
+          <div className="w-full" data-control="">
+            <SuggestionChips label="Suggested replies" bleed={PANEL_PADDING} suggestions={PHONE_COPY.afterChips} onSelect={noAction} />
+          </div>
+        );
+      default:
+        return (
+          <MessageBubble from={m.from} ghost={m.kind === "ghost"} status={m.status}>
+            {m.text}
+          </MessageBubble>
+        );
+    }
+  }
+
+  return (
+    <AndroidPhone brandColor={color} theme="auto" fit="contain" label="Phone preview">
+      <MessagesHeader logo={logo("text-[15px]")} name={headerName} verified={verified} subtitle={subtitle} />
+      <ConversationPanel composer={<Composer />} banner={banner ? <DemoBanner /> : undefined}>
+        {/* fills the panel edge to edge, so content clips only at the panel's top and the composer's divider */}
+        <div
+          ref={scroller}
+          data-ph-scroller=""
+          aria-live="polite"
+          className="flex min-h-0 flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto"
+          style={{ padding: `${banner ? BANNER_CLEARANCE : PANEL_PADDING}px ${PANEL_PADDING}px ${PANEL_PADDING}px`, scrollbarWidth: "none" }}
+        >
+          <ThreadIntro logo={logo("text-[28px]")} name={headerName} description={intro} verified={verified} />
+          <Timestamp>{PHONE_COPY.timestamp}</Timestamp>
+          <AnimatePresence initial={false}>
+            {messages.map((m) => (
+              <motion.div
+                key={`${mode}-${m.id}`}
+                initial={enter}
+                animate={{ opacity: 1, y: 0 }}
+                exit={still ? undefined : { opacity: 0 }}
+                transition={{ duration: 0.26, ease: "easeOut" }}
+                className={`flex w-full shrink-0 flex-col ${m.from === "user" ? "items-end" : "items-start"}`}
+              >
+                {render(m)}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          {typing && (
+            <motion.div initial={enter} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="flex w-full shrink-0 flex-col items-start">
+              <TypingIndicator logo={logo("text-[10px]")} />
+            </motion.div>
+          )}
+        </div>
+      </ConversationPanel>
     </AndroidPhone>
   );
 }

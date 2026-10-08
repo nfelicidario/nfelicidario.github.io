@@ -1,16 +1,21 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Globe, Mail, Phone } from "lucide-react";
+import { ArrowLeft, BadgeCheck, ExternalLink, Globe, Mail, Phone } from "lucide-react";
+import { GESTURE_BAR_H } from "./AndroidPhone";
 import { MediaPlaceholder } from "./RichCard";
 import { VerifiedBadge } from "./VerifiedBadge";
-import { PANEL_INSET, PANEL_RADIUS } from "./ConversationPanel";
 
 /**
- * The agent info screen a user reaches from the conversation header: hero banner (45:14),
- * the logo overlapping it, masked to a rounded square on no background, display name with the filled verified badge,
- * the 100-char description, then website, phone, and email rows, with the privacy and terms
- * links. Rendered on the same lighter inset panel as the conversation.
+ * The agent details screen a user reaches from the conversation header, as Google Messages
+ * draws it: a back arrow row; the 45:14 hero band (the 1440 x 448 banner, a soft brand
+ * gradient when none is given) with the logo overlapping its bottom edge, centered, masked to
+ * a rounded square on no background; the display name with the filled verified badge; the
+ * description centered in muted text (two lines); a row of round brand-tinted actions (Call,
+ * Website, Email); then rounded cards on the gray ground: Verified, the phone number, the
+ * website, the email, and the privacy policy and terms links. The whole screen scrolls.
+ *
+ * Every value is optional; `placeholders` stand in (muted) while a form is still empty.
  */
 export type AgentInfoProps = {
   logo: ReactNode;
@@ -22,77 +27,231 @@ export type AgentInfoProps = {
   website?: string;
   phone?: string;
   email?: string;
-  /** show the privacy policy and terms links */
+  /** shown muted while the matching value is empty */
+  placeholders?: Partial<AgentInfoPlaceholders>;
+  /** show the privacy policy and terms cards */
   legal?: boolean;
+  /** CSS px of the logo's square */
+  logoSize?: number;
 };
 
-export function AgentInfo({ logo, name, description, verified = false, banner, website, phone, email, legal = true }: AgentInfoProps) {
-  type Row = { icon: ReactNode; text: string; label: string };
-  const rows: Row[] = [];
-  if (website) rows.push({ icon: <Globe size={20} aria-hidden="true" />, text: website, label: "Website" });
-  if (phone) rows.push({ icon: <Phone size={20} aria-hidden="true" />, text: phone, label: "Phone" });
-  if (email) rows.push({ icon: <Mail size={20} aria-hidden="true" />, text: email, label: "Email" });
+export type AgentInfoPlaceholders = { description: string; website: string; phone: string; email: string };
+
+export const AGENT_INFO_PLACEHOLDERS: AgentInfoPlaceholders = {
+  description: "A line about your business and what you send.",
+  website: "yourbrand.example",
+  phone: "+1 555 010 0199",
+  email: "hello@yourbrand.example",
+};
+
+export const INFO_LOGO_SIZE = 72;
+const CARD_RADIUS = 16;
+
+export function AgentInfo({
+  logo,
+  name,
+  description,
+  verified = false,
+  banner,
+  website,
+  phone,
+  email,
+  placeholders,
+  legal = true,
+  logoSize = INFO_LOGO_SIZE,
+}: AgentInfoProps) {
+  const ph = { ...AGENT_INFO_PLACEHOLDERS, ...placeholders };
+  const value = (v: string | undefined, fallback: string) => ({ text: v || fallback, muted: !v });
+
+  const actions = [
+    { icon: <Phone size={22} aria-hidden="true" />, label: "Call" },
+    { icon: <Globe size={22} aria-hidden="true" />, label: "Website" },
+    { icon: <Mail size={22} aria-hidden="true" />, label: "Email" },
+  ];
+  const rows = [
+    { key: "phone", icon: <Phone size={20} aria-hidden="true" />, ...value(phone, ph.phone), sub: "Phone" },
+    { key: "website", icon: <Globe size={20} aria-hidden="true" />, ...value(website, ph.website), sub: "Website" },
+    { key: "email", icon: <Mail size={20} aria-hidden="true" />, ...value(email, ph.email), sub: "Email" },
+  ];
+  const desc = value(description, ph.description);
 
   return (
     <div
+      data-ph-scroller=""
       style={{
         display: "flex",
         minHeight: 0,
         flex: 1,
         flexDirection: "column",
-        margin: `0 ${PANEL_INSET}px ${PANEL_INSET}px`,
-        overflow: "hidden",
-        borderRadius: PANEL_RADIUS,
-        background: "var(--ph-surface)",
+        overflowX: "hidden",
+        overflowY: "auto",
+        scrollbarWidth: "none",
+        background: "var(--ph-bg)",
+        color: "var(--ph-on-surface)",
       }}
     >
-      <div aria-hidden="true" style={{ aspectRatio: "45 / 14", flexShrink: 0, overflow: "hidden" }}>{banner ?? <MediaPlaceholder />}</div>
-      <div style={{ padding: "0 20px" }}>
+      <style href="ph-info" precedence="default">
+        {"[data-ph-scroller]::-webkit-scrollbar{display:none}"}
+      </style>
+      {/* back arrow row */}
+      <div aria-hidden="true" style={{ display: "flex", height: 56, flexShrink: 0, alignItems: "center", padding: "0 8px" }}>
+        <span style={{ display: "grid", width: 40, height: 40, placeItems: "center", borderRadius: 999 }}>
+          <ArrowLeft size={22} />
+        </span>
+      </div>
+
+      {/* hero band with the logo over its bottom edge */}
+      <div aria-hidden="true" style={{ position: "relative", flexShrink: 0, marginBottom: logoSize / 2 }}>
+        <div style={{ aspectRatio: "45 / 14", overflow: "hidden" }}>{banner ?? <HeroBand />}</div>
         <span
-          aria-hidden="true"
           style={{
+            position: "absolute",
+            left: "50%",
+            bottom: -logoSize / 2,
             display: "grid",
-            width: 72,
-            height: 72,
-            marginTop: -36,
+            width: logoSize,
+            height: logoSize,
             overflow: "hidden",
             placeItems: "center",
-            borderRadius: 16,
+            transform: "translateX(-50%)",
+            borderRadius: Math.round(logoSize * 0.22),
             background: "transparent",
-            boxShadow: "0 0 0 3px var(--ph-surface)",
           }}
         >
           {logo}
         </span>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, fontSize: 22, fontWeight: 500, lineHeight: 1.2 }}>
-          <span style={{ minWidth: 0, overflowWrap: "anywhere" }}>{name}</span>
-          {verified && <VerifiedBadge size={24} />}
-        </div>
-        {description && (
-          <p style={{ margin: "10px 0 0", fontSize: 14, lineHeight: "19px", color: "var(--ph-on-surface-variant)", overflowWrap: "anywhere" }}>
-            {description}
-          </p>
-        )}
       </div>
-      {rows.length > 0 && (
-        <ul style={{ listStyle: "none", margin: "14px 0 0", padding: "6px 0", borderTop: "1px solid var(--ph-outline-variant)" }}>
-          {rows.map((r) => (
-            <li key={r.label} style={{ display: "flex", alignItems: "center", gap: 18, height: 48, padding: "0 20px", fontSize: 15 }}>
-              <span style={{ display: "grid", placeItems: "center", color: "var(--ph-brand-text)" }}>{r.icon}</span>
-              <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>{r.label}: </span>
-                {r.text}
+
+      {/* name, badge, description */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "10px 24px 0", textAlign: "center" }}>
+        <div style={{ display: "flex", maxWidth: "100%", alignItems: "center", gap: 6, fontSize: 22, fontWeight: 500, lineHeight: 1.2 }}>
+          <span style={{ minWidth: 0, overflowWrap: "anywhere" }}>{name}</span>
+          {verified && <VerifiedBadge size={22} />}
+        </div>
+        <p
+          style={{
+            margin: 0,
+            maxWidth: "100%",
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            fontSize: 14,
+            lineHeight: "19px",
+            color: "var(--ph-on-surface-variant)",
+            opacity: desc.muted ? 0.7 : 1,
+            overflowWrap: "anywhere",
+          }}
+        >
+          {desc.text}
+        </p>
+      </div>
+
+      {/* round actions tinted with the brand color */}
+      <div aria-hidden="true" style={{ display: "flex", justifyContent: "center", gap: 12, padding: "18px 16px 0" }}>
+        {actions.map((a) => (
+          <div key={a.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, width: 84 }}>
+            <span
+              style={{
+                display: "grid",
+                width: 84,
+                height: 48,
+                placeItems: "center",
+                borderRadius: 999,
+                background: "color-mix(in srgb, var(--ph-brand) 14%, var(--ph-surface))",
+                color: "var(--ph-on-surface)",
+              }}
+            >
+              {a.icon}
+            </span>
+            <span style={{ fontSize: 12.5, fontWeight: 500 }}>{a.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* cards on the gray ground */}
+      <ul
+        style={{
+          listStyle: "none",
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+          margin: 0,
+          padding: `20px ${12}px ${GESTURE_BAR_H + 10}px`,
+        }}
+      >
+        <li style={card}>
+          <span style={rowIcon}>
+            <BadgeCheck size={20} aria-hidden="true" />
+          </span>
+          <span style={{ minWidth: 0 }}>
+            <span style={rowTitle}>Verified</span>
+            <span style={rowSub}>The identity of this sender has been verified.</span>
+          </span>
+        </li>
+        {rows.map((r) => (
+          <li key={r.key} style={card}>
+            <span style={rowIcon}>{r.icon}</span>
+            <span style={{ minWidth: 0 }}>
+              <span style={{ ...rowTitle, opacity: r.muted ? 0.6 : 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.text}</span>
+              <span style={rowSub}>{r.sub}</span>
+            </span>
+          </li>
+        ))}
+        {legal &&
+          ["View Privacy Policy", "View Terms of Service"].map((t) => (
+            <li key={t} style={{ ...card, minHeight: 56 }}>
+              <span style={rowIcon}>
+                <ExternalLink size={20} aria-hidden="true" />
               </span>
+              <span style={rowTitle}>{t}</span>
             </li>
           ))}
-        </ul>
-      )}
-      {legal && (
-        <div style={{ display: "flex", gap: 14, padding: "8px 20px", fontSize: 13, fontWeight: 500, color: "var(--ph-brand-text)" }}>
-          <span>Privacy policy</span>
-          <span>Terms of service</span>
-        </div>
-      )}
+      </ul>
     </div>
   );
 }
+
+/** the hero band when there is no banner: a soft gradient in the brand color */
+function HeroBand() {
+  return (
+    <MediaPlaceholder
+      style={{
+        background:
+          "linear-gradient(120deg, color-mix(in srgb, var(--ph-brand) 70%, var(--ph-surface)) 0%, var(--ph-brand) 50%, color-mix(in srgb, var(--ph-brand) 55%, var(--ph-bg)) 100%)",
+      }}
+    />
+  );
+}
+
+const card = {
+  display: "flex",
+  alignItems: "center",
+  gap: 16,
+  minHeight: 64,
+  padding: "10px 16px",
+  borderRadius: CARD_RADIUS,
+  background: "var(--ph-surface)",
+} as const;
+
+const rowIcon = {
+  display: "grid",
+  flexShrink: 0,
+  placeItems: "center",
+  color: "var(--ph-on-surface-variant)",
+} as const;
+
+const rowTitle = {
+  display: "block",
+  fontSize: 15,
+  lineHeight: "20px",
+  color: "var(--ph-on-surface)",
+} as const;
+
+const rowSub = {
+  display: "block",
+  marginTop: 1,
+  fontSize: 13,
+  lineHeight: "17px",
+  color: "var(--ph-on-surface-variant)",
+} as const;

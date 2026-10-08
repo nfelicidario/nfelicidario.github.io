@@ -2,20 +2,28 @@
  * THE HAPPY PATH, in plain words (one line per step: what the viewer sees, then what they click)
  *
  *  1. Demo RCS. The phone opens a new thread: the agent's logo, name, and description at the
- *     top, the date, "This is an RCS for Business chat.", the agent typing, a greeting, typing
- *     again, a rich card, then three suggested replies under the card. CLICK any suggested reply.
- *  2. Demo RCS, replied. The reply shows on the right in the brand color and the agent answers.
- *     The name, logo, and brand color fields update the phone live. CLICK "Make it live".
+ *     top, the date, the agent typing, "Check out these sweet new deals for this week!", typing
+ *     again, then a carousel of three deal cards (each with a price and a "Get this deal"
+ *     button) and two chips under it, "Find location" and "View full menu". CLICK any card's
+ *     "Get this deal". The reply shows on the right in the brand color, the agent types, and an
+ *     upsell card lands: "Make it a meal?" with "Yes, and checkout" and "No thanks". CLICK
+ *     "Yes, and checkout". The reply shows, the agent types, and an order confirmation card
+ *     lands (order number, items, total, pickup time, "Track my order"), with "Reorder" and
+ *     "Give feedback" chips under it.
+ *  2. Demo RCS, ordered. The name, logo, and brand color fields update the phone live.
+ *     CLICK "Make it live".
  *  3. Sign up. A short form: name, work email, password. CLICK "Create account".
- *  4. Brand. Legal name, website, and contact email, prefilled from step 1. CLICK "Continue".
+ *  4. Brand. Legal name, website, and contact email, prefilled from step 1. The phone shows
+ *     the agent details screen filling in. CLICK "Continue".
  *  5. Agent. Display name, logo, color, and description, with Google's limits. CLICK "Continue".
  *  6. Campaign. Use case, sample message, opt-in method, and volume. PICK an opt-in method,
  *     then CLICK "Submit for review". (Submitting without an opt-in shows the carrier error.)
  *  7. Review. The timeline runs on its own; nothing to click.
- *  8. Live. The same thread from the real agent, verified. CLICK a chip to see it answer.
+ *  8. Live. The same deals from the real, verified agent. CLICK "Get this deal", then
+ *     "Yes, and checkout", to order again.
  *
  * Clicking anything else inside the prototype pulses a blue outline on the next thing to
- * click. Form fields, Replay, the color swatch, and the chip row never trigger the pulse.
+ * click. Form fields, Replay, the color swatch, the chip rows, and the cards never trigger it.
  *
  * ----------------------------------------------------------------------------------------
  *
@@ -23,17 +31,19 @@
  * plays, in one place. The hero imports from here, so editing this file is enough.
  *
  * How to edit safely:
- *  - Keep chip labels under 25 characters (Google's limit; longer labels are cut off).
+ *  - Keep chip and card button labels under 25 characters (Google's limit; longer labels are
+ *    cut off).
  *  - Keep the `step` and `phase` names in FRAMES exactly as they are, and keep every frame:
  *    the hero looks frames up by those names. Change `ms` freely (how long autoplay holds a
  *    frame, in milliseconds). `auto` marks the frames that advance on their own in
  *    interactive mode too (a reply arriving), so leave it where it is.
  *  - Keep the agent name under 40 characters and descriptions under 100 (Google's limits).
  *  - The brand color is #RRGGBB. Any color is accepted; the demo form does not check contrast.
- *  - Mock data only: invented businesses, people, and numbers. Nothing from a real customer.
+ *  - Mock data only: invented businesses, people, prices, and numbers. Nothing from a real
+ *    customer.
  */
 
-import { MAX_LABEL } from "@/components/phone";
+import { MAX_LABEL, type SuggestionKind } from "@/components/phone";
 
 /* ------------------------------------------------------------- the agent */
 
@@ -51,22 +61,77 @@ export const AGENT = {
 
 /* --------------------------------------------------------- phone copy */
 
+/** labels are capped at Google's 25 characters */
+const label = (s: string) => s.slice(0, MAX_LABEL);
+
+/** one deal card in the carousel */
+export type Deal = {
+  title: string;
+  /** one line under the title */
+  text: string;
+  /** USD; the confirmation adds these up */
+  price: number;
+  /** the button inside the card */
+  cta: string;
+  /** what the user's reply says after tapping the button */
+  reply: string;
+};
+
+export type ChipAction = { label: string; kind?: SuggestionKind };
+
 /** what the phone says in the Messages thread */
 export const PHONE_COPY = {
   /** the day divider above the first message */
-  timestamp: "Today · 9:30 AM",
-  /** the muted notice under the date on a new business thread */
-  notice: "This is an RCS for Business chat.",
-  /** the agent's opening line in step 1; `name` is the agent name typed so far */
-  greeting: (name: string) => `Hi Sam, it's ${name}. The Tuesday Family Box is back this week.`,
-  /** used in the greeting before a name has been typed */
-  fallbackName: "your agent",
-  /** the rich card under the greeting */
-  card: {
-    title: "Tuesday Family Box",
-    meta: "$32",
-    text: "Four entrees, two sides, and two house sauces. Pickup only.",
+  timestamp: "Today · 11:30 AM",
+  /** the agent's opening line in step 1 */
+  opener: "Check out these sweet new deals for this week!",
+  /** the three deal cards, in carousel order */
+  deals: [
+    {
+      title: "Two-for-one burgers",
+      text: "Buy a classic burger, get a second one free. Through Sunday.",
+      price: 8.49,
+      cta: label("Get this deal"),
+      reply: "I'll take the burger deal",
+    },
+    {
+      title: "Family bundle",
+      text: "Four entrees, two large sides, and a gallon of lemonade.",
+      price: 29.99,
+      cta: label("Get this deal"),
+      reply: "I'll take the family bundle",
+    },
+    {
+      title: "Pumpkin spice shake",
+      text: "Back for fall only, with whipped cream and cinnamon.",
+      price: 4.29,
+      cta: label("Get this deal"),
+      reply: "I'll take the pumpkin shake",
+    },
+  ] as Deal[],
+  /** the two actions under the carousel; real controls, not the happy path */
+  dealChips: [
+    { label: label("Find location"), kind: "location" },
+    { label: label("View full menu"), kind: "url" },
+  ] as ChipAction[],
+  /** the upsell card after the first reply */
+  upsell: {
+    title: "Make it a meal?",
+    text: "Add a medium drink and seasoned fries.",
+    price: 3.49,
+    yes: label("Yes, and checkout"),
+    no: label("No thanks"),
   },
+  /** the order confirmation card */
+  confirmation: {
+    orderNumber: "4821",
+    title: (orderNumber: string) => `Order #${orderNumber} confirmed`,
+    addon: "Medium drink and seasoned fries",
+    pickup: "Pickup today at 12:10 PM",
+    track: label("Track my order"),
+  },
+  /** the two chips under the confirmation */
+  afterChips: [{ label: label("Reorder") }, { label: label("Give feedback") }] as ChipAction[],
   /** the dashed placeholder bubble while there is no sample message yet */
   ghost: "Your first message shows up here.",
   /** the status line under the agent name while the agent is not yet verified */
@@ -74,28 +139,17 @@ export const PHONE_COPY = {
     preview: "Preview",
     review: "In carrier review",
   },
+  /** the agent details screen while the provisioning form is still empty */
+  info: {
+    description: "A line about your business and what you send.",
+    phone: "+1 555 010 0199",
+    website: "yourbrand.example",
+    email: "hello@yourbrand.example",
+  },
 };
 
-/* ------------------------------------------------------------- chips */
-
-export type Chip = { label: string; reply: string };
-
-/** labels are capped at Google's 25 characters */
-const chip = (label: string, reply: string): Chip => ({ label: label.slice(0, MAX_LABEL), reply });
-
-/** step 1, the demo agent: each chip and the reply the agent sends back */
-export const YOURS_CHIPS: Chip[] = [
-  chip("Order for pickup", "Done. Your box will be ready Tuesday at 5:30 pm. Reply CHANGE to pick another time."),
-  chip("What's in it?", "Four entrees, two sides, and two house sauces. Feeds four."),
-  chip("Remind me Tuesday", "Will do. I'll text you Tuesday morning."),
-];
-
-/** the live agent at the end: each chip and the reply it sends back */
-export const LIVE_CHIPS: Chip[] = [
-  chip("BOX", "Reserved. One Tuesday Family Box, ready at 5:30 pm. Reply CHANGE to pick another time."),
-  chip("See the menu", "Here's this week's menu. Tap any item to add it to a pickup order."),
-  chip("Not this week", "No problem. I'll check back next Tuesday."),
-];
+/** USD, two decimals */
+export const money = (n: number) => `$${n.toFixed(2)}`;
 
 /* ------------------------------------------------------ form values */
 
@@ -148,9 +202,9 @@ export const PREFILL = {
   email: (site: string) => `sam@${site}`,
   legalName: (name: string) => `${name} LLC`,
   /** the agent description; the hero trims it to 100 characters */
-  description: (name: string) => `Weekly specials, pickup orders, and reminders from ${name}.`,
+  description: (name: string) => `Weekly deals, pickup orders, and order updates from ${name}.`,
   /** the campaign's sample message, also the live agent's first message */
-  sample: (name: string) => `Hi Sam, it's ${name}. The Tuesday Family Box is back this week. Reply BOX to reserve one.`,
+  sample: (name: string) => `Hi Sam, it's ${name}. ${PHONE_COPY.opener} Reply STOP to opt out.`,
 };
 
 /** the choices in the campaign step's dropdowns */
@@ -202,17 +256,22 @@ export type Frame = { step: Step; phase: string; ms: number; auto?: boolean };
  * `auto` frames advance by themselves in interactive mode as well.
  */
 export const FRAMES: Frame[] = [
-  // step 1: the thread opens from the top (agent info, date, notice), the agent types, greets,
-  // types again, sends the card, then offers chips; the viewer taps one, then names, colors,
-  // and logos the agent. The five opening frames are `auto` so the thread plays itself in
-  // interactive mode too (and again after the form's Replay).
+  // step 1: the thread opens from the top (agent info, date), the agent types, sends the
+  // opener, types again, sends the deal carousel, then offers the two chips. The viewer taps
+  // a card's button ("tap", the reply lands and the agent types), the upsell card arrives
+  // ("upsell", the viewer taps "Yes, and checkout"), the reply lands ("checkout"), and the
+  // confirmation card arrives ("confirmed"). Then autoplay names, colors, and logos the agent.
+  // The opening frames are `auto` so the thread plays itself in interactive mode too (and
+  // again after the form's Replay); "chips" and "upsell" wait for the viewer.
   { step: "yours", phase: "typing1", ms: 900, auto: true },
-  { step: "yours", phase: "greeting", ms: 450, auto: true },
-  { step: "yours", phase: "typing2", ms: 700, auto: true },
-  { step: "yours", phase: "card", ms: 500, auto: true },
-  { step: "yours", phase: "chips", ms: 900 },
+  { step: "yours", phase: "opener", ms: 450, auto: true },
+  { step: "yours", phase: "typing2", ms: 800, auto: true },
+  { step: "yours", phase: "carousel", ms: 1500, auto: true },
+  { step: "yours", phase: "chips", ms: 1200 },
   { step: "yours", phase: "tap", ms: 800, auto: true },
-  { step: "yours", phase: "replied", ms: 1500 },
+  { step: "yours", phase: "upsell", ms: 1600 },
+  { step: "yours", phase: "checkout", ms: 800, auto: true },
+  { step: "yours", phase: "confirmed", ms: 1800 },
   { step: "yours", phase: "name", ms: 2600 },
   { step: "yours", phase: "color", ms: 900 },
   { step: "yours", phase: "logo", ms: 1200 },
@@ -236,10 +295,12 @@ export const FRAMES: Frame[] = [
   { step: "campaign", phase: "fixed", ms: 1100 },
   // carrier review
   { step: "submitted", phase: "reviewing", ms: 2500, auto: true },
-  // live: the same thread from the real agent
+  // live: the same deals from the real agent, already in the thread; the viewer orders again
   { step: "live", phase: "live", ms: 1600 },
-  { step: "live", phase: "tapped", ms: 900, auto: true },
-  { step: "live", phase: "replied", ms: 3800 },
+  { step: "live", phase: "tapped", ms: 800, auto: true },
+  { step: "live", phase: "upsell", ms: 1600 },
+  { step: "live", phase: "checkout", ms: 800, auto: true },
+  { step: "live", phase: "confirmed", ms: 3800 },
 ];
 
 /* --------------------------------------------------------- happy path */
@@ -253,7 +314,7 @@ export const FRAMES: Frame[] = [
 export type HappyMoment = {
   step: Step;
   /** the `data-target` id of the control */
-  target: "chip" | "make-live" | "create-account" | "continue" | "opt-in" | "submit";
+  target: "card-cta" | "checkout" | "make-live" | "create-account" | "continue" | "opt-in" | "submit";
   /** what the viewer sees */
   sees: string;
   /** what the viewer clicks */
@@ -261,12 +322,14 @@ export type HappyMoment = {
 };
 
 export const HAPPY_PATH: HappyMoment[] = [
-  { step: "yours", target: "chip", sees: "The agent greets Sam, sends a rich card, and offers suggested replies.", clicks: "Tap any suggested reply" },
-  { step: "yours", target: "make-live", sees: "The reply lands and the agent answers. Name, logo, and color update the phone.", clicks: "Press Make it live" },
+  { step: "yours", target: "card-cta", sees: "The agent announces the week's deals and sends three cards.", clicks: "Tap Get this deal on any card" },
+  { step: "yours", target: "checkout", sees: "The reply lands and the agent offers to make it a meal.", clicks: "Tap Yes, and checkout" },
+  { step: "yours", target: "make-live", sees: "The order is confirmed. Name, logo, and color update the phone.", clicks: "Press Make it live" },
   { step: "signup", target: "create-account", sees: "A short sign-up form.", clicks: "Press Create account" },
-  { step: "brand", target: "continue", sees: "The brand, prefilled from step 1.", clicks: "Press Continue" },
+  { step: "brand", target: "continue", sees: "The brand, prefilled from step 1; the agent details screen fills in.", clicks: "Press Continue" },
   { step: "agent", target: "continue", sees: "The agent, prefilled, with Google's limits inline.", clicks: "Press Continue" },
   { step: "campaign", target: "opt-in", sees: "The campaign form; the opt-in method is still empty.", clicks: "Pick an opt-in method" },
   { step: "campaign", target: "submit", sees: "The campaign form, complete.", clicks: "Press Submit for review" },
-  { step: "live", target: "chip", sees: "The same thread from the live, verified agent.", clicks: "Tap a chip" },
+  { step: "live", target: "card-cta", sees: "The same deals from the live, verified agent.", clicks: "Tap Get this deal on any card" },
+  { step: "live", target: "checkout", sees: "The upsell, from the live agent.", clicks: "Tap Yes, and checkout" },
 ];
