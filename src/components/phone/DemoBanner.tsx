@@ -5,9 +5,9 @@ import { Info } from "lucide-react";
 /**
  * A small neutral note floating over the top of the conversation panel that says the agent
  * is a demo. A tonal gray pill on the panel surface (`--ph-surface-high`), a 1 px dark gray
- * outline (`--ph-on-surface-variant` at 60%), 16 px corners. The info icon sits immediately
- * to the left of the text as one inline group, the group centered in the banner, the icon
- * vertically centered on the first line of the (centered, balanced) two-line text. It spans
+ * outline (`--ph-on-surface-variant` at 60%), 16 px corners. The info icon and the text form
+ * one group centered in the banner: the icon sits 8 px to the left of the text, vertically
+ * centered against the whole (centered, balanced) two-line text block. It spans
  * the thread's content width: `ConversationPanel` positions it with the panel padding as its
  * side insets. Reads phone tokens only, so it looks the same whatever the brand color.
  */
@@ -32,9 +32,9 @@ export function DemoBanner({ text = DEMO_BANNER_TEXT }: DemoBannerProps) {
         display: "flex",
         width: "100%",
         flexShrink: 0,
-        alignItems: "flex-start",
+        alignItems: "center",
         justifyContent: "center",
-        gap: 6,
+        gap: 8,
         padding: "6px 12px",
         borderRadius: 16,
         border: "1px solid color-mix(in srgb, var(--ph-on-surface-variant) 60%, transparent)",
@@ -45,8 +45,7 @@ export function DemoBanner({ text = DEMO_BANNER_TEXT }: DemoBannerProps) {
         letterSpacing: 0.1,
       }}
     >
-      {/* the icon is as tall as one line, so it centers on the first line of a wrapped text */}
-      <Info size={ICON} aria-hidden="true" style={{ flexShrink: 0, marginTop: (LINE - ICON) / 2, color: "var(--ph-on-surface-variant)" }} />
+      <Info size={ICON} aria-hidden="true" style={{ flexShrink: 0, color: "var(--ph-on-surface-variant)" }} />
       <span style={{ minWidth: 0, textAlign: "center", textWrap: "balance" }}>{text}</span>
     </div>
   );

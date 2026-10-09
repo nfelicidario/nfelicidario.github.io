@@ -14,13 +14,14 @@
  *     CLICK "Make it live".
  *  3. Sign up. A short form: name, work email, password. CLICK "Create account".
  *  4. Brand. Legal name, website, and contact email, prefilled from step 1. The phone shows
- *     the agent details screen filling in. CLICK "Continue".
+ *     the agent details screen filling in, under a "Preview" note. CLICK "Continue".
  *  5. Agent. Display name, logo, color, and description, with Google's limits. CLICK "Continue".
  *  6. Campaign. Use case, sample message, opt-in method, and volume. The phone shows the
- *     Demo RCS thread again (intro, the sample message as the greeting, the carousel, and the
- *     chips) without the demo banner. PICK an opt-in method, then CLICK "Submit for review".
- *     (Submitting without an opt-in shows the carrier error.)
- *  7. Review. The timeline runs on its own; nothing to click.
+ *     thread with the intro and the sample message as the only agent bubble (no carousel, no
+ *     chips), the name and badge as on a live agent, under the "Preview" note. PICK an opt-in
+ *     method, then CLICK "Submit for review". (Submitting without an opt-in shows the
+ *     carrier error.)
+ *  7. Review. The timeline runs on its own; nothing to click. The phone stays on the preview.
  *  8. Live. The same deals from the real, verified agent, no demo banner. CLICK a card's
  *     button, then "Yes, and checkout", to order again.
  *
@@ -168,11 +169,8 @@ export const PHONE_COPY = {
   ] as ChipAction[],
   /** the dashed placeholder bubble while there is no sample message yet */
   ghost: "Your first message shows up here.",
-  /** the status line under the agent name while the agent is not yet verified */
-  subtitle: {
-    preview: "Preview",
-    review: "In carrier review",
-  },
+  /** the note over the phone on the Brand, Agent, Campaign, and Review steps (the demo banner's style) */
+  previewBanner: "Preview. This is how your agent will look once it's live.",
   /** the agent details screen while the provisioning form is still empty */
   info: {
     description: "A line about your business and what you send.",
@@ -260,6 +258,9 @@ export const REVIEW_TIMELINE = [
   { label: "Reviewing", sub: "Carriers verify the brand and campaign", state: "active" },
   { label: "Live", sub: "Usually one to three weeks", state: "todo" },
 ] as const;
+
+/** the sign-up pane's heading and subheading */
+export const SIGNUP_COPY = { title: "Create your account", body: "Save your agent and pick up where you left off." };
 
 /** the card after the account is created */
 export const SIGNUP_SUCCESS = { title: "Account created", body: "Setting up your workspace." };

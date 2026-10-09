@@ -8,7 +8,8 @@ import { useDragScroll } from "./useDragScroll";
  * Suggested replies and suggested actions, rendered as the outlined pills Google Messages
  * draws: 40 px tall, a 1 px neutral outline (`--ph-outline-variant`), the label in the plain
  * on-surface color at the thread's body size (15 px, regular), and an action's icon (20 px)
- * at the left in the phone's system accent (`--ph-accent`, never the brand). Chips sit in one
+ * at the left in the neutral system gray (`--ph-on-surface-variant`, as the real threads draw
+ * it, never the brand or the accent). Chips sit in one
  * horizontal row 8 px apart that never wraps: it overflows with the scrollbar hidden, scrolls
  * natively on touch, and can be dragged with the mouse (`useDragScroll`). Like Messages, the
  * row is right-aligned while every chip fits (`align="end"`, the default; `align="start"`
@@ -191,7 +192,7 @@ export function SuggestionChips({ suggestions, onSelect, disabled = false, label
               transition: "background 150ms, border-color 150ms, opacity 150ms",
             }}
           >
-            {glyph && <span aria-hidden="true" style={{ display: "flex", color: action ? "var(--ph-accent)" : undefined }}>{glyph}</span>}
+            {glyph && <span aria-hidden="true" style={{ display: "flex", color: action ? "var(--ph-on-surface-variant)" : undefined }}>{glyph}</span>}
             {clampLabel(s.label)}
           </button>
         );

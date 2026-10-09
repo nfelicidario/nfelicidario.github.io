@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useId, useReducer, useRef, useState, type Dispatch, type MouseEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useId, useReducer, useRef, useState, type CSSProperties, type Dispatch, type MouseEvent, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useHeroFooter } from "@/components/case/HeroStage";
 import {
@@ -50,6 +50,7 @@ import {
   PREFILL,
   PROVISION_EYEBROW,
   REVIEW_TIMELINE,
+  SIGNUP_COPY,
   SIGNUP_SUCCESS,
   STATUS,
   STEP_BLURBS,
@@ -988,8 +989,8 @@ function SignUp({ s, timed, still, dispatch }: PanelProps) {
   return (
     <>
       <div>
-        <h3 className="text-[clamp(18px,2vw,22px)] font-bold text-ink">Save {s.values.agentName.trim() || "your agent"}.</h3>
-        <p className="mt-1.5 text-[13.5px] text-body">An account keeps your agent while we set it up.</p>
+        <h3 className="text-[clamp(18px,2vw,22px)] font-bold text-ink">{SIGNUP_COPY.title}</h3>
+        <p className="mt-1.5 text-[13.5px] text-body">{SIGNUP_COPY.body}</p>
       </div>
       {s.i === F.signupSuccess ? (
         <Success title={SIGNUP_SUCCESS.title} body={SIGNUP_SUCCESS.body} still={still} />
@@ -1179,13 +1180,30 @@ function StatusPill({ status }: { status: Status }) {
   );
 }
 
+/** the `tl-dot` (10 px, 7 px margin-top) has its center 12 px below the row's top */
+const TL_DOT_CENTER = 12;
+const TL_LINE: CSSProperties = {
+  position: "absolute",
+  left: "50%",
+  width: 0,
+  transform: "translateX(-50%)",
+  borderLeft: "1.5px dashed color-mix(in srgb, var(--muted) 55%, var(--rule))",
+};
+
 function Timeline({ still }: { still: boolean }) {
   const rows = REVIEW_TIMELINE;
   return (
     <ol className="grid gap-0" aria-label="Review timeline">
       {rows.map((r, k) => (
         <li key={r.label} className="grid grid-cols-[18px_1fr] gap-x-3">
-          <span className="tl-marker" data-line={k === 0 ? "down" : k === rows.length - 1 ? "up" : undefined}>
+          {/*
+            the connector is drawn per row in two pieces, each ending at a dot's center: from
+            the row's top down to this dot (every row but the first), and from this dot down to
+            the row's bottom (every row but the last), so the line never runs past "Live"
+          */}
+          <span className="relative flex justify-center">
+            {k > 0 && <span aria-hidden="true" style={{ ...TL_LINE, top: 0, height: TL_DOT_CENTER }} />}
+            {k < rows.length - 1 && <span aria-hidden="true" style={{ ...TL_LINE, top: TL_DOT_CENTER, bottom: 0 }} />}
             <span className="tl-dot" data-filled={r.state === "done" ? "true" : "false"} />
           </span>
           <div className="pb-4">
@@ -1493,10 +1511,13 @@ const noAction = () => {};
  *    card with its chips. On the demo agent (yours) the demo banner floats over the top of
  *    the column; the live agent has no banner. The column scrolls edge to edge and keeps the
  *    newest content in view; the composer is pinned under a divider.
- *  - brand and agent steps: the agent details screen, filling in as the form does
- *  - campaign and submitted: the same thread as the demo (intro, greeting, carousel, chips)
- *    with the campaign's sample message as the greeting (a ghost bubble until it exists),
- *    inert, and without the demo banner
+ *  - brand and agent steps: the agent details screen, filling in as the form does, under the
+ *    preview note
+ *  - campaign and submitted: the thread with the intro and the campaign's sample message as
+ *    the only agent bubble (a ghost bubble until it exists), no carousel, no chips, under the
+ *    preview note
+ * In every state the header and the intro show the name with the verified badge, as the real
+ * thread does; the only thing that marks a preview is the note over the top.
  */
 function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still: boolean; dispatch: Dispatch<Action> }) {
   const step = FRAMES[s.i].step;
@@ -1527,19 +1548,13 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
     canPick = s.i === F.live && thread.deal === null;
     canCheckout = s.i === F.liveUpsell && thread.addon === null;
   } else {
-    // the campaign preview: the sample message where the greeting goes, then the same
-    // carousel and chips as the demo, nothing tappable
-    messages.push(
-      sample ? { id: "sample", from: "agent", text: sample } : { id: "ghost", from: "agent", kind: "ghost", text: PHONE_COPY.ghost },
-      { id: "carousel", from: "agent", kind: "carousel" },
-      { id: "chips", from: "agent", kind: "chips" },
-    );
+    // the campaign preview: the sample message as the only agent bubble, nothing tappable
+    messages.push(sample ? { id: "sample", from: "agent", text: sample } : { id: "ghost", from: "agent", kind: "ghost", text: PHONE_COPY.ghost });
   }
 
   const headerName = name || PREFILL.fallbackName;
-  const verified = mode !== "preview";
-  /** the badge alone marks a verified agent; the status line only shows before it is */
-  const subtitle = verified ? undefined : step === "submitted" ? PHONE_COPY.subtitle.review : PHONE_COPY.subtitle.preview;
+  /** the demo agent wears the demo banner, a preview wears the preview note, the live agent nothing */
+  const banner = mode === "yours" ? <DemoBanner /> : mode === "preview" ? <DemoBanner text={PHONE_COPY.previewBanner} /> : undefined;
   /** the intro's one-liner: the agent description once it exists, else the prefill it will get */
   const intro = (s.values.description || PREFILL.description(headerName)).slice(0, MAX.description);
   const logo = (size: string) => <LogoMark logo={s.logo} color={color} name={name} className={`h-full w-full ${size}`} />;
@@ -1561,6 +1576,8 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
         <AgentInfo
           logo={logo("text-[28px]")}
           name={headerName}
+          verified
+          note={banner}
           description={shown(s, timed, "description") || undefined}
           website={shown(s, timed, "website") || undefined}
           email={shown(s, timed, "contact") || undefined}
@@ -1569,9 +1586,6 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
       </AndroidPhone>
     );
   }
-
-  /** only the demo agent wears the banner; the campaign preview and the live agent go without */
-  const banner = mode === "yours";
 
   function render(m: Msg) {
     switch (m.kind) {
@@ -1668,8 +1682,8 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
 
   return (
     <AndroidPhone brandColor={color} theme="auto" fit="contain" label="Phone preview">
-      <MessagesHeader logo={logo("text-[15px]")} name={headerName} verified={verified} subtitle={subtitle} />
-      <ConversationPanel composer={<Composer />} banner={banner ? <DemoBanner /> : undefined}>
+      <MessagesHeader logo={logo("text-[15px]")} name={headerName} verified />
+      <ConversationPanel composer={<Composer />} banner={banner}>
         {/* fills the panel edge to edge, so content clips only at the panel's top and the composer's divider */}
         <div
           ref={scroller}
@@ -1678,7 +1692,7 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
           className="flex min-h-0 flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto"
           style={{ padding: `${banner ? BANNER_CLEARANCE : PANEL_PADDING}px ${PANEL_PADDING}px ${PANEL_PADDING}px`, scrollbarWidth: "none" }}
         >
-          <ThreadIntro logo={logo("text-[28px]")} name={headerName} description={intro} verified={verified} />
+          <ThreadIntro logo={logo("text-[28px]")} name={headerName} description={intro} verified />
           <Timestamp>{PHONE_COPY.timestamp}</Timestamp>
           <AnimatePresence initial={false}>
             {messages.map((m) => (

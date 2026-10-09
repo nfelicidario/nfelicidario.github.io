@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { ArrowLeft, BadgeCheck, ExternalLink, Globe, Mail, Phone } from "lucide-react";
 import { GESTURE_BAR_H } from "./AndroidPhone";
+import { PANEL_PADDING } from "./ConversationPanel";
 import { MediaPlaceholder } from "./RichCard";
 import { VerifiedBadge } from "./VerifiedBadge";
 
@@ -20,6 +21,8 @@ import { VerifiedBadge } from "./VerifiedBadge";
  * screen that reads the brand color.
  *
  * Every value is optional; `placeholders` stand in (muted) while a form is still empty.
+ * `note` (usually a `DemoBanner` with preview copy) sits under the back arrow row, above the
+ * hero band, inset like the thread's banner.
  */
 export type AgentInfoProps = {
   logo: ReactNode;
@@ -28,6 +31,8 @@ export type AgentInfoProps = {
   verified?: boolean;
   /** 1440 x 448 banner; a brand gradient stands in when omitted */
   banner?: ReactNode;
+  /** a small note over the top of the screen, e.g. `DemoBanner` with preview copy */
+  note?: ReactNode;
   website?: string;
   phone?: string;
   email?: string;
@@ -57,6 +62,7 @@ export function AgentInfo({
   description,
   verified = false,
   banner,
+  note,
   website,
   phone,
   email,
@@ -103,6 +109,12 @@ export function AgentInfo({
           <ArrowLeft size={22} />
         </span>
       </div>
+
+      {note && (
+        <div style={{ display: "flex", flexShrink: 0, justifyContent: "center", padding: `0 ${PANEL_PADDING}px 8px` }}>
+          {note}
+        </div>
+      )}
 
       {/* hero band with the logo over its bottom edge */}
       <div aria-hidden="true" style={{ position: "relative", flexShrink: 0, marginBottom: logoSize / 2 }}>
