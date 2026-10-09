@@ -14,7 +14,9 @@
  *     carrier testing by spreadsheet, the billing spreadsheet, the internal tracking platform,
  *     and the status email. A tally in the corner counts portals, emails, days, and Ops time.
  *     CLICK the one action on each screen ("Send", "Create agent", "Copy credentials",
- *     "Submit", or "Next").
+ *     "Submit", or "Next"). After the last screen, a short interstitial card closes the old
+ *     way: "That was the old way: 10 portals, 6+ emails, about 8 hours of Ops time per
+ *     request. Here's the vision." CLICK "See the vision".
  *  4. The vision. A clean diagram: the customer, one Vibes Admin, four sender types, and
  *     auto-generated submissions to every third party, with Ops reviewing from one place.
  *     Nothing to click; after a moment the same email arrives.
@@ -24,6 +26,10 @@
  *     each party's own use-case list; add what is still missing. CLICK "Submit all". The
  *     statuses flip to Submitted one after another, then carriers review for a moment.
  *  7. Live. The request flips to Live. 1 portal, 0 emails, about 90 minutes of Ops time.
+ *
+ * Steps 1 to 3 are the BEFORE half (the old way) and steps 4 to 7 the AFTER half (Vibes
+ * Admin). Every card carries a BEFORE or AFTER stamp in its top-left corner, the page's POV
+ * badge follows the half, and the before half renders in a cooler, desaturated tone.
  *
  * Clicking anything else inside the prototype pulses a blue outline on the next thing to
  * click. The diagram's steps, the use-case dropdown, the submission rows, and the "Add"
@@ -41,7 +47,7 @@
  *    frame, in milliseconds). `auto` marks the frames that advance on their own in
  *    interactive mode too (an email arriving, carriers reviewing), so leave it where it is.
  *  - SCREENS must stay 14 long, in the order of the old process; the old-way frames are
- *    generated from it.
+ *    generated from it, and the "wrap" interstitial is the last frame of the old step.
  *  - Mock data only: an invented customer, invented people, invented values. The numbers in
  *    the counters (10 portals, 6+ emails, 8 hours, 90 minutes) are the approved ones.
  */
@@ -58,10 +64,29 @@ export const STEP_LABELS: Record<Step, string> = {
   request: "A request",
   old: "The old way",
   vision: "The vision",
-  request2: "A request",
+  request2: "A request, again",
   admin: "Vibes Admin",
   live: "Live",
 };
+
+/** which half of the story a step belongs to: the old way, or Vibes Admin */
+export type Half = "before" | "after";
+
+export const HALF: Record<Step, Half> = {
+  before: "before",
+  request: "before",
+  old: "before",
+  vision: "after",
+  request2: "after",
+  admin: "after",
+  live: "after",
+};
+
+/** the stamp in the top-left corner of every card, and the phase on the page's POV badge */
+export const HALF_LABELS: Record<Half, string> = { before: "Before", after: "After" };
+
+/** the fixed part of the page's POV badge while the hero runs */
+export const POV_LABEL = "Operations";
 
 /* ------------------------------------------------------------- customer */
 
@@ -202,6 +227,13 @@ export type Screen = {
 };
 
 export const TALLY_MAX = { portal: 10, email: 6, day: 21 };
+
+/** the interstitial that closes the old way, between step 3 and step 4 */
+export const WRAP = {
+  title: "That was the old way: 10 portals, 6+ emails, about 8 hours of Ops time per request.",
+  next: "Here's the vision.",
+  action: "See the vision",
+};
 
 /** the fourteen screens of the old way, in order */
 export const SCREENS: Screen[] = [
@@ -538,8 +570,9 @@ export const FRAMES: Frame[] = [
   // step 2: the email card, then the zoom into the RCS branch
   { step: "request", phase: "email", ms: 1800 },
   { step: "request", phase: "zoom", ms: 2000 },
-  // step 3: one frame per screen, "s1" to "s14"
+  // step 3: one frame per screen, "s1" to "s14", then the interstitial that closes the old way
   ...SCREENS.map((_, k) => ({ step: "old" as Step, phase: `s${k + 1}`, ms: SCREEN_MS })),
+  { step: "old", phase: "wrap", ms: 1600 },
   // step 4: the vision; the email arrives again on its own
   { step: "vision", phase: "diagram", ms: 3600, auto: true },
   // step 5: the same email, now opened in Vibes Admin
@@ -564,7 +597,7 @@ export const FRAMES: Frame[] = [
  */
 export type HappyMoment = {
   step: Step;
-  target: "acknowledge" | "get-started" | "screen-action" | "open-admin" | "submit-all";
+  target: "acknowledge" | "get-started" | "screen-action" | "see-vision" | "open-admin" | "submit-all";
   /** what the viewer sees */
   sees: string;
   /** what the viewer clicks */
@@ -575,6 +608,7 @@ export const HAPPY_PATH: HappyMoment[] = [
   { step: "request", target: "acknowledge", sees: "An email arrives over the diagram: a request for an RCS agent.", clicks: "Press Acknowledge" },
   { step: "request", target: "get-started", sees: "The diagram zooms into the RCS branch.", clicks: "Press Get started" },
   { step: "old", target: "screen-action", sees: "One of fourteen screens; the tally counts up.", clicks: "Press the screen's one action" },
+  { step: "old", target: "see-vision", sees: "The old way, summed up: 10 portals, 6+ emails, about 8 hours of Ops time per request.", clicks: "Press See the vision" },
   { step: "request2", target: "open-admin", sees: "The same email, over the vision.", clicks: "Press Open in Vibes Admin" },
   { step: "admin", target: "submit-all", sees: "The request and its five prefilled submissions.", clicks: "Press Submit all" },
 ];

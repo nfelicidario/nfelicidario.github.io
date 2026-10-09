@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useId, useReducer, useRef, useState, type Dispatch, type MouseEvent, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { useHeroFooter } from "@/components/case/HeroStage";
+import { setPov } from "@/components/case/povStore";
 import {
   Activity,
   BadgeCheck,
@@ -10,6 +11,7 @@ import {
   ChevronDown,
   ChevronRight,
   Clock,
+  History,
   KeyRound,
   LayoutDashboard,
   Mail,
@@ -33,7 +35,10 @@ import {
   EMAIL,
   END_CARD,
   FRAMES,
+  HALF,
+  HALF_LABELS,
   HAPPY_PATH,
+  POV_LABEL,
   REQUEST_FIELDS,
   SCREENS,
   STATUS,
@@ -42,6 +47,8 @@ import {
   SUBMISSIONS,
   TALLY_MAX,
   USE_CASES,
+  WRAP,
+  type Half,
   type HappyMoment,
   type Screen,
   type ScreenIcon,
@@ -61,8 +68,14 @@ import {
  * Each phase draws its own card on the page ground:
  *  - before, a request, the vision: a full-stage card with the diagram; the email card floats
  *    in its corner
- *  - the old way: a narrow centered card, one mock screen at a time, a tally in its corner
+ *  - the old way: a narrow centered card, one mock screen at a time, a tally in its corner,
+ *    then a short interstitial that sums the old way up and hands over to the vision
  *  - Vibes Admin, live: a full-stage two-pane card (the request left, submissions right)
+ *
+ * The two halves (HALF in script.ts): steps 1 to 3 are the before, steps 4 to 7 the after.
+ * Every card opens with a BEFORE or AFTER stamp band, the page's POV badge follows the half
+ * (povStore), and the before half is toned down: the card surfaces mixed toward gray and
+ * everything slightly desaturated (`data-half` on the root, see HERO_CSS).
  * The card animates its size between phases with a layout spring; panes are keyed by phase
  * and only fade in (no exit gate, so a footer jump can never leave a stale pane behind).
  * Step progression, Replay, and Skip to vision belong to the stage footer (useHeroFooter).
@@ -93,7 +106,13 @@ import {
  */
 const HERO_CSS =
   "[data-va-hero] :is(input,select):focus-visible{outline:1.5px solid var(--accent);outline-offset:-1px}" +
-  "@keyframes va-hint{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 0 2px var(--accent)}}";
+  "@keyframes va-hint{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 0 2px var(--accent)}}" +
+  // the before half: surfaces mixed toward the cool gray of --muted, then a touch desaturated.
+  // The mixes are computed on the root (a token cannot reference itself) and applied one level down.
+  "[data-va-hero]>*{transition:filter .5s ease}" +
+  "[data-va-hero][data-half=before]{--va-surface:color-mix(in srgb,var(--surface) 88%,var(--muted));" +
+  "--va-bg:color-mix(in srgb,var(--bg) 90%,var(--muted));--va-raised:color-mix(in srgb,var(--raised) 88%,var(--muted))}" +
+  "[data-va-hero][data-half=before]>*{--surface:var(--va-surface);--bg:var(--va-bg);--raised:var(--va-raised);filter:saturate(.72)}";
 
 /** how long the happy-path pulse shows, in ms (two pulses) */
 const HINT_MS = 1200;
@@ -111,6 +130,8 @@ const F = {
   zoom: at("request", "zoom"),
   /** the first old-way screen; screen k is F.old + k */
   old: at("old", "s1"),
+  /** the interstitial that closes the old way */
+  wrap: at("old", "wrap"),
   vision: at("vision", "diagram"),
   email2: at("request2", "email"),
   draft: at("admin", "draft"),
@@ -218,6 +239,14 @@ export function VibesAdminHero({ autoplay = false }: { autoplay?: boolean }) {
     return () => footer.set(null);
   }, [footer, reduced, stepIndex, autoplay]);
 
+  /** the page's POV badge follows the half: "Operations · Before" in gray, "Operations · After" in blue */
+  useEffect(() => {
+    if (reduced) return;
+    const half = HALF[step];
+    setPov({ label: POV_LABEL, phase: HALF_LABELS[half], tone: half === "before" ? "muted" : "accent" });
+  }, [reduced, step]);
+  useEffect(() => () => setPov(null), []);
+
   useEffect(() => {
     if (reduced) return;
     const f = FRAMES[s.i];
@@ -306,7 +335,7 @@ function happyTarget(s: State): Target | null {
     case "request":
       return f.phase === "email" ? "acknowledge" : "get-started";
     case "old":
-      return "screen-action";
+      return f.phase === "wrap" ? "see-vision" : "screen-action";
     case "request2":
       return "open-admin";
     case "admin":
@@ -362,6 +391,7 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, lef
   const f = FRAMES[s.i];
   const step = f.step;
   const group = GROUP[step];
+  const half = HALF[step];
   const interactive = !still && !inert;
   const diagramMode = step === "before" || step === "request" ? "before" : "vision";
 
@@ -396,6 +426,7 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, lef
         inert={inert}
         className={`absolute inset-0 flex items-center justify-center p-3 md:p-4 ${still ? "bg-bg" : ""}`}
         data-step={step}
+        data-half={half}
         data-va-hero=""
         onClickCapture={interactive ? onClickCapture : undefined}
       >
@@ -411,8 +442,9 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, lef
         <motion.div
           layout={!still}
           transition={{ layout: { type: "spring", stiffness: 260, damping: 32 } }}
-          className={`${CARD} grid w-full grid-rows-[minmax(0,1fr)] ${group === "old" ? "h-auto max-h-full max-w-[560px]" : "h-full max-w-[1040px]"}`}
+          className={`${CARD} grid w-full grid-rows-[auto_minmax(0,1fr)] ${group === "old" ? "h-auto max-h-full max-w-[560px]" : "h-full max-w-[1040px]"}`}
         >
+          <Stamp half={half} />
           {/* keyed by phase group, entrance only: no exit gate (see the note at the top) */}
           <motion.div
             key={group === "diagram" ? diagramMode : group}
@@ -423,7 +455,7 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, lef
             className="grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)]"
           >
             {group === "diagram" && <DiagramCard mode={diagramMode} zoom={s.i === F.zoom} still={still} />}
-            {group === "old" && <OldWayCard {...common} />}
+            {group === "old" && (s.i === F.wrap ? <WrapCard {...common} /> : <OldWayCard {...common} />)}
             {group === "admin" && <AdminCard {...common} left={left} />}
           </motion.div>
         </motion.div>
@@ -431,6 +463,25 @@ function HeroView({ s, timed, still = false, inert = false, dispatch = noop, lef
         {(step === "request" || step === "request2") && <EmailCard {...common} />}
       </div>
     </HintContext.Provider>
+  );
+}
+
+/* ------------------------------------------------------------------ stamp */
+
+/** the running header on every card: BEFORE in gray on steps 1 to 3, AFTER in blue on steps 4 to 7 */
+function Stamp({ half }: { half: Half }) {
+  const before = half === "before";
+  const Icon = before ? History : Sparkles;
+  return (
+    <div
+      className={`flex items-center gap-1.5 border-b px-4 py-1.5 transition-colors duration-500 ${
+        before ? "border-rule bg-raised text-muted" : "border-accent/30 bg-accent-soft text-accent"
+      }`}
+    >
+      <Icon size={12} aria-hidden="true" />
+      <span className={`label text-[10px] font-bold ${before ? "text-muted" : "text-accent"}`}>{HALF_LABELS[half]}</span>
+      <span className="sr-only">{before ? ": the old way" : ": Vibes Admin"}</span>
+    </div>
   );
 }
 
@@ -638,6 +689,33 @@ function OldWayCard({ s, still, dispatch }: PaneProps) {
         </Primary>
       </div>
     </motion.div>
+  );
+}
+
+/** the interstitial that closes the old way: the tally in one line, then the handover to the vision */
+function WrapCard({ still, dispatch }: PaneProps) {
+  return (
+    <div className="grid gap-4 px-5 py-5" role="status">
+      <motion.div initial={still ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: "easeOut" }} className="flex items-start gap-3">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-raised text-muted">
+          <History size={16} aria-hidden="true" />
+        </span>
+        <p className="text-[15px] font-semibold leading-snug text-ink">{WRAP.title}</p>
+      </motion.div>
+      <motion.div
+        initial={still ? false : { opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: still ? 0 : 0.6, duration: 0.3, ease: "easeOut" }}
+        className="flex flex-wrap items-center justify-between gap-3 border-t border-rule pt-4"
+      >
+        <span className="inline-flex items-center gap-2 text-[15px] font-semibold text-accent">
+          <Sparkles size={16} aria-hidden="true" /> {WRAP.next}
+        </span>
+        <Primary still={still} target="see-vision" onClick={() => dispatch({ type: "GOTO", i: F.vision })}>
+          {WRAP.action}
+        </Primary>
+      </motion.div>
+    </div>
   );
 }
 
