@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowLeft, ArrowRight, CalendarRange, Eye, Layers, UserRound, Users, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarRange, Layers, UserRound, Users, type LucideIcon } from "lucide-react";
+import { PovBadge } from "./PovBadge";
 
 const META_ICONS: Record<string, LucideIcon> = {
   role: UserRound,
@@ -50,12 +51,7 @@ export function CaseHero({
             Work
           </Link>
           <div className="justify-self-center">
-            {pov && (
-              <span className="label inline-flex items-center gap-1.5 rounded-full border border-rule bg-surface px-2.5 py-1 text-ink">
-                <Eye size={13} aria-hidden="true" className="text-muted" />
-                POV: {pov}
-              </span>
-            )}
+            {pov && <PovBadge label={pov} />}
           </div>
           <div className="justify-self-end">
             {brand ? (

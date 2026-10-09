@@ -141,3 +141,8 @@ button:not(:disabled), [role="button"]:not([aria-disabled="true"]) { cursor: poi
   background: var(--surface); border: 2px solid var(--accent);
 }
 .tl-dot[data-filled="true"] { background: var(--accent); }
+
+/* ---------- POV badge phase pulse ---------- */
+@keyframes pov-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+.pov-pulse { animation: pov-pulse 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .pov-pulse { animation: none; } }
