@@ -16,11 +16,13 @@
  *  4. Brand. Legal name, website, and contact email, prefilled from step 1. The phone shows
  *     the agent details screen filling in. CLICK "Continue".
  *  5. Agent. Display name, logo, color, and description, with Google's limits. CLICK "Continue".
- *  6. Campaign. Use case, sample message, opt-in method, and volume. PICK an opt-in method,
- *     then CLICK "Submit for review". (Submitting without an opt-in shows the carrier error.)
+ *  6. Campaign. Use case, sample message, opt-in method, and volume. The phone shows the
+ *     Demo RCS thread again (intro, the sample message as the greeting, the carousel, and the
+ *     chips) without the demo banner. PICK an opt-in method, then CLICK "Submit for review".
+ *     (Submitting without an opt-in shows the carrier error.)
  *  7. Review. The timeline runs on its own; nothing to click.
- *  8. Live. The same deals from the real, verified agent. CLICK a card's button, then
- *     "Yes, and checkout", to order again.
+ *  8. Live. The same deals from the real, verified agent, no demo banner. CLICK a card's
+ *     button, then "Yes, and checkout", to order again.
  *
  * Clicking anything else inside the prototype pulses a blue outline on the next thing to
  * click. Form fields, Replay, the color swatch, the cards, and the chips under the
@@ -279,6 +281,16 @@ export const STEP_LABELS: Record<Step, string> = {
   submitted: "Review",
   live: "Live",
 };
+
+/** the short description beside each provisioning step's name in the pane header */
+export const STEP_BLURBS: Record<"brand" | "agent" | "campaign", string> = {
+  brand: "The company behind the agent",
+  agent: "The sending profile your customers see",
+  campaign: "What you'll send with your RCS agent",
+};
+
+/** the eyebrow over every provisioning step, in label style: "PROVISIONING • CUSTOMER REQUEST • STEP n OF 3" */
+export const PROVISION_EYEBROW = (n: number, of: number) => `Provisioning • Customer request • Step ${n} of ${of}`;
 
 /** one moment of the story: a step, a phase within it, and how long autoplay holds it */
 export type Frame = { step: Step; phase: string; ms: number; auto?: boolean };

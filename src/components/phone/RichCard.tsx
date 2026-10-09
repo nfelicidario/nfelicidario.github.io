@@ -1,16 +1,21 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import { clampLabel, suggestionIcon, type SuggestionKind } from "./SuggestionChips";
+import { clampLabel, emojiGlyph, suggestionIcon, type SuggestionKind } from "./SuggestionChips";
 import { useDragScroll } from "./useDragScroll";
 
 /**
- * An RBM rich card: media on top, title, description, then up to four suggestions as
- * full-width rows inside the card, the way Google Messages draws them: a white card with a
- * neutral 1 px outline, each action a white rounded row with a gray outline and dark text,
- * the action's icon in a small tonal circle at the left, label left-aligned. Nothing here reads
- * the brand color. Media heights follow Google's spec: short 112, medium 168, tall 264 dp. A
- * standalone vertical card spans the screen width minus the 16 dp margins.
+ * An RBM rich card, as Google Messages draws it: a tonal card (`--ph-surface-high`, the same
+ * tier as the agent's bubbles) with 20 px corners and no outline, the media cropped to the
+ * top edge to edge, the title (17 px, medium) and description (16 px, regular, on-surface)
+ * inset 16 px, then up to four suggestions as full-width rows inside the card. Each row is a
+ * lighter 56 px pill-cornered surface (`--ph-surface`, 16 px radius) with the card's tone
+ * showing through as a hairline between rows; an action's icon sits in a 40 px tonal circle
+ * at the left, then the label, left-aligned, in the plain on-surface color (no brand color
+ * anywhere on the card). A reply row with a leading emoji shows the emoji in the icon's place
+ * at the label's size, no circle. Media heights follow Google's spec: short 112, medium 168,
+ * tall 264 dp (the references show 2:1 media on full-width cards, which is medium). A
+ * standalone vertical card spans the thread width.
  */
 export type CardSuggestion = {
   label: string;
@@ -37,7 +42,21 @@ export type RichCardProps = {
 };
 
 export const MEDIA_HEIGHT = { short: 112, medium: 168, tall: 264 } as const;
-export const CARD_RADIUS = 24;
+export const CARD_RADIUS = 20;
+/** an action row's height and corner radius */
+export const CARD_ROW_HEIGHT = 56;
+export const CARD_ROW_RADIUS = 16;
+/** the gap between rows: the card's tone showing through as a hairline */
+const ROW_GAP = 3;
+/** the card's inner inset, body and rows alike */
+const CARD_INSET = 16;
+const ROW_ICON_CIRCLE = 40;
+
+/** a leading emoji on a reply label, split off so it can sit in the icon's place */
+function splitEmoji(label: string): { emoji: string | null; rest: string } {
+  const m = /^(\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic})*)\s+(.*)$/u.exec(label);
+  return m ? { emoji: m[1], rest: m[2] } : { emoji: null, rest: label };
+}
 
 export function RichCard({
   title,
@@ -61,8 +80,7 @@ export function RichCard({
         maxWidth: "100%",
         overflow: "hidden",
         borderRadius: CARD_RADIUS,
-        border: "1px solid var(--ph-outline-variant)",
-        background: "var(--ph-surface)",
+        background: "var(--ph-surface-high)",
         color: "var(--ph-on-surface)",
         ...style,
       }}
@@ -70,24 +88,24 @@ export function RichCard({
       <div aria-hidden="true" style={{ height: MEDIA_HEIGHT[mediaHeight], overflow: "hidden", flexShrink: 0 }}>
         {media ?? <MediaPlaceholder />}
       </div>
-      <div style={{ padding: `12px 14px ${actions.length ? 10 : 14}px` }}>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
-          <div style={{ fontSize: 16, fontWeight: 500, lineHeight: "22px" }}>{title}</div>
-          {meta && <div style={{ fontSize: 14, fontWeight: 500, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{meta}</div>}
+      {/* the body grows, so the rows sit at the bottom when a carousel stretches the card */}
+      <div style={{ flex: 1, padding: `${CARD_INSET}px ${CARD_INSET}px ${actions.length ? 14 : CARD_INSET}px` }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 }}>
+          <div style={{ fontSize: 17, fontWeight: 500, lineHeight: "24px", overflowWrap: "anywhere" }}>{title}</div>
+          {meta && <div style={{ fontSize: 15, fontWeight: 500, lineHeight: "24px", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{meta}</div>}
         </div>
-        {description && (
-          <div style={{ margin: "4px 0 0", fontSize: 14, lineHeight: "19px", color: "var(--ph-on-surface-variant)" }}>{description}</div>
-        )}
+        {description && <div style={{ margin: "4px 0 0", fontSize: 16, lineHeight: "22px", color: "var(--ph-on-surface)" }}>{description}</div>}
       </div>
       {actions.length > 0 && (
         <>
           <style href="ph-card-action" precedence="default">
-            {"[data-ph-card-action]:not(:disabled):hover{background:var(--ph-surface-low);border-color:var(--ph-outline)}"}
+            {"[data-ph-card-action]:not(:disabled):hover{background:var(--ph-surface-low)}"}
           </style>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "0 10px 10px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: ROW_GAP, padding: `0 ${CARD_INSET}px ${CARD_INSET}px` }}>
             {actions.map((s) => {
               const off = disabled || !s.onSelect;
-              const icon = suggestionIcon(s.kind, 16);
+              const icon = suggestionIcon(s.kind, 22);
+              const { emoji, rest } = icon ? { emoji: null, rest: s.label } : splitEmoji(s.label);
               return (
                 <button
                   key={s.label}
@@ -99,21 +117,21 @@ export function RichCard({
                     position: "relative",
                     display: "flex",
                     alignItems: "center",
-                    gap: 10,
-                    minHeight: 44,
+                    gap: icon ? 15 : 10,
+                    minHeight: CARD_ROW_HEIGHT,
                     margin: 0,
-                    padding: icon ? "5px 13px 5px 7px" : "5px 13px",
-                    border: "1px solid var(--ph-outline-variant)",
-                    borderRadius: 16,
+                    padding: `6px ${CARD_INSET}px`,
+                    border: 0,
+                    borderRadius: CARD_ROW_RADIUS,
                     background: "var(--ph-surface)",
                     font: "inherit",
-                    fontSize: 14,
-                    fontWeight: 500,
-                    lineHeight: "18px",
+                    fontSize: 16,
+                    fontWeight: 400,
+                    lineHeight: "22px",
                     textAlign: "left",
                     color: "var(--ph-on-surface)",
                     cursor: off ? "not-allowed" : "pointer",
-                    transition: "background 150ms, border-color 150ms",
+                    transition: "background 150ms",
                   }}
                 >
                   {icon && (
@@ -121,8 +139,8 @@ export function RichCard({
                       aria-hidden="true"
                       style={{
                         display: "grid",
-                        width: 32,
-                        height: 32,
+                        width: ROW_ICON_CIRCLE,
+                        height: ROW_ICON_CIRCLE,
                         flexShrink: 0,
                         placeItems: "center",
                         borderRadius: 999,
@@ -133,7 +151,8 @@ export function RichCard({
                       {icon}
                     </span>
                   )}
-                  <span style={{ minWidth: 0, overflowWrap: "anywhere" }}>{clampLabel(s.label)}</span>
+                  {emoji && emojiGlyph(emoji, 20)}
+                  <span style={{ minWidth: 0, overflowWrap: "anywhere" }}>{clampLabel(emoji ? rest : s.label)}</span>
                   {s.overlay}
                 </button>
               );
@@ -163,14 +182,15 @@ export function MediaPlaceholder({ seed = 0, style }: { seed?: number; style?: C
 /**
  * A carousel of 2 to 10 vertical cards in one horizontal row that scrolls with the scrollbar
  * hidden: natively on touch and pen, by click-and-drag with the mouse, and snapping to a card
- * once the gesture ends. Google fixes card widths at small 180 or medium 296 dp; pass
- * `cardWidth` (any CSS width, e.g. "72%") to size cards to the row instead. `bleed` works as
- * on `SuggestionChips`: the row runs to the parent's edge and pads by the same amount, so the
- * next card peeks in at the edge.
+ * once the gesture ends. Google fixes card widths at small 180 or medium 296 dp (Messages
+ * draws the medium width with the next card peeking in at the right edge, 8 dp apart); pass
+ * `cardWidth` (any CSS width, e.g. "72%") to size cards to the row instead. Every card
+ * stretches to the tallest, as Messages does. `bleed` works as on `SuggestionChips`: the row
+ * runs to the parent's edge and pads by the same amount, so the next card peeks in at the edge.
  */
 export function RichCardCarousel({
   cards,
-  size = "small",
+  size = "medium",
   cardWidth,
   bleed = 0,
   gap = 8,
@@ -198,6 +218,7 @@ export function RichCardCarousel({
       {...handlers}
       style={{
         display: "flex",
+        alignItems: "stretch",
         gap,
         alignSelf: "stretch",
         flexShrink: 0,
@@ -226,7 +247,7 @@ export function RichCardCarousel({
           media={c.media ?? <MediaPlaceholder seed={k} />}
           width={w}
           disabled={disabled}
-          style={{ flexShrink: 0, scrollSnapAlign: "start", pointerEvents: dragging ? "none" : undefined, ...c.style }}
+          style={{ alignSelf: "stretch", flexShrink: 0, scrollSnapAlign: "start", pointerEvents: dragging ? "none" : undefined, ...c.style }}
         />
       ))}
     </div>

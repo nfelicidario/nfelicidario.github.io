@@ -10,8 +10,10 @@ import { BatteryFull, Signal, Wifi } from "lucide-react";
  * hit testing, and motion layout animations honest.
  *
  * Colors are phone-local CSS variables (Material 3 roles: surface, surface containers,
- * on-surface, outline), with light and dark variants. The surfaces are fixed neutrals;
- * `brandColor` reaches exactly three things: the hero band on the agent details screen, the
+ * on-surface, outline), with light and dark variants. The surfaces are fixed neutrals, and
+ * `--ph-accent` is the phone's own system accent (the Material dynamic-color primary that
+ * Messages paints chip icons with), fixed to a Google blue, not the brand; `brandColor`
+ * reaches exactly three things: the hero band on the agent details screen, the
  * verified badge, and the user's reply bubbles. The screen ground (`--ph-bg`) is the
  * surface-container tier that the status bar, header, and composer share; `ConversationPanel`
  * and `AgentInfo` sit on it as a lighter `--ph-surface` panel. Nothing here reads the site's
@@ -57,6 +59,7 @@ export function phoneTokens(brand: string, theme: "light" | "dark"): CSSProperti
   const light = {
     "--ph-brand": brand,
     "--ph-on-brand": "#ffffff",
+    "--ph-accent": "#0b57d0",
     "--ph-bg": "#eceef2",
     "--ph-surface": "#ffffff",
     "--ph-surface-low": "#f5f6f8",
@@ -72,6 +75,7 @@ export function phoneTokens(brand: string, theme: "light" | "dark"): CSSProperti
   const dark = {
     "--ph-brand": brand,
     "--ph-on-brand": "#ffffff",
+    "--ph-accent": "#a8c7fa",
     "--ph-bg": "#0e1014",
     "--ph-surface": "#1b1d22",
     "--ph-surface-low": "#24262b",

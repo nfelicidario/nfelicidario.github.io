@@ -31,6 +31,7 @@ import {
   CircleAlert,
   ClipboardCheck,
   Clock,
+  FilePen,
   Info,
   Rocket,
   RotateCcw,
@@ -47,9 +48,11 @@ import {
   OPTIONS,
   PHONE_COPY,
   PREFILL,
+  PROVISION_EYEBROW,
   REVIEW_TIMELINE,
   SIGNUP_SUCCESS,
   STATUS,
+  STEP_BLURBS,
   STEP_LABELS,
   money,
   type Field,
@@ -1032,18 +1035,18 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
     <>
       <div className="grid gap-2.5">
         <div className="flex items-center justify-between gap-2">
-          <div className="label">Provisioning</div>
+          {/* "PROVISIONING • CUSTOMER REQUEST • STEP n OF 3", uppercase from the label utility */}
+          <div className="label">{stepAt >= 0 ? PROVISION_EYEBROW(stepAt + 1, PROVISION_STEPS.length) : "Provisioning"}</div>
           <StatusPill status={status} />
         </div>
         {stepAt >= 0 ? (
-          <div className="flex items-center gap-2.5">
+          <div className="flex min-w-0 items-center gap-2.5">
             <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
               <StepIcon size={16} aria-hidden="true" />
             </span>
-            <span className="text-[15px] font-semibold text-ink">{STEP_LABELS[step]}</span>
-            <span className="ml-auto text-[12px] text-muted">
-              Step {stepAt + 1} of {PROVISION_STEPS.length}
-            </span>
+            <span className="shrink-0 text-[15px] font-semibold text-ink">{STEP_LABELS[step]}</span>
+            <span aria-hidden="true" className="h-4 w-px shrink-0 bg-rule" />
+            <span className="min-w-0 truncate text-[12.5px] text-muted">{STEP_BLURBS[PROVISION_STEPS[stepAt].step as keyof typeof STEP_BLURBS]}</span>
           </div>
         ) : (
           <div className="truncate text-[15px] font-semibold text-ink">{s.values.agentName}</div>
@@ -1066,7 +1069,6 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
               go(F.agent);
             }}
           >
-            <p className="text-[12.5px] text-muted">The company behind the agent.</p>
             <Field s={s} timed={timed} dispatch={dispatch} field="legalName" label="Legal name" />
             <Field
               s={s}
@@ -1123,7 +1125,6 @@ function Provision({ s, timed, still, dispatch }: PanelProps) {
               submitCampaign();
             }}
           >
-            <p className="text-[12.5px] text-muted">The promise to carriers: what you&apos;ll send and to whom.</p>
             <Field s={s} timed={timed} dispatch={dispatch} field="useCase" label="Use case" options={OPTIONS.useCases} />
             <Field s={s} timed={timed} dispatch={dispatch} field="sample" label="Sample message" multiline />
             <Field
@@ -1171,6 +1172,7 @@ function StatusPill({ status }: { status: Status }) {
     <span aria-live="polite" className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11.5px] font-semibold ${cls}`}>
       {status === STATUS.live && <BadgeCheck size={13} aria-hidden="true" />}
       {status === STATUS.submitted && <Clock size={12} aria-hidden="true" />}
+      {status === STATUS.draft && <FilePen size={12} aria-hidden="true" />}
       <span className="sr-only">Status: </span>
       {status}
     </span>
@@ -1488,11 +1490,13 @@ const noAction = () => {};
  *    business as it is typed), typing, the deal carousel, and the two action chips right
  *    behind it. A card's button sends the user's reply (right, brand color), then typing, then
  *    the upsell card; "Yes, and checkout" sends the next reply, typing, and the confirmation
- *    card with its chips. The demo banner floats over the top of
- *    the column; the column scrolls edge to edge and keeps the newest content in view; the
- *    composer is pinned under a divider.
+ *    card with its chips. On the demo agent (yours) the demo banner floats over the top of
+ *    the column; the live agent has no banner. The column scrolls edge to edge and keeps the
+ *    newest content in view; the composer is pinned under a divider.
  *  - brand and agent steps: the agent details screen, filling in as the form does
- *  - campaign and submitted: the sample message, or a ghost bubble until it exists
+ *  - campaign and submitted: the same thread as the demo (intro, greeting, carousel, chips)
+ *    with the campaign's sample message as the greeting (a ghost bubble until it exists),
+ *    inert, and without the demo banner
  */
 function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still: boolean; dispatch: Dispatch<Action> }) {
   const step = FRAMES[s.i].step;
@@ -1523,7 +1527,13 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
     canPick = s.i === F.live && thread.deal === null;
     canCheckout = s.i === F.liveUpsell && thread.addon === null;
   } else {
-    messages.push(sample ? { id: "sample", from: "agent", text: sample } : { id: "ghost", from: "agent", kind: "ghost", text: PHONE_COPY.ghost });
+    // the campaign preview: the sample message where the greeting goes, then the same
+    // carousel and chips as the demo, nothing tappable
+    messages.push(
+      sample ? { id: "sample", from: "agent", text: sample } : { id: "ghost", from: "agent", kind: "ghost", text: PHONE_COPY.ghost },
+      { id: "carousel", from: "agent", kind: "carousel" },
+      { id: "chips", from: "agent", kind: "chips" },
+    );
   }
 
   const headerName = name || PREFILL.fallbackName;
@@ -1560,7 +1570,8 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
     );
   }
 
-  const banner = mode !== "preview";
+  /** only the demo agent wears the banner; the campaign preview and the live agent go without */
+  const banner = mode === "yours";
 
   function render(m: Msg) {
     switch (m.kind) {
@@ -1603,7 +1614,7 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
         );
       case "upsell":
         return (
-          <div className="w-[92%]" data-target="checkout" data-control="">
+          <div className="w-full" data-target="checkout" data-control="">
             <RichCard
               title={PHONE_COPY.upsell.title}
               meta={`+${money(PHONE_COPY.upsell.price)}`}
@@ -1625,7 +1636,7 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
       case "confirmation":
         return (
           <RichCard
-            width="92%"
+            width="100%"
             title={PHONE_COPY.confirmation.title(PHONE_COPY.confirmation.orderNumber)}
             meta={money(total)}
             media={<CardMedia art={PHONE_COPY.confirmation.media.art} photo={PHONE_COPY.confirmation.media.photo} />}

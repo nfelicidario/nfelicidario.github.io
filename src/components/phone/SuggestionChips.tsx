@@ -5,16 +5,19 @@ import { CalendarPlus, Globe, LocateFixed, MapPin, Phone } from "lucide-react";
 import { useDragScroll } from "./useDragScroll";
 
 /**
- * Suggested replies and suggested actions, rendered as Material 3 outlined chips in one
- * horizontal row above the composer: neutral outline, neutral text, 36 px tall (8 px of
- * vertical padding around the label). The row never wraps: it overflows with the scrollbar
- * hidden, scrolls natively on touch, and can be dragged with the mouse (`useDragScroll`). Soft fades on the
- * edges hint at more chips: the right fade while there is more to scroll to, the left fade
- * once the row has been scrolled. `bleed` lets the row clip at its parent's edge instead
- * of at its own padding box.
- * Google allows up to 11 per message, labels up to 25 characters. Actions carry an icon:
- * dial, open URL, view location, share location, create calendar event. A reply can carry
- * an `emoji` as its leading glyph instead.
+ * Suggested replies and suggested actions, rendered as the outlined pills Google Messages
+ * draws: 40 px tall, a 1 px neutral outline (`--ph-outline-variant`), the label in the plain
+ * on-surface color at the thread's body size (15 px, regular), and an action's icon (20 px)
+ * at the left in the phone's system accent (`--ph-accent`, never the brand). Chips sit in one
+ * horizontal row 8 px apart that never wraps: it overflows with the scrollbar hidden, scrolls
+ * natively on touch, and can be dragged with the mouse (`useDragScroll`). Like Messages, the
+ * row is right-aligned while every chip fits (`align="end"`, the default; `align="start"`
+ * keeps them left) and starts at the left once it overflows. Soft fades on the edges hint at
+ * more chips: the right fade while there is more to scroll to, the left fade once the row has
+ * been scrolled. `bleed` lets the row clip at its parent's edge instead of at its own padding
+ * box. Google allows up to 11 per message, labels up to 25 characters. Actions carry an icon:
+ * dial, open URL, view location, share location, create calendar event. A reply can carry an
+ * `emoji` as its leading glyph instead.
  */
 export type SuggestionKind = "reply" | "dial" | "url" | "location" | "share-location" | "calendar";
 
@@ -37,6 +40,8 @@ export type SuggestionChipsProps = {
    * mid-row. Pass the parent's horizontal padding. 0 keeps the row inside the parent.
    */
   bleed?: number;
+  /** where the chips sit while they all fit: "end" (right, as Messages does) or "start" */
+  align?: "start" | "end";
 };
 
 export const MAX_SUGGESTIONS = 11;
@@ -50,11 +55,13 @@ export function clampLabel(label: string, max = MAX_LABEL): string {
 const FADE_WIDTH = 32;
 /** horizontal padding when the row is not bleeding */
 const ROW_PAD_X = 16;
-/** a chip's vertical padding; with the 18 px label line and the 1 px border it stands `CHIP_HEIGHT` tall */
-const CHIP_PAD_Y = 8;
-export const CHIP_HEIGHT = 36;
+/** a chip's vertical padding; with the 20 px label line and the 1 px border it stands `CHIP_HEIGHT` tall */
+const CHIP_PAD_Y = 9;
+export const CHIP_HEIGHT = 40;
+/** the action icon's size on a chip */
+export const CHIP_ICON = 20;
 
-export function suggestionIcon(kind: SuggestionKind | undefined, size = 18): ReactNode {
+export function suggestionIcon(kind: SuggestionKind | undefined, size = CHIP_ICON): ReactNode {
   const p = { size, "aria-hidden": true as const, style: { flexShrink: 0 } };
   switch (kind) {
     case "dial":
@@ -72,8 +79,8 @@ export function suggestionIcon(kind: SuggestionKind | undefined, size = 18): Rea
   }
 }
 
-/** an emoji sized and aligned like the 18px action icons */
-export function emojiGlyph(emoji: string, size = 16): ReactNode {
+/** an emoji sized and aligned like the action icons */
+export function emojiGlyph(emoji: string, size = 18): ReactNode {
   return (
     <span aria-hidden="true" style={{ flexShrink: 0, fontSize: size, lineHeight: 1 }}>
       {emoji}
@@ -81,7 +88,7 @@ export function emojiGlyph(emoji: string, size = 16): ReactNode {
   );
 }
 
-export function SuggestionChips({ suggestions, onSelect, disabled = false, label = "Suggestions", bleed = 0 }: SuggestionChipsProps) {
+export function SuggestionChips({ suggestions, onSelect, disabled = false, label = "Suggestions", bleed = 0, align = "end" }: SuggestionChipsProps) {
   const scroller = useRef<HTMLDivElement>(null);
   const { dragging, handlers } = useDragScroll<HTMLDivElement>();
   const [overflowLeft, setOverflowLeft] = useState(false);
@@ -147,7 +154,8 @@ export function SuggestionChips({ suggestions, onSelect, disabled = false, label
       </style>
       {suggestions.slice(0, MAX_SUGGESTIONS).map((s, i) => {
         const off = disabled || !onSelect;
-        const glyph = s.kind && s.kind !== "reply" ? suggestionIcon(s.kind) : s.emoji ? emojiGlyph(s.emoji) : null;
+        const action = s.kind && s.kind !== "reply";
+        const glyph = action ? suggestionIcon(s.kind) : s.emoji ? emojiGlyph(s.emoji) : null;
         return (
           <button
             key={s.label}
@@ -161,16 +169,19 @@ export function SuggestionChips({ suggestions, onSelect, disabled = false, label
               minHeight: CHIP_HEIGHT,
               flexShrink: 0,
               alignItems: "center",
-              gap: 6,
+              gap: 10,
+              // an auto left margin on the first chip right-aligns the row while it fits and
+              // collapses to nothing once it overflows, which `justify-content` cannot do
               margin: 0,
-              padding: `${CHIP_PAD_Y}px ${glyph ? 14 : 16}px ${CHIP_PAD_Y}px ${glyph ? 10 : 16}px`,
+              marginLeft: i === 0 && align === "end" ? "auto" : 0,
+              padding: `${CHIP_PAD_Y}px ${glyph ? 18 : 16}px ${CHIP_PAD_Y}px ${glyph ? 14 : 16}px`,
               borderRadius: 999,
               border: `1px solid ${s.selected ? "var(--ph-outline)" : "var(--ph-outline-variant)"}`,
               background: s.selected ? "var(--ph-surface-high)" : "transparent",
               font: "inherit",
-              fontSize: 14,
-              fontWeight: 500,
-              lineHeight: "18px",
+              fontSize: 15,
+              fontWeight: 400,
+              lineHeight: "20px",
               letterSpacing: 0.1,
               whiteSpace: "nowrap",
               color: "var(--ph-on-surface)",
@@ -180,7 +191,7 @@ export function SuggestionChips({ suggestions, onSelect, disabled = false, label
               transition: "background 150ms, border-color 150ms, opacity 150ms",
             }}
           >
-            {glyph}
+            {glyph && <span aria-hidden="true" style={{ display: "flex", color: action ? "var(--ph-accent)" : undefined }}>{glyph}</span>}
             {clampLabel(s.label)}
           </button>
         );

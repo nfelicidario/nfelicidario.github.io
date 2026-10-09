@@ -11,10 +11,13 @@ import { VerifiedBadge } from "./VerifiedBadge";
  * draws it: a back arrow row; the 45:14 hero band (the 1440 x 448 banner, a soft brand
  * gradient when none is given) with the logo overlapping its bottom edge, centered, masked to
  * a rounded square on no background; the display name with the filled verified badge; the
- * description centered in muted text (two lines); a row of round neutral actions (Call,
- * Website, Email); then rounded cards on the gray ground: Verified, the phone number, the
- * website, the email, and the privacy policy and terms links. The whole screen scrolls. The
- * hero band's fallback gradient is the one place on this screen that reads the brand color.
+ * description centered in muted text (two lines); a row of round tonal actions (Call,
+ * Website, Email); then rounded list cards: Verified, the phone number, the website, the
+ * email, and the privacy policy and terms links. The screen is the tonal look of the
+ * references: the ground is the light `--ph-surface-low` tier and the cards and the round
+ * actions are the light system gray of the surface-container tier (`--ph-surface-high`), not
+ * white. The whole screen scrolls. The hero band's fallback gradient is the one place on this
+ * screen that reads the brand color.
  *
  * Every value is optional; `placeholders` stand in (muted) while a form is still empty.
  */
@@ -87,7 +90,7 @@ export function AgentInfo({
         overflowX: "hidden",
         overflowY: "auto",
         scrollbarWidth: "none",
-        background: "var(--ph-bg)",
+        background: "var(--ph-surface-low)",
         color: "var(--ph-on-surface)",
       }}
     >
@@ -148,7 +151,7 @@ export function AgentInfo({
         </p>
       </div>
 
-      {/* round actions on the lighter surface, neutral */}
+      {/* round tonal actions, neutral */}
       <div aria-hidden="true" style={{ display: "flex", justifyContent: "center", gap: 12, padding: "18px 16px 0" }}>
         {actions.map((a) => (
           <div key={a.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, width: 84 }}>
@@ -159,7 +162,7 @@ export function AgentInfo({
                 height: 48,
                 placeItems: "center",
                 borderRadius: 999,
-                background: "var(--ph-surface)",
+                background: "var(--ph-surface-high)",
                 color: "var(--ph-on-surface)",
               }}
             >
@@ -170,7 +173,7 @@ export function AgentInfo({
         ))}
       </div>
 
-      {/* cards on the gray ground */}
+      {/* list cards in the light system gray (surface-container tier) on the lighter ground */}
       <ul
         style={{
           listStyle: "none",
@@ -232,7 +235,7 @@ const card = {
   minHeight: 64,
   padding: "10px 16px",
   borderRadius: CARD_RADIUS,
-  background: "var(--ph-surface)",
+  background: "var(--ph-surface-high)",
 } as const;
 
 const rowIcon = {
