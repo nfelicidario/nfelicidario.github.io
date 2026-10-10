@@ -47,7 +47,15 @@ export default function Page() {
         title="We built the second step first"
         lede="RCS Studio launched as a tool for building RCS message flows. But a customer can't send anything until their agent is provisioned, and nobody had built that part. I repositioned the product around getting an agent live, and it became the way every Vibes customer gets one."
         meta={[
-          { label: "Role", value: "Product designer, acting product manager" },
+          {
+            label: "Role",
+            value: (
+              <ul className="grid gap-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
+                <li>Product designer</li>
+                <li>Acting product manager</li>
+              </ul>
+            ),
+          },
           { label: "Team", value: "Engineering manager and three engineers. No dedicated PM for most of the project." },
           { label: "Timeline", value: "Aug 2025 to Jul 2026" },
           {
@@ -56,10 +64,11 @@ export default function Page() {
               <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
                 <li>Figma</li>
                 <li>Storybook</li>
-                <li>React + TypeScript</li>
+                <li>React</li>
+                <li>TypeScript</li>
                 <li>Claude Code</li>
                 <li>
-                  <s className="text-muted">Jira</s> → Linear
+                  <s className="text-muted">Jira</s> Linear
                 </li>
                 <li>AWS</li>
                 <li>Datadog</li>

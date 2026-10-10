@@ -45,6 +45,11 @@ export function CaseHero({
   if (stage) {
     return (
       <section className="mx-auto max-w-6xl pt-6 pb-14 md:pt-8 md:pb-16">
+        {product && (
+          <h1 className="mb-5 text-center text-[clamp(26px,3vw,34px)] font-bold tracking-[-0.02em] text-ink">
+            {product}
+          </h1>
+        )}
         <div className="mb-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
           <Link
             href="/#work"
@@ -66,18 +71,12 @@ export function CaseHero({
             )}
           </div>
         </div>
-        {product && (
-          <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <span className="font-display text-[24px] font-bold tracking-[-0.02em] text-ink">{product}</span>
-            <span className="label">{kicker}</span>
-          </div>
-        )}
         {stage}
         <div className="mt-14 grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start md:mt-16">
           <div>
             {heading ?? (
               <>
-                <h1 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">{title}</h1>
+                <h2 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">{title}</h2>
                 <p className="mt-4 max-w-[52ch] text-[16px]">{lede}</p>
               </>
             )}
