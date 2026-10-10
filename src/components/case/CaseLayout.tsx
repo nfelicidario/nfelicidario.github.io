@@ -205,12 +205,12 @@ export function Stats({ items }: { items: { value: string; label: string }[] }) 
   );
 }
 
-export function Outcome({ title = "Outcome", stats, children }: { title?: string; stats: { value: string; label: string }[]; children?: ReactNode }) {
+export function Outcome({ title = "Outcome", stats, children }: { title?: string; stats?: { value: string; label: string }[]; children?: ReactNode }) {
   return (
     <section className="mx-auto max-w-6xl border-t border-rule py-14 md:py-16">
       <h2 className="mb-6 text-[26px] font-bold text-ink md:text-[30px]">{title}</h2>
-      <Stats items={stats} />
-      {children && <div className="mt-6 grid max-w-[62ch] gap-3 text-[15.5px] [&>p]:text-body">{children}</div>}
+      {stats && <Stats items={stats} />}
+      {children && <div className={`grid max-w-[62ch] gap-3 text-[15.5px] [&>p]:text-body ${stats ? "mt-6" : ""}`}>{children}</div>}
     </section>
   );
 }

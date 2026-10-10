@@ -21,6 +21,8 @@ export default function Page() {
 }
 ```
 
+Slide-like story format (RCS Studio uses it; other case studies still use `Beat`): `SixtySeconds` under the hero (problem, the call, the result, stats, three takeaways), then `Beats` wrapping numbered `StoryBeat`s. Each `StoryBeat` takes `id` (anchor), `title`, one `visual` (an `Artifact`), two or three lines as children, and the long version in `deeper` (shown behind "Go deeper"). `Beats` draws the sticky progress rail, tracks the current beat, and wires the left and right arrow keys. Import from `@/components/case/Story`.
+
 Rules:
 - Text per beat: 2–4 sentences. The artifact carries the rest.
 - `Artifact` is the only frame for visuals. Put custom interactive components inside it.
