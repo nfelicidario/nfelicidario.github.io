@@ -26,7 +26,7 @@ export const projects: Project[] = [
       "Owned requirements, roadmap, design, and production code.",
     ],
     outcomes: [
-      "GA in July 2026, Vibes' first self-serve product in a decade.",
+      "GA in July 2026, Vibes' first self-serve product ever.",
       "450+ agents provisioned, in one to three weeks each.",
     ],
     summary:

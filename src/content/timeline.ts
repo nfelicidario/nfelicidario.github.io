@@ -16,7 +16,7 @@ export const recent: Milestone[] = [
     what: "RCS Studio reached general availability at Vibes, designed and built end to end.",
     sub: [
       "Owned the design, requirements, roadmap, and production code.",
-      "The company's first self-serve product in a decade.",
+      "The company's first self-serve product ever, and its first new product in a decade.",
     ],
     href: "/work/rcs-studio/",
   },

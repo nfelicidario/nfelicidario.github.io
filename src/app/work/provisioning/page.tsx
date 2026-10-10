@@ -36,6 +36,7 @@ export default function ProvisioningPage() {
     <div className="container-x">
       <CaseHero
         kicker="Vibes · 2026"
+        product="Vibes Admin"
         pov="Operations"
         brand={<VibesLogo className="h-full w-auto" />}
         title="The user nobody designed for"

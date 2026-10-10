@@ -11,7 +11,7 @@ const META_ICONS: Record<string, LucideIcon> = {
 };
 import { projects } from "@/content/projects";
 
-export type Meta = { label: string; value: string };
+export type Meta = { label: string; value: ReactNode };
 
 export function CaseHero({
   kicker,
@@ -21,6 +21,7 @@ export function CaseHero({
   stage,
   heading,
   pov,
+  product,
   brand,
   artifact,
 }: {
@@ -34,6 +35,8 @@ export function CaseHero({
   heading?: ReactNode;
   /** point of view badge shown top center, e.g. "Customer" */
   pov?: string;
+  /** the product or project name, shown as a title strip above the stage */
+  product?: string;
   /** replaces the kicker text with a faint brand mark on the right */
   brand?: ReactNode;
   /** legacy: a side artifact next to the title */
@@ -63,6 +66,12 @@ export function CaseHero({
             )}
           </div>
         </div>
+        {product && (
+          <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="font-display text-[24px] font-bold tracking-[-0.02em] text-ink">{product}</span>
+            <span className="label">{kicker}</span>
+          </div>
+        )}
         {stage}
         <div className="mt-14 grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start md:mt-16">
           <div>

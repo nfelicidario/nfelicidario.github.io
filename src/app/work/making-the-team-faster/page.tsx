@@ -15,6 +15,7 @@ export default function MakingTheTeamFaster() {
     <div className="container-x">
       <CaseHero
         kicker="Vibes · Aug 2025 to present"
+        product="Agentic SDLC"
         pov="Team"
         brand={<VibesLogo className="h-full w-auto" />}
         title="Making the team faster"

@@ -27,6 +27,7 @@ export default function Page() {
     <div className="container-x">
       <CaseHero
         kicker="Stride · 2020–2025"
+        product="Stride"
         title="Three times the product was wrong"
         lede="Five years as co-founder and founding product designer at a seed-stage coaching startup, told as three times the product was wrong and what I did each time: a pivot that found the customer, an onboarding that fixed the first week, and a microlearning product that finally sold."
         meta={[

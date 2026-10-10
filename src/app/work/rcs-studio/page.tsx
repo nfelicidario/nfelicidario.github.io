@@ -41,22 +41,39 @@ export default function Page() {
     <div className="container-x">
       <CaseHero
         kicker="Vibes · 2025–26"
+        product="RCS Studio"
         pov="Customer"
         brand={<VibesLogo className="h-full w-auto" />}
         title="We built the second step first"
-        lede="RCS Studio launched as a flow builder for developers, and beta customers showed me the product was really the step before it."
+        lede="RCS Studio launched as a tool for building RCS message flows. But a customer can't send anything until their agent is provisioned, and nobody had built that part. I repositioned the product around getting an agent live, and it became the way every Vibes customer gets one."
         meta={[
-          { label: "Role", value: "Sole product designer" },
-          { label: "Team", value: "Engineering manager, three engineers" },
+          { label: "Role", value: "Product designer, acting product manager" },
+          { label: "Team", value: "Engineering manager and three engineers. No dedicated PM for most of the project." },
           { label: "Timeline", value: "Aug 2025 to Jul 2026" },
-          { label: "Stack", value: "Figma, then TypeScript, React, Claude Code" },
+          {
+            label: "Stack",
+            value: (
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
+                <li>Figma</li>
+                <li>Storybook</li>
+                <li>React + TypeScript</li>
+                <li>Claude Code</li>
+                <li>
+                  <s className="text-muted">Jira</s> → Linear
+                </li>
+                <li>AWS</li>
+                <li>Datadog</li>
+                <li>GitLab</li>
+              </ul>
+            ),
+          },
         ]}
         stage={<RcsStudioStage />}
       />
 
       <Tldr
         items={[
-          "Vibes' first customer-facing, self-serve product in a decade, and the first thing the company ever put on the public internet.",
+          "Vibes' first customer-facing, self-serve product ever, and its first new product in a decade.",
           "The founding bet was that provisioning would take care of itself. Customers showed me it was the whole first step, so I repositioned the product around it before beta.",
           "Now the portal for every RCS agent Vibes provisions: 450-plus, in one to three weeks against months for competitors.",
           "It proved customers would sign up and try things on their own. I'm now working with the head of product on a company-wide self-serve entry point.",
