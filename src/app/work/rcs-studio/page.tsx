@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Artifact, CaseHero, Hindsight, NextCase, Outcome } from "@/components/case/CaseLayout";
-import { Beats, SixtySeconds, StoryBeat, StoryLink } from "@/components/case/Story";
+import { Beats, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
+import { RcsIntro } from "@/components/work/rcs-studio/Intro";
 import { LookShift } from "@/components/work/rcs-studio/LookShift";
 import { RcsStudioStage } from "@/components/work/rcs-studio/hero/RcsStudioStage";
 import { Simplify } from "@/components/work/rcs-studio/Simplify";
@@ -36,6 +37,38 @@ const shipped = [
   },
 ];
 
+const meta = [
+  {
+    label: "Role",
+    value: (
+      <ul className="grid gap-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
+        <li>Product designer</li>
+        <li>Acting product manager</li>
+      </ul>
+    ),
+  },
+  { label: "Team", value: "Engineering manager and three engineers. No dedicated PM for most of the project." },
+  { label: "Timeline", value: "Aug 2025 to Jul 2026" },
+  {
+    label: "Stack",
+    value: (
+      <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
+        <li>Figma</li>
+        <li>Storybook</li>
+        <li>React</li>
+        <li>TypeScript</li>
+        <li>Claude Code</li>
+        <li>
+          <s className="text-muted">Jira</s> Linear
+        </li>
+        <li>AWS</li>
+        <li>Datadog</li>
+        <li>GitLab</li>
+      </ul>
+    ),
+  },
+];
+
 export default function Page() {
   return (
     <div className="container-x">
@@ -46,49 +79,33 @@ export default function Page() {
         brand={<VibesLogo className="h-full w-auto" />}
         title="We built the second step first"
         lede="RCS Studio launched as a tool for building RCS message flows. But a customer can't send anything until their agent is provisioned, and nobody had built that part. I repositioned the product around getting an agent live, and it became the way every Vibes customer gets one."
-        meta={[
-          {
-            label: "Role",
-            value: (
-              <ul className="grid gap-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
-                <li>Product designer</li>
-                <li>Acting product manager</li>
-              </ul>
-            ),
-          },
-          { label: "Team", value: "Engineering manager and three engineers. No dedicated PM for most of the project." },
-          { label: "Timeline", value: "Aug 2025 to Jul 2026" },
-          {
-            label: "Stack",
-            value: (
-              <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
-                <li>Figma</li>
-                <li>Storybook</li>
-                <li>React</li>
-                <li>TypeScript</li>
-                <li>Claude Code</li>
-                <li>
-                  <s className="text-muted">Jira</s> Linear
-                </li>
-                <li>AWS</li>
-                <li>Datadog</li>
-                <li>GitLab</li>
-              </ul>
-            ),
-          },
-        ]}
+        meta={meta}
+        intro={<RcsIntro meta={meta} />}
         stage={<RcsStudioStage />}
       />
 
       <SixtySeconds
         problem="RCS Studio launched as a flow builder for developers. Customers arrived asking what RCS was and how to get an agent live, and nobody had built that part."
-        call="Reposition the product around provisioning, the step everyone was stuck on, and make the builder the second step. I prototyped it rather than argue it."
-        result="RCS Studio is now how every Vibes customer gets an RCS agent: 450-plus provisioned, in weeks instead of months, and the company's first proof that customers will self-serve."
+        workLabel="The work"
+        work="As product designer and acting product manager, I repositioned RCS Studio around provisioning right before beta, built a prototype of the new flow and brought it to the operations team to win over the engineering manager, and later shipped the provisioning flows in production code."
+        result="RCS Studio is now how every Vibes customer gets an RCS agent: 500-plus provisioned, in weeks instead of months, and the company's first proof that customers will self-serve."
         stats={[
-          { value: "450+", label: "RCS agents provisioned through RCS Studio" },
-          { value: "1–3 wks", label: "to provision, against months for competitors" },
-          { value: "Feb → Jul", label: "2026, beta to general availability" },
-          { value: "Month 3", label: "running the product independently" },
+          { value: "500+", label: "RCS agents provisioned through RCS Studio" },
+          { value: "1–3 wks", label: "to provision, compared to several months for competitors" },
+          {
+            value: "Aug 2025 to Jul 2026",
+            label: "from joining to general availability",
+            custom: (
+              <Span
+                points={[
+                  { at: "Aug 25", what: "Joined" },
+                  { at: "Feb 26", what: "Beta" },
+                  { at: "Jul 26", what: "GA" },
+                ]}
+              />
+            ),
+          },
+          { value: "1st", label: "self-serve product in the company's twenty years" },
         ]}
         takeaways={[
           "Customers tell you what the first step is. Listen for the question they all ask.",

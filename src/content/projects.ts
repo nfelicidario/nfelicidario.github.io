@@ -27,13 +27,13 @@ export const projects: Project[] = [
     ],
     outcomes: [
       "GA in July 2026, Vibes' first self-serve product ever.",
-      "450+ agents provisioned, in one to three weeks each.",
+      "500+ agents provisioned, in one to three weeks each.",
     ],
     summary:
       "The company built a flow builder for developers. Customers needed onboarding. I repositioned the product around provisioning right before beta.",
     org: "Vibes",
     years: "2025–26",
-    metric: "450+ agents",
+    metric: "500+ agents",
     hues: ["#1f4fe0", "#0b1b33"],
     status: "draft",
   },

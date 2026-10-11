@@ -24,6 +24,7 @@ export function CaseHero({
   product,
   brand,
   artifact,
+  intro,
 }: {
   kicker: string;
   title: string;
@@ -41,6 +42,8 @@ export function CaseHero({
   brand?: ReactNode;
   /** legacy: a side artifact next to the title */
   artifact?: ReactNode;
+  /** replaces the whole title, lede, and meta block under the stage */
+  intro?: ReactNode;
 }) {
   if (stage) {
     return (
@@ -72,32 +75,19 @@ export function CaseHero({
           </div>
         </div>
         {stage}
-        <div className="mt-14 grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start md:mt-16">
-          <div>
-            {heading ?? (
-              <>
-                <h2 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">{title}</h2>
-                <p className="mt-4 max-w-[52ch] text-[16px]">{lede}</p>
-              </>
-            )}
+        {intro ?? (
+          <div className="mt-14 grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start md:mt-16">
+            <div>
+              {heading ?? (
+                <>
+                  <h2 className="max-w-[18ch] text-[clamp(28px,3.6vw,42px)] font-bold text-ink">{title}</h2>
+                  <p className="mt-4 max-w-[52ch] text-[16px]">{lede}</p>
+                </>
+              )}
+            </div>
+            <MetaList meta={meta} className="border-t border-rule pt-4 md:border-t-0 md:border-l md:pl-6 md:pt-0" />
           </div>
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-rule pt-4 text-[13.5px] md:border-t-0 md:border-l md:pl-6 md:pt-0">
-            {meta.map((m) => {
-              const Icon = META_ICONS[m.label.toLowerCase()];
-              return (
-                <div key={m.label} className="grid grid-cols-[18px_1fr] gap-x-2">
-                  <span className="pt-[1px] text-muted" aria-hidden="true">
-                    {Icon && <Icon size={14} />}
-                  </span>
-                  <div>
-                    <dt className="label mb-0.5">{m.label}</dt>
-                    <dd className="font-medium text-ink">{m.value}</dd>
-                  </div>
-                </div>
-              );
-            })}
-          </dl>
-        </div>
+        )}
       </section>
     );
   }
@@ -118,6 +108,29 @@ export function CaseHero({
       </div>
       {artifact && <div>{artifact}</div>}
     </section>
+  );
+}
+
+/** the role / team / timeline / stack list with its icons; `columns` 1, 2, or 4 */
+export function MetaList({ meta, className = "", columns = 2 }: { meta: Meta[]; className?: string; columns?: 1 | 2 | 4 }) {
+  const cols = columns === 1 ? "grid-cols-1" : columns === 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2";
+  return (
+    <dl className={`grid ${cols} gap-x-6 gap-y-4 text-[13.5px] ${className}`}>
+      {meta.map((m) => {
+        const Icon = META_ICONS[m.label.toLowerCase()];
+        return (
+          <div key={m.label} className="grid grid-cols-[18px_1fr] gap-x-2">
+            <span className="pt-[1px] text-muted" aria-hidden="true">
+              {Icon && <Icon size={14} />}
+            </span>
+            <div>
+              <dt className="label mb-0.5">{m.label}</dt>
+              <dd className="font-medium text-ink">{m.value}</dd>
+            </div>
+          </div>
+        );
+      })}
+    </dl>
   );
 }
 
@@ -192,12 +205,14 @@ export function Artifact({
   );
 }
 
-export function Stats({ items }: { items: { value: string; label: string }[] }) {
+export type Stat = { value: string; label: string; /** replaces the big value, e.g. a mini timeline */ custom?: ReactNode };
+
+export function Stats({ items }: { items: Stat[] }) {
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
       {items.map((s) => (
         <div key={s.label} className="bubble border border-rule bg-surface p-4">
-          <div className="num font-display text-[26px] font-bold tracking-[-0.02em] text-ink">{s.value}</div>
+          {s.custom ?? <div className="num font-display text-[26px] font-bold tracking-[-0.02em] text-ink">{s.value}</div>}
           <div className="mt-1 text-[12.5px] text-muted">{s.label}</div>
         </div>
       ))}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type React from "react";
 import {
   Children,
   createContext,
@@ -12,8 +13,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ChevronDown } from "lucide-react";
-import { Stats } from "./CaseLayout";
+import { ChevronDown, Keyboard } from "lucide-react";
+import { Stats, type Stat } from "./CaseLayout";
 
 /**
  * The slide-like story format. A `SixtySeconds` strip gives the whole arc (problem, the call,
@@ -29,16 +30,20 @@ import { Stats } from "./CaseLayout";
 
 export type SixtySecondsProps = {
   problem: ReactNode;
-  call: ReactNode;
+  /** what Nolan did about it */
+  work: ReactNode;
+  /** label for the middle cell */
+  workLabel?: string;
   result: ReactNode;
-  stats?: { value: string; label: string }[];
-  takeaways: ReactNode[];
+  stats?: Stat[];
+  takeaways?: ReactNode[];
+  takeawaysLabel?: string;
 };
 
-export function SixtySeconds({ problem, call, result, stats, takeaways }: SixtySecondsProps) {
+export function SixtySeconds({ problem, work, workLabel = "What I did", result, stats, takeaways, takeawaysLabel = "If you remember three things" }: SixtySecondsProps) {
   const cells = [
     { k: "The problem", v: problem },
-    { k: "The call", v: call },
+    { k: workLabel, v: work },
     { k: "The result", v: result },
   ];
   return (
@@ -59,9 +64,10 @@ export function SixtySeconds({ problem, call, result, stats, takeaways }: SixtyS
             </li>
           ))}
         </ol>
-        {stats && <div className="mt-4">{<Stats items={stats} />}</div>}
+        {stats && <div className="mt-4"><Stats items={stats} /></div>}
+        {takeaways && (
         <div className="mt-5 border-t border-rule pt-4">
-          <div className="label mb-2">What I&apos;d want you to take away</div>
+          <div className="label mb-2">{takeawaysLabel}</div>
           <ul className="grid gap-2 text-[14.5px] text-body md:grid-cols-3 md:gap-4">
             {takeaways.map((t, i) => (
               <li key={i} className="flex gap-2.5">
@@ -71,8 +77,38 @@ export function SixtySeconds({ problem, call, result, stats, takeaways }: SixtyS
             ))}
           </ul>
         </div>
+        )}
       </div>
     </section>
+  );
+}
+
+/** a three-point mini timeline for a stat card: start, beta, general availability */
+export function Span({ points }: { points: { at: string; what: string }[] }) {
+  return (
+    <div className="pt-1">
+      <div className="relative mx-1 h-[3px] rounded-full bg-rule">
+        {points.map((pt, i) => (
+          <span
+            key={pt.at}
+            aria-hidden="true"
+            className={`absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-surface ${i === points.length - 1 ? "bg-accent" : "bg-ink"}`}
+            style={{ left: `${(i / (points.length - 1)) * 100}%` }}
+          />
+        ))}
+      </div>
+      <ol className="mt-2 grid text-[11.5px] leading-tight" style={{ gridTemplateColumns: `repeat(${points.length}, minmax(0, 1fr))` }}>
+        {points.map((pt, i) => (
+          <li
+            key={pt.at}
+            className={`${i === 0 ? "text-left" : i === points.length - 1 ? "text-right" : "text-center"}`}
+          >
+            <span className="num block font-semibold text-ink">{pt.at}</span>
+            <span className="text-muted">{pt.what}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 
@@ -113,7 +149,9 @@ export function Beats({ children, label = "The story" }: { children: ReactNode; 
   // Arrow keys jump beats, but only when nothing else wants the keys.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      const fwd = e.key === "ArrowRight" || e.key === "ArrowDown";
+      const back = e.key === "ArrowLeft" || e.key === "ArrowUp";
+      if (!fwd && !back) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const t = e.target instanceof HTMLElement ? e.target : null;
       if (t && (t.closest("input, textarea, select, [contenteditable], figure[aria-labelledby]") || t.isContentEditable)) return;
@@ -122,7 +160,7 @@ export function Beats({ children, label = "The story" }: { children: ReactNode; 
       const r = root.getBoundingClientRect();
       if (r.bottom < 0 || r.top > window.innerHeight) return; // only while the story is on screen
       const sections = Array.from(root.querySelectorAll<HTMLElement>("[data-beat]"));
-      const next = e.key === "ArrowRight" ? Math.min(current + 1, sections.length - 1) : Math.max(current - 1, 0);
+      const next = fwd ? Math.min(current + 1, sections.length - 1) : Math.max(current - 1, 0);
       if (next === current) return;
       e.preventDefault();
       jumpTo(sections[next]);
@@ -131,12 +169,70 @@ export function Beats({ children, label = "The story" }: { children: ReactNode; 
     return () => window.removeEventListener("keydown", onKey);
   }, [current]);
 
+  const go = (t: BeatInfo) => (e: React.MouseEvent) => {
+    const el = document.getElementById(t.id);
+    if (!el) return;
+    e.preventDefault();
+    jumpTo(el);
+    history.replaceState(null, "", `#${t.id}`);
+  };
+
   return (
     <BeatsContext.Provider value={ctx}>
-      <div ref={rootRef} className="mx-auto max-w-6xl">
+      <div ref={rootRef} className="relative mx-auto max-w-6xl lg:pl-20">
+        {/* side rail, large screens */}
+        <div className="absolute inset-y-0 left-0 hidden w-12 lg:block" aria-hidden={false}>
+          <nav
+            aria-label={`${label} progress`}
+            className="group sticky top-[28vh] flex w-12 flex-col items-center gap-3"
+          >
+            <span className="label num text-muted">
+              {current + 1}
+              <span className="mx-0.5 opacity-60">/</span>
+              {titles.length}
+            </span>
+            <ol className="flex flex-col items-center gap-2" aria-label="Beats">
+              {titles.map((t, i) => (
+                <li key={t.id} className="relative flex">
+                  <a
+                    href={`#${t.id}`}
+                    aria-current={i === current ? "step" : undefined}
+                    onClick={go(t)}
+                    className={`peer block w-1.5 rounded-full transition-all duration-300 ${
+                      i === current ? "h-6 bg-accent" : i < current ? "h-1.5 bg-accent/50 hover:bg-accent" : "h-1.5 bg-rule hover:bg-muted"
+                    }`}
+                  >
+                    <span className="sr-only">
+                      Beat {i + 1}: {t.title}
+                    </span>
+                  </a>
+                  <span
+                    aria-hidden="true"
+                    className={`pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md border border-rule bg-surface px-2 py-0.5 text-[12px] opacity-0 shadow-[var(--shadow)] transition-opacity peer-hover:opacity-100 ${
+                      i === current ? "font-semibold text-ink" : "text-body"
+                    }`}
+                  >
+                    {t.title}
+                  </span>
+                </li>
+              ))}
+            </ol>
+            <span
+              className="mt-1 flex flex-col items-center gap-1 text-muted"
+              title="Arrow keys move between beats"
+            >
+              <Keyboard size={14} aria-hidden="true" />
+              <span className="label whitespace-nowrap text-[10px] opacity-0 transition-opacity group-hover:opacity-100">
+                ↑ ↓ keys
+              </span>
+            </span>
+          </nav>
+        </div>
+
+        {/* compact top rail, small screens */}
         <nav
           aria-label={`${label} progress`}
-          className="sticky top-0 z-20 -mx-1 border-b border-rule bg-bg/85 px-1 py-2.5 backdrop-blur"
+          className="sticky top-0 z-20 -mx-1 border-b border-rule bg-bg/85 px-1 py-2.5 backdrop-blur lg:hidden"
         >
           <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
             <span className="label num text-muted">
@@ -151,15 +247,9 @@ export function Beats({ children, label = "The story" }: { children: ReactNode; 
                     href={`#${t.id}`}
                     title={t.title}
                     aria-current={i === current ? "step" : undefined}
-                    onClick={(e) => {
-                      const el = document.getElementById(t.id);
-                      if (!el) return;
-                      e.preventDefault();
-                      jumpTo(el);
-                      history.replaceState(null, "", `#${t.id}`);
-                    }}
+                    onClick={go(t)}
                     className={`block h-1.5 rounded-full transition-all duration-300 ${
-                      i === current ? "w-6 bg-accent" : i < current ? "w-1.5 bg-accent/50 hover:bg-accent" : "w-1.5 bg-rule hover:bg-muted"
+                      i === current ? "w-6 bg-accent" : i < current ? "w-1.5 bg-accent/50" : "w-1.5 bg-rule"
                     }`}
                   >
                     <span className="sr-only">
@@ -180,7 +270,7 @@ export function Beats({ children, label = "The story" }: { children: ReactNode; 
 
 function jumpTo(el: HTMLElement) {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const y = el.getBoundingClientRect().top + window.scrollY - 56;
+  const y = el.getBoundingClientRect().top + window.scrollY - 48;
   window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
 }
 
