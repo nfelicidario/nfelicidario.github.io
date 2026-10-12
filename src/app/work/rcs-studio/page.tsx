@@ -48,7 +48,20 @@ const meta = [
     ),
   },
   { label: "Team", value: "Engineering manager and three engineers. No dedicated PM for most of the project." },
-  { label: "Timeline", value: "Aug 2025 to Jul 2026" },
+  {
+    label: "Timeline",
+    value: (
+      <div className="max-w-[220px]">
+        <Span
+          points={[
+            { at: "Aug 25", what: "Joined" },
+            { at: "Feb 26", what: "Beta" },
+            { at: "Jul 26", what: "GA" },
+          ]}
+        />
+      </div>
+    ),
+  },
   {
     label: "Stack",
     value: (
@@ -92,25 +105,14 @@ export default function Page() {
         stats={[
           { value: "500+", label: "RCS agents provisioned through RCS Studio" },
           { value: "1–3 wks", label: "to provision, compared to several months for competitors" },
-          {
-            value: "Aug 2025 to Jul 2026",
-            label: "from joining to general availability",
-            custom: (
-              <Span
-                points={[
-                  { at: "Aug 25", what: "Joined" },
-                  { at: "Feb 26", what: "Beta" },
-                  { at: "Jul 26", what: "GA" },
-                ]}
-              />
-            ),
-          },
-          { value: "1st", label: "self-serve product in the company's twenty years" },
+          { value: "3 steps", label: "to a working flow, down from an open-ended state builder" },
+          { value: "1st", label: "self-serve product at Vibes, ever" },
         ]}
+        takeawaysLabel="What changed how I work"
         takeaways={[
-          "Customers tell you what the first step is. Listen for the question they all ask.",
-          "Don't argue a reframe. Prototype it, show it to the people who do the work, and bring back their reaction.",
-          "A second step can't be the hardest part of the product.",
+          "Find the first step before polishing the second. I now start by watching where customers get stuck before they ever reach the feature.",
+          "Prototype the argument. When I disagree with the team's direction, I build the proof of concept and bring back the reaction instead of a deck.",
+          "Ship the flows I design. Since March 2026 I write the production code for my own designs, which keeps the roadmap honest and the handoff short.",
         ]}
       />
 

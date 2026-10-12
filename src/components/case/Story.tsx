@@ -83,7 +83,7 @@ export function SixtySeconds({ problem, work, workLabel = "What I did", result, 
   );
 }
 
-/** a three-point mini timeline for a stat card: start, beta, general availability */
+/** a three-point mini timeline: start, beta, general availability */
 export function Span({ points }: { points: { at: string; what: string }[] }) {
   return (
     <div className="pt-1">
@@ -92,7 +92,7 @@ export function Span({ points }: { points: { at: string; what: string }[] }) {
           <span
             key={pt.at}
             aria-hidden="true"
-            className={`absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-surface ${i === points.length - 1 ? "bg-accent" : "bg-ink"}`}
+            className={`absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-bg ${i === points.length - 1 ? "bg-accent" : "bg-ink"}`}
             style={{ left: `${(i / (points.length - 1)) * 100}%` }}
           />
         ))}
