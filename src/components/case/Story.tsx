@@ -13,7 +13,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ChevronDown, Keyboard } from "lucide-react";
+import { ChevronDown, CircleAlert, Hammer, Keyboard, Trophy } from "lucide-react";
 import { Stats, type Stat } from "./CaseLayout";
 
 /**
@@ -28,55 +28,105 @@ import { Stats, type Stat } from "./CaseLayout";
 
 /* ------------------------------------------------------------ 60 seconds */
 
+export type Term = { icon: ReactNode; title: string; text: ReactNode };
+
 export type SixtySecondsProps = {
-  problem: ReactNode;
-  /** what Nolan did about it */
-  work: ReactNode;
-  /** label for the middle cell */
+  /** one line on what the product is, set large */
+  lede?: ReactNode;
+  /** the two or three terms a reader needs, as tiles */
+  terms?: Term[];
+  problem: ReactNode[];
+  work: ReactNode[];
   workLabel?: string;
-  result: ReactNode;
+  result: ReactNode[];
   stats?: Stat[];
   takeaways?: ReactNode[];
   takeawaysLabel?: string;
 };
 
-export function SixtySeconds({ problem, work, workLabel = "What I did", result, stats, takeaways, takeawaysLabel = "If you remember three things" }: SixtySecondsProps) {
+export function SixtySeconds({
+  lede,
+  terms,
+  problem,
+  work,
+  workLabel = "The work",
+  result,
+  stats,
+  takeaways,
+  takeawaysLabel = "If you remember three things",
+}: SixtySecondsProps) {
   const cells = [
-    { k: "The problem", v: problem },
-    { k: workLabel, v: work },
-    { k: "The result", v: result },
+    { k: "The problem", icon: <CircleAlert size={15} />, items: problem },
+    { k: workLabel, icon: <Hammer size={15} />, items: work },
+    { k: "The result", icon: <Trophy size={15} />, items: result },
   ];
   return (
     <section className="mx-auto max-w-6xl pb-6" aria-label="The whole story in sixty seconds">
-      <div className="bubble border border-rule bg-surface p-5 md:p-6">
-        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <h2 className="text-[20px] font-bold text-ink">The whole story in 60 seconds</h2>
-          <span className="text-[13px] text-muted">The beats below tell it properly.</span>
-        </div>
-        <ol className="grid gap-4 md:grid-cols-3">
+      <div className="bubble border border-rule bg-surface p-5 md:p-7">
+        <h2 className="text-[20px] font-bold text-ink">The whole story in 60 seconds</h2>
+
+        {(lede || terms) && (
+          <div className="mt-5 grid gap-5 md:grid-cols-[1fr_1.5fr] md:items-center md:gap-8">
+            {lede && (
+              <p className="max-w-[30ch] font-display text-[clamp(19px,1.9vw,23px)] font-semibold leading-[1.3] tracking-[-0.01em] text-ink">
+                {lede}
+              </p>
+            )}
+            {terms && (
+              <dl className="grid gap-3 sm:grid-cols-2">
+                {terms.map((t) => (
+                  <div key={t.title} className="bubble-sm border border-rule bg-bg p-4">
+                    <dt className="label flex items-center gap-2 text-ink">
+                      <span className="grid h-7 w-7 place-items-center rounded-full bg-accent-soft text-accent" aria-hidden="true">
+                        {t.icon}
+                      </span>
+                      {t.title}
+                    </dt>
+                    <dd className="mt-2 text-[13.5px] leading-snug text-body">{t.text}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </div>
+        )}
+
+        <ol className={`grid gap-3 md:grid-cols-3 ${lede || terms ? "mt-5 border-t border-rule pt-5" : "mt-5"}`}>
           {cells.map((c, i) => (
-            <li key={c.k} className="bubble-sm border border-rule bg-bg px-4 py-3.5">
-              <div className="label mb-1.5 flex items-center gap-2 text-accent">
-                <span className="num">{i + 1}</span>
-                {c.k}
+            <li key={c.k} className="bubble-sm border border-rule bg-bg px-4 py-4">
+              <div className="flex items-center gap-2.5">
+                <span className="relative grid h-8 w-8 place-items-center rounded-full bg-accent-soft text-accent" aria-hidden="true">
+                  {c.icon}
+                  <span className="num absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-bold leading-none text-bg">
+                    {i + 1}
+                  </span>
+                </span>
+                <span className="label text-ink">
+                  <span className="sr-only">{i + 1}. </span>
+                  {c.k}
+                </span>
               </div>
-              <p className="text-[14.5px] leading-snug text-body">{c.v}</p>
+              <ul className="mt-3 grid gap-1.5 pl-4 text-[14px] leading-snug text-body marker:text-rule" style={{ listStyle: "disc" }}>
+                {c.items.map((it, j) => (
+                  <li key={j}>{it}</li>
+                ))}
+              </ul>
             </li>
           ))}
         </ol>
+
         {stats && <div className="mt-4"><Stats items={stats} /></div>}
         {takeaways && (
-        <div className="mt-5 border-t border-rule pt-4">
-          <div className="label mb-2">{takeawaysLabel}</div>
-          <ul className="grid gap-2 text-[14.5px] text-body md:grid-cols-3 md:gap-4">
-            {takeaways.map((t, i) => (
-              <li key={i} className="flex gap-2.5">
-                <span aria-hidden="true" className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                <span>{t}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+          <div className="mt-5 border-t border-rule pt-4">
+            <div className="label mb-2">{takeawaysLabel}</div>
+            <ul className="grid gap-2 text-[14.5px] text-body md:grid-cols-3 md:gap-4">
+              {takeaways.map((t, i) => (
+                <li key={i} className="flex gap-2.5">
+                  <span aria-hidden="true" className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </section>
@@ -88,13 +138,13 @@ export function Span({ points, direction = "horizontal" }: { points: { at: strin
   if (direction === "vertical") {
     return (
       <ol className="relative grid gap-3 pl-5">
-        <span aria-hidden="true" className="absolute left-[4px] top-1.5 bottom-1.5 w-[3px] rounded-full bg-rule" />
+        <span aria-hidden="true" className="absolute top-1.5 bottom-1.5 w-[2px] rounded-full bg-rule" style={{ left: 5 }} />
         {points.map((pt, i) => (
           <li key={pt.at} className="relative text-[13px] leading-tight">
             <span
               aria-hidden="true"
-              className={`absolute -left-5 top-[3px] h-2.5 w-2.5 rounded-full border-2 border-bg ${i === points.length - 1 ? "bg-accent" : "bg-ink"}`}
-              style={{ left: -16 }}
+              className={`absolute top-[3px] h-2.5 w-2.5 rounded-full border-2 border-bg ${i === points.length - 1 ? "bg-accent" : "bg-ink"}`}
+              style={{ left: -19 }}
             />
             <span className="num font-semibold text-ink">{pt.at}</span>
             <span className="ml-2 text-muted">{pt.what}</span>
@@ -302,12 +352,15 @@ function collectBeats(children: ReactNode): BeatInfo[] {
 
 /* ------------------------------------------------------------- one beat */
 
+export type BeatLayout = "split" | "split-reverse" | "stack" | "wide";
+
 export function StoryBeat({
   id,
   title,
   children,
   visual,
   deeper,
+  layout = "split",
 }: {
   /** anchor id, e.g. "the-bet" */
   id: string;
@@ -318,37 +371,63 @@ export function StoryBeat({
   visual: ReactNode;
   /** the long version, shown behind "Go deeper" */
   deeper?: ReactNode;
+  /**
+   * split: text left, visual right (sticky). split-reverse: visual left. stack: centered text over
+   * a full-width visual. wide: visual takes two thirds, text one third.
+   */
+  layout?: BeatLayout;
 }) {
   const n = (useContext(BeatsContext)[id] ?? 0) + 1;
+  const num = String(n).padStart(2, "0");
+  const text = (
+    <>
+      <div className={`label mb-3 text-accent ${layout === "stack" ? "justify-center" : ""} flex items-center gap-2`}>
+        <span className="num">{num}</span>
+      </div>
+      <h2 id={`${id}-title`} className="text-[28px] font-bold text-ink md:text-[34px]">
+        {title}
+      </h2>
+      <div className={`mt-4 grid gap-3 text-[16.5px] leading-relaxed [&>p]:text-body ${layout === "stack" ? "mx-auto max-w-[58ch]" : "max-w-[46ch]"}`}>
+        {children}
+      </div>
+      {deeper && <GoDeeper align={layout === "stack" ? "center" : "left"}>{deeper}</GoDeeper>}
+    </>
+  );
+  const grid =
+    layout === "stack"
+      ? "grid gap-10"
+      : layout === "wide"
+        ? "grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:items-start"
+        : "grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] md:items-start";
+  const textOrder = layout === "split-reverse" ? "order-2 md:order-2" : "order-2 md:order-1";
+  const visualOrder = layout === "split-reverse" ? "order-1 md:order-1" : "order-1 md:order-2";
   return (
     <section
       id={id}
       data-beat
-      className="scroll-mt-14 border-t border-rule py-12 md:py-16 first-of-type:border-t-0"
+      className="scroll-mt-14 border-t border-rule py-16 first-of-type:border-t-0 md:min-h-[560px] md:py-24"
       aria-labelledby={`${id}-title`}
     >
-      <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] md:items-start">
-        <div className="order-2 md:order-1">
-          <div className="label mb-3 flex items-center gap-2 text-accent">
-            <span className="num">{String(n).padStart(2, "0")}</span>
-          </div>
-          <h2 id={`${id}-title`} className="text-[26px] font-bold text-ink md:text-[30px]">
-            {title}
-          </h2>
-          <div className="mt-4 grid max-w-[46ch] gap-3 text-[16px] leading-relaxed [&>p]:text-body">{children}</div>
-          {deeper && <GoDeeper>{deeper}</GoDeeper>}
+      {layout === "stack" ? (
+        <div className={grid}>
+          <div className="text-center">{text}</div>
+          <div className="min-w-0">{visual}</div>
         </div>
-        <div className="order-1 min-w-0 md:order-2 md:sticky md:top-16">{visual}</div>
-      </div>
+      ) : (
+        <div className={grid}>
+          <div className={textOrder}>{text}</div>
+          <div className={`min-w-0 md:sticky md:top-16 ${visualOrder}`}>{visual}</div>
+        </div>
+      )}
     </section>
   );
 }
 
-function GoDeeper({ children }: { children: ReactNode }) {
+function GoDeeper({ children, align = "left" }: { children: ReactNode; align?: "left" | "center" }) {
   const id = useId();
   const [open, setOpen] = useState(false);
   return (
-    <div className="mt-5">
+    <div className={`mt-5 ${align === "center" ? "flex flex-col items-center" : ""}`}>
       <button
         type="button"
         aria-expanded={open}
@@ -359,7 +438,11 @@ function GoDeeper({ children }: { children: ReactNode }) {
         {open ? "Less" : "Go deeper"}
         <ChevronDown size={14} className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
       </button>
-      <div id={id} hidden={!open} className="mt-4 grid max-w-[52ch] gap-3 border-l-2 border-rule pl-4 text-[15px] [&>p]:text-body">
+      <div
+        id={id}
+        hidden={!open}
+        className={`mt-4 grid max-w-[52ch] gap-3 text-[15px] [&>p]:text-body ${align === "center" ? "text-left" : "border-l-2 border-rule pl-4"}`}
+      >
         {children}
       </div>
     </div>

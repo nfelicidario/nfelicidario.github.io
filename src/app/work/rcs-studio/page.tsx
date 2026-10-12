@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Artifact, CaseHero, Hindsight, NextCase, Outcome } from "@/components/case/CaseLayout";
 import { Beats, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
+import { BadgeCheck, Blocks } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
-import { ToggleTool } from "@/components/ToggleTool";
 import { LookShift } from "@/components/work/rcs-studio/LookShift";
 import { RcsStudioStage } from "@/components/work/rcs-studio/hero/RcsStudioStage";
 import { Simplify } from "@/components/work/rcs-studio/Simplify";
@@ -55,26 +55,7 @@ const meta = [
     ),
   },
   { label: "Team", value: "Engineering manager and three engineers. No dedicated PM for most of the project." },
-  {
-    label: "Timeline",
-    value: (
-      <ToggleTool
-        id="rcs-timeline"
-        label="Timeline"
-        variants={[
-          {
-            name: "Horizontal",
-            render: (
-              <div className="max-w-[240px]">
-                <Span points={TIMELINE} />
-              </div>
-            ),
-          },
-          { name: "Vertical", render: <Span points={TIMELINE} direction="vertical" /> },
-        ]}
-      />
-    ),
-  },
+  { label: "Timeline", value: <Span points={TIMELINE} direction="vertical" /> },
   {
     label: "Stack",
     value: (
@@ -111,10 +92,34 @@ export default function Page() {
       />
 
       <SixtySeconds
-        problem="RCS Studio launched as a flow builder for developers. Customers arrived asking what RCS was and how to get an agent live, and nobody had built that part."
-        workLabel="The work"
-        work="As product designer and acting product manager, I repositioned RCS Studio around provisioning right before beta, built a prototype of the new flow and brought it to the operations team to win over the engineering manager, and later shipped the provisioning flows in production code."
-        result="RCS Studio is now how every Vibes customer gets an RCS agent: 500-plus provisioned, in weeks instead of months, and the company's first proof that customers will self-serve."
+        lede="Vibes' entry into RCS, the successor to SMS, and the first product customers could sign up for on their own."
+        terms={[
+          {
+            icon: <BadgeCheck size={15} />,
+            title: "Provisioning",
+            text: "How a business gets a verified RCS agent. The brand and agent are registered and approved by Google and the carriers, so messages arrive from a verified, branded sender instead of a bare phone number.",
+          },
+          {
+            icon: <Blocks size={15} />,
+            title: "Building",
+            text: "App-like experiences inside the message thread, with rich cards, carousels, and suggested replies, connected to live business data through API integrations.",
+          },
+        ]}
+        problem={[
+          "RCS Studio launched as a flow builder for developers.",
+          "Customers arrived asking what RCS was and how to get an agent live.",
+          "Nobody had built that part.",
+        ]}
+        work={[
+          "Owned requirements, roadmap, and design as product designer and acting product manager, and repositioned the product around provisioning right before beta.",
+          "Built a prototype of the new flow and brought it to the operations team, which won over the engineering manager.",
+          "Contributed to the provisioning flows in production code: the UI in merge requests that the engineers built the API hookups and logic behind.",
+        ]}
+        result={[
+          "RCS Studio is now how every Vibes customer gets an RCS agent.",
+          "500-plus provisioned, in weeks instead of months.",
+          "The company's first proof that customers will self-serve.",
+        ]}
         stats={[
           { value: "500+", label: "RCS agents provisioned through RCS Studio" },
           { value: "1–3 wks", label: "to provision, compared to several months for competitors" },
@@ -123,9 +128,9 @@ export default function Page() {
         ]}
         takeawaysLabel="What changed how I work"
         takeaways={[
-          "Find the first step before polishing the second. I now start by watching where customers get stuck before they ever reach the feature.",
           "Prototype the argument. When I disagree with the team's direction, I build the proof of concept and bring back the reaction instead of a deck.",
-          "Ship the flows I design. Since March 2026 I write the production code for my own designs, which keeps the roadmap honest and the handoff short.",
+          "Challenge the defaults. RCS Studio broke with how mobile marketing had always been sold and with how Vibes had always built, and each break moved what RCS could do.",
+          "Prototype in the codebase. I open a merge request with the UI, and the engineers point their Claude Code session at it for the interface while they build the API hookups and logic behind it.",
         ]}
       />
 
@@ -133,9 +138,10 @@ export default function Page() {
         <StoryBeat
           id="the-bet"
           title="The bet"
+          layout="stack"
           visual={
             <Artifact label="A lot of firsts for a twenty-year B2B company">
-              <ul className="grid gap-2">
+              <ul className="grid gap-2 sm:grid-cols-3">
                 {firsts.map((f) => (
                   <li key={f.v} className="bubble-sm flex items-baseline gap-3 border border-rule bg-bg px-4 py-3">
                     <span className="label text-accent">{f.k}</span>
@@ -189,6 +195,7 @@ export default function Page() {
         <StoryBeat
           id="two-customers"
           title="Two customers, not one developer"
+          layout="wide"
           visual={
             <Artifact label="Who actually showed up" pill="Personas">
               <ThreeUsers />
@@ -215,6 +222,7 @@ export default function Page() {
         <StoryBeat
           id="making-the-case"
           title="Making the case"
+          layout="split-reverse"
           visual={
             <Artifact label="The reframe that aligned the team">
               <div className="grid gap-3">
@@ -250,6 +258,7 @@ export default function Page() {
         <StoryBeat
           id="the-builder"
           title="The builder, demoted and simplified"
+          layout="stack"
           visual={
             <Artifact label="The builder, before and after" pill="Abstract shapes">
               <Simplify />
@@ -274,6 +283,7 @@ export default function Page() {
         <StoryBeat
           id="a-new-look"
           title="A look for different users"
+          layout="split-reverse"
           visual={
             <Artifact label="Type, spacing, color" pill="Abstract tiles">
               <LookShift />
@@ -298,6 +308,7 @@ export default function Page() {
         <StoryBeat
           id="what-it-proved"
           title="What it proved"
+          layout="wide"
           visual={
             <Artifact label="How the work changed shape">
               <div className="grid gap-3 sm:grid-cols-2">
@@ -337,7 +348,7 @@ export default function Page() {
         </StoryBeat>
       </Beats>
 
-      <Outcome>
+      <Outcome align="center">
         <p>
           RCS Studio is now the portal for every RCS agent Vibes provisions. More importantly, it proved that
           customers would sign up and get an agent running on their own, something the company had never
@@ -346,7 +357,7 @@ export default function Page() {
         </p>
       </Outcome>
 
-      <Hindsight>
+      <Hindsight align="center">
         <p>
           I&apos;d have built RCS Studio as a surface of Vibes&apos; existing products, not a standalone brand on
           its own domain. The early vision tried to be too much, and the industry was never going to adopt RCS

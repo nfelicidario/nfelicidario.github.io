@@ -220,21 +220,33 @@ export function Stats({ items }: { items: Stat[] }) {
   );
 }
 
-export function Outcome({ title = "Outcome", stats, children }: { title?: string; stats?: { value: string; label: string }[]; children?: ReactNode }) {
+export function Outcome({
+  title = "Outcome",
+  stats,
+  children,
+  align = "left",
+}: {
+  title?: string;
+  stats?: Stat[];
+  children?: ReactNode;
+  align?: "left" | "center";
+}) {
+  const c = align === "center";
   return (
-    <section className="mx-auto max-w-6xl border-t border-rule py-14 md:py-16">
+    <section className={`mx-auto max-w-6xl border-t border-rule py-14 md:py-16 ${c ? "text-center" : ""}`}>
       <h2 className="mb-6 text-[26px] font-bold text-ink md:text-[30px]">{title}</h2>
       {stats && <Stats items={stats} />}
-      {children && <div className={`grid max-w-[62ch] gap-3 text-[15.5px] [&>p]:text-body ${stats ? "mt-6" : ""}`}>{children}</div>}
+      {children && <div className={`grid max-w-[62ch] gap-3 text-[15.5px] [&>p]:text-body ${stats ? "mt-6" : ""} ${c ? "mx-auto" : ""}`}>{children}</div>}
     </section>
   );
 }
 
-export function Hindsight({ children }: { children: ReactNode }) {
+export function Hindsight({ children, align = "left" }: { children: ReactNode; align?: "left" | "center" }) {
+  const c = align === "center";
   return (
-    <section className="mx-auto max-w-6xl border-t border-rule py-14 md:py-16">
+    <section className={`mx-auto max-w-6xl border-t border-rule py-14 md:py-16 ${c ? "text-center" : ""}`}>
       <h2 className="text-[26px] font-bold text-ink md:text-[30px]">With hindsight</h2>
-      <div className="mt-4 grid max-w-[62ch] gap-3 text-[15.5px] [&>p]:text-body">{children}</div>
+      <div className={`mt-4 grid max-w-[62ch] gap-3 text-[15.5px] [&>p]:text-body ${c ? "mx-auto" : ""}`}>{children}</div>
     </section>
   );
 }
