@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Artifact, CaseHero, Hindsight, NextCase, Outcome } from "@/components/case/CaseLayout";
 import { Beats, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
+import { ToggleTool } from "@/components/ToggleTool";
 import { LookShift } from "@/components/work/rcs-studio/LookShift";
 import { RcsStudioStage } from "@/components/work/rcs-studio/hero/RcsStudioStage";
 import { Simplify } from "@/components/work/rcs-studio/Simplify";
@@ -37,6 +38,12 @@ const shipped = [
   },
 ];
 
+const TIMELINE = [
+  { at: "Aug 2025", what: "Joined" },
+  { at: "Feb 2026", what: "Beta" },
+  { at: "Jul 2026", what: "GA" },
+];
+
 const meta = [
   {
     label: "Role",
@@ -51,15 +58,21 @@ const meta = [
   {
     label: "Timeline",
     value: (
-      <div className="max-w-[220px]">
-        <Span
-          points={[
-            { at: "Aug 25", what: "Joined" },
-            { at: "Feb 26", what: "Beta" },
-            { at: "Jul 26", what: "GA" },
-          ]}
-        />
-      </div>
+      <ToggleTool
+        id="rcs-timeline"
+        label="Timeline"
+        variants={[
+          {
+            name: "Horizontal",
+            render: (
+              <div className="max-w-[240px]">
+                <Span points={TIMELINE} />
+              </div>
+            ),
+          },
+          { name: "Vertical", render: <Span points={TIMELINE} direction="vertical" /> },
+        ]}
+      />
     ),
   },
   {

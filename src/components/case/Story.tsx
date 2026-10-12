@@ -84,9 +84,27 @@ export function SixtySeconds({ problem, work, workLabel = "What I did", result, 
 }
 
 /** a three-point mini timeline: start, beta, general availability */
-export function Span({ points }: { points: { at: string; what: string }[] }) {
+export function Span({ points, direction = "horizontal" }: { points: { at: string; what: string }[]; direction?: "horizontal" | "vertical" }) {
+  if (direction === "vertical") {
+    return (
+      <ol className="relative grid gap-3 pl-5">
+        <span aria-hidden="true" className="absolute left-[4px] top-1.5 bottom-1.5 w-[3px] rounded-full bg-rule" />
+        {points.map((pt, i) => (
+          <li key={pt.at} className="relative text-[13px] leading-tight">
+            <span
+              aria-hidden="true"
+              className={`absolute -left-5 top-[3px] h-2.5 w-2.5 rounded-full border-2 border-bg ${i === points.length - 1 ? "bg-accent" : "bg-ink"}`}
+              style={{ left: -16 }}
+            />
+            <span className="num font-semibold text-ink">{pt.at}</span>
+            <span className="ml-2 text-muted">{pt.what}</span>
+          </li>
+        ))}
+      </ol>
+    );
+  }
   return (
-    <div className="pt-1">
+    <div className="pt-3">
       <div className="relative mx-1 h-[3px] rounded-full bg-rule">
         {points.map((pt, i) => (
           <span
@@ -99,11 +117,8 @@ export function Span({ points }: { points: { at: string; what: string }[] }) {
       </div>
       <ol className="mt-2 grid text-[11.5px] leading-tight" style={{ gridTemplateColumns: `repeat(${points.length}, minmax(0, 1fr))` }}>
         {points.map((pt, i) => (
-          <li
-            key={pt.at}
-            className={`${i === 0 ? "text-left" : i === points.length - 1 ? "text-right" : "text-center"}`}
-          >
-            <span className="num block font-semibold text-ink">{pt.at}</span>
+          <li key={pt.at} className={`${i === 0 ? "text-left" : i === points.length - 1 ? "text-right" : "text-center"}`}>
+            <span className="num block whitespace-nowrap font-semibold text-ink">{pt.at}</span>
             <span className="text-muted">{pt.what}</span>
           </li>
         ))}
