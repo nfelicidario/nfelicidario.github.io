@@ -205,13 +205,20 @@ export function Artifact({
   );
 }
 
-export type Stat = { value: string; label: string; /** replaces the big value, e.g. a mini timeline */ custom?: ReactNode };
+export type Stat = {
+  value: string;
+  label: string;
+  /** replaces the big value, e.g. a mini timeline or a list of firsts */
+  custom?: ReactNode;
+  /** take two columns of the four */
+  span?: 2;
+};
 
 export function Stats({ items }: { items: Stat[] }) {
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
       {items.map((s) => (
-        <div key={s.label} className="bubble border border-rule bg-surface p-4">
+        <div key={s.label} className={`bubble border border-rule bg-surface p-4 ${s.span === 2 ? "col-span-2" : ""}`}>
           {s.custom ?? <div className="num font-display text-[26px] font-bold tracking-[-0.02em] text-ink">{s.value}</div>}
           <div className="mt-1 text-[12.5px] text-muted">{s.label}</div>
         </div>

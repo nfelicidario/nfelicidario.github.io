@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import { Artifact, CaseHero, Hindsight, NextCase, Outcome } from "@/components/case/CaseLayout";
 import { Beats, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
-import { BadgeCheck, Blocks } from "lucide-react";
+import { ArrowRight, BadgeCheck, Blocks } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
 import { LookShift } from "@/components/work/rcs-studio/LookShift";
 import { RcsStudioStage } from "@/components/work/rcs-studio/hero/RcsStudioStage";
@@ -11,6 +12,12 @@ import { ThreeUsers } from "@/components/work/rcs-studio/ThreeUsers";
 import { VibesLogo } from "@/components/VibesLogo";
 
 export const metadata: Metadata = { title: "RCS Studio" };
+
+const thesis = [
+  { k: "The shift", v: "The industry moves to RCS on its own." },
+  { k: "The agents", v: "Every brand will soon have an RCS agent." },
+  { k: "The need", v: "All of them will need a builder for the rich features." },
+];
 
 const firsts = [
   { k: "First", v: "public sign-up" },
@@ -92,44 +99,66 @@ export default function Page() {
       />
 
       <SixtySeconds
-        lede="Vibes' entry into RCS, the successor to SMS, and the first product customers could sign up for on their own."
+        lede="RCS Studio is Vibes' self-serve platform for getting a business onto RCS, the richer successor to SMS."
         terms={[
           {
             icon: <BadgeCheck size={15} />,
             title: "Provisioning",
-            text: "How a business gets a verified RCS agent. The brand and agent are registered and approved by Google and the carriers, so messages arrive from a verified, branded sender instead of a bare phone number.",
+            text: "How a business gets a verified RCS agent. The brand and agent are registered and approved by third-party partners, so messages arrive from a verified, branded sender instead of a bare phone number.",
           },
           {
             icon: <Blocks size={15} />,
             title: "Building",
-            text: "App-like experiences inside the message thread, with rich cards, carousels, and suggested replies, connected to live business data through API integrations.",
+            text: "App-like experiences inside the messaging inbox people already use, built from rich, interactive features and connected to live business data through API integrations.",
           },
         ]}
         problem={[
           "RCS Studio launched as a flow builder for developers.",
-          "Customers arrived asking what RCS was and how to get an agent live.",
-          "Nobody had built that part.",
+          { text: "Customers arrived asking:", sub: ["What is RCS?", "How do I get started?", "How do I get an agent live?"] },
+          {
+            text: "Getting an agent live meant provisioning, and the product had no path for it yet:",
+            sub: ["Registering a brand and an agent", "Verification and approval by third-party partners", "Weeks of email, handled by hand"],
+          },
         ]}
         work={[
-          "Owned requirements, roadmap, and design as product designer and acting product manager, and repositioned the product around provisioning right before beta.",
-          "Built a prototype of the new flow and brought it to the operations team, which won over the engineering manager.",
-          "Contributed to the provisioning flows in production code: the UI in merge requests that the engineers built the API hookups and logic behind.",
+          "Owned requirements, roadmap, and design as product designer and acting product manager.",
+          {
+            text: "Repositioned the product around provisioning right before beta:",
+            sub: ["Provisioning became the first step", "The builder became the second"],
+          },
+          "Built a prototype of the new flow and brought it to the operations team, which won over the skeptics.",
+          "Contributed to the provisioning flows in production code.",
         ]}
         result={[
-          "RCS Studio is now how every Vibes customer gets an RCS agent.",
-          "500-plus provisioned, in weeks instead of months.",
-          "The company's first proof that customers will self-serve.",
+          {
+            text: "RCS Studio is now how every Vibes customer gets an RCS agent:",
+            sub: ["500-plus provisioned", "Weeks instead of months"],
+          },
+          "The company's first proof that customers will sign up and get started on their own.",
         ]}
         stats={[
           { value: "500+", label: "RCS agents provisioned through RCS Studio" },
           { value: "1–3 wks", label: "to provision, compared to several months for competitors" },
-          { value: "3 steps", label: "to a working flow, down from an open-ended state builder" },
-          { value: "1st", label: "self-serve product at Vibes, ever" },
+          {
+            value: "3 firsts",
+            label: "for a twenty-year B2B company that had only ever sold through a sales team",
+            span: 2,
+            custom: (
+              <ul className="grid gap-1.5 sm:grid-cols-3">
+                {firsts.map((f) => (
+                  <li key={f.v} className="bubble-sm flex items-baseline gap-2 border border-rule bg-bg px-3 py-2">
+                    <span className="label text-accent">{f.k}</span>
+                    <span className="text-[13.5px] font-semibold leading-tight text-ink">{f.v}</span>
+                  </li>
+                ))}
+              </ul>
+            ),
+          },
         ]}
         takeawaysLabel="What changed how I work"
         takeaways={[
-          "Prototype the argument. When I disagree with the team's direction, I build the proof of concept and bring back the reaction instead of a deck.",
-          "Challenge the defaults. RCS Studio broke with how mobile marketing had always been sold and with how Vibes had always built, and each break moved what RCS could do.",
+          "Prototype the argument. When the team disagrees, I build a proof of concept that combines the ideas on the table, or build them separately when they can't be reconciled, then a second one that captures the compromise we reach. The direction I was leaning is usually the easiest to execute and most of what survives.",
+          "Question the defaults. Mobile marketing has its standards and Vibes has its habits, and RCS Studio had to step outside both to find out what RCS could really do.",
           "Prototype in the codebase. I open a merge request with the UI, and the engineers point their Claude Code session at it for the interface while they build the API hookups and logic behind it.",
         ]}
       />
@@ -140,16 +169,23 @@ export default function Page() {
           title="The bet"
           layout="stack"
           visual={
-            <Artifact label="A lot of firsts for a twenty-year B2B company">
-              <ul className="grid gap-2 sm:grid-cols-3">
-                {firsts.map((f) => (
-                  <li key={f.v} className="bubble-sm flex items-baseline gap-3 border border-rule bg-bg px-4 py-3">
-                    <span className="label text-accent">{f.k}</span>
-                    <span className="text-[15px] font-semibold text-ink">{f.v}</span>
-                  </li>
+            <Artifact label="The thesis, as pitched">
+              <ol className="grid gap-3 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:items-center">
+                {thesis.map((t, i) => (
+                  <Fragment key={t.k}>
+                    {i > 0 && (
+                      <li aria-hidden="true" className="hidden justify-center text-muted sm:flex">
+                        <ArrowRight size={16} />
+                      </li>
+                    )}
+                    <li className="bubble-sm border border-rule bg-bg px-4 py-3">
+                      <div className="label mb-1 text-accent">{t.k}</div>
+                      <p className="text-[14.5px] font-semibold leading-snug text-ink">{t.v}</p>
+                    </li>
+                  </Fragment>
                 ))}
-              </ul>
-              <p className="mt-3 text-[12.5px] text-muted">Everything before this had been sold through a sales team.</p>
+              </ol>
+              <p className="mt-3 text-[12.5px] text-muted">So a hackathon project became a product.</p>
             </Artifact>
           }
           deeper={

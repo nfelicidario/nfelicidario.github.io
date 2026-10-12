@@ -29,16 +29,18 @@ import { Stats, type Stat } from "./CaseLayout";
 /* ------------------------------------------------------------ 60 seconds */
 
 export type Term = { icon: ReactNode; title: string; text: ReactNode };
+/** a bullet, optionally with sub-bullets */
+export type Point = ReactNode | { text: ReactNode; sub: ReactNode[] };
 
 export type SixtySecondsProps = {
   /** one line on what the product is, set large */
   lede?: ReactNode;
   /** the two or three terms a reader needs, as tiles */
   terms?: Term[];
-  problem: ReactNode[];
-  work: ReactNode[];
+  problem: Point[];
+  work: Point[];
   workLabel?: string;
-  result: ReactNode[];
+  result: Point[];
   stats?: Stat[];
   takeaways?: ReactNode[];
   takeawaysLabel?: string;
@@ -106,9 +108,21 @@ export function SixtySeconds({
                 </span>
               </div>
               <ul className="mt-3 grid gap-1.5 pl-4 text-[14px] leading-snug text-body marker:text-rule" style={{ listStyle: "disc" }}>
-                {c.items.map((it, j) => (
-                  <li key={j}>{it}</li>
-                ))}
+                {c.items.map((it, j) => {
+                  const pt = it && typeof it === "object" && "sub" in (it as object) ? (it as { text: ReactNode; sub: ReactNode[] }) : null;
+                  return (
+                    <li key={j}>
+                      {pt ? pt.text : (it as ReactNode)}
+                      {pt && (
+                        <ul className="mt-1 grid gap-1 pl-4 text-[13.5px] text-muted marker:text-rule" style={{ listStyle: "circle" }}>
+                          {pt.sub.map((sb, k) => (
+                            <li key={k}>{sb}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </li>
           ))}
