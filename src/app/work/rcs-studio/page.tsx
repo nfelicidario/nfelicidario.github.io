@@ -83,35 +83,36 @@ export default function Page() {
           {
             icon: <BadgeCheck size={15} />,
             title: "Provisioning",
-            text: "Getting a business a verified RCS agent, registered and approved by third-party partners.",
+            text: "Getting a business sender, such as an RCS agent, registered, verified, and approved by the appropriate third parties.",
           },
           {
             icon: <Blocks size={15} />,
             title: "Flow building",
-            text: "App-like experiences built from rich RCS features and live business data, delivered inside the messaging app people already use.",
+            text: "App-like experiences built from RCS features and data connections, delivered inside a user's native messaging app.",
           },
         ]}
         problem={[
           "Launched as a flow builder for developers",
           { text: "Buyers asked:", sub: ["What is RCS?", "Why is it better than SMS?", "How do we get started?"] },
-          "Provisioning, which answers those questions, was missing",
+          "Provisioning was missing",
         ]}
         work={[
           "Owned requirements, roadmap, and design",
           "Repositioned the product around provisioning, with the flow builder as step two",
-          "Prototyped the new flow to win over the skeptics",
+          "Prototyped the new provisioning experience to win over the skeptics",
           "Contributed to the provisioning flows in production code",
         ]}
         result={[
-          { text: "Now how every Vibes customer gets an RCS agent", sub: ["500-plus provisioned", "Weeks instead of months"] },
-          "The company's first proof that customers will sign up and get started on their own",
+          "Vibes' first proof that customers want to sign up and get started on their own",
           "Provisioning now extends to TFN, with 10DLC and Short Code next",
           "The design direction now leads the company's next-generation products",
         ]}
         stats={[
           { value: "500+", label: "RCS agents provisioned through RCS Studio" },
           { value: "1–3 wks", label: "to provision, compared to several months for competitors" },
-          { value: "1st", label: "public sign-up and self-serve product at Vibes, ever" },
+          { value: "1st", label: "public sign-up at Vibes" },
+          { value: "1st", label: "self-serve product at Vibes" },
+          { value: "1st", label: "new Vibes product in roughly a decade" },
         ]}
         takeawaysLabel="What changed how I work"
         takeaways={[
@@ -121,7 +122,7 @@ export default function Page() {
           },
           {
             lead: "Push the boundaries.",
-            text: "Mobile marketing has its standards and Vibes has its habits. RCS Studio pushed past both: the company's first public sign-up, first self-serve product, and first new product in a decade.",
+            text: "Mobile marketing has its standards and Vibes has its habits. RCS Studio pushed past both and unlocked a lot of new findings.",
           },
           {
             lead: "Prototype in the codebase.",

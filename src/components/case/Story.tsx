@@ -93,19 +93,13 @@ export function SixtySeconds({
         )}
 
         <ol className={`grid gap-3 md:grid-cols-3 ${lede || terms ? "mt-5 border-t border-rule pt-5" : "mt-5"}`}>
-          {cells.map((c, i) => (
+          {cells.map((c) => (
             <li key={c.k} className="bubble-sm border border-rule bg-bg px-4 py-4">
               <div className="flex items-center gap-2.5">
-                <span className="relative grid h-8 w-8 place-items-center rounded-full bg-accent-soft text-accent" aria-hidden="true">
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-soft text-accent" aria-hidden="true">
                   {c.icon}
-                  <span className="num absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-bold leading-none text-bg">
-                    {i + 1}
-                  </span>
                 </span>
-                <span className="label text-ink">
-                  <span className="sr-only">{i + 1}. </span>
-                  {c.k}
-                </span>
+                <span className="label text-ink">{c.k}</span>
               </div>
               <ul className="mt-3 grid gap-1.5 pl-4 text-[14px] leading-snug text-body marker:text-rule" style={{ listStyle: "disc" }}>
                 {c.items.map((it, j) => {
