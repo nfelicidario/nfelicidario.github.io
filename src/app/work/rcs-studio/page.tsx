@@ -1,49 +1,19 @@
 import type { Metadata } from "next";
-import { Fragment } from "react";
 import { Artifact, CaseHero, Hindsight, NextCase, Outcome } from "@/components/case/CaseLayout";
 import { Beats, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
-import { ArrowRight, BadgeCheck, Blocks } from "lucide-react";
+import { BadgeCheck, Blocks } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
 import { LookShift } from "@/components/work/rcs-studio/LookShift";
+import { Proof } from "@/components/work/rcs-studio/Proof";
+import { PrototypeToReframe } from "@/components/work/rcs-studio/PrototypeToReframe";
+import { TheBet } from "@/components/work/rcs-studio/TheBet";
+import { WhoWasAsking } from "@/components/work/rcs-studio/WhoWasAsking";
 import { RcsStudioStage } from "@/components/work/rcs-studio/hero/RcsStudioStage";
 import { Simplify } from "@/components/work/rcs-studio/Simplify";
-import { ThesisVsReality } from "@/components/work/rcs-studio/ThesisVsReality";
 import { ThreeUsers } from "@/components/work/rcs-studio/ThreeUsers";
 import { VibesLogo } from "@/components/VibesLogo";
 
 export const metadata: Metadata = { title: "RCS Studio" };
-
-const thesis = [
-  { k: "The shift", v: "The industry moves to RCS on its own." },
-  { k: "The agents", v: "Every brand will soon have an RCS agent." },
-  { k: "The need", v: "All of them will need a builder for the rich features." },
-];
-
-const firsts = [
-  { k: "First", v: "public sign-up" },
-  { k: "First", v: "self-serve product" },
-  { k: "First", v: "new product in roughly a decade" },
-];
-
-const shipped = [
-  {
-    label: "Aug 2025 to Feb 2026",
-    items: [
-      "A Figma design doc for nearly every change, broken into epics and stories",
-      "A roadmap the product organization still uses for executive reviews",
-      "The beta landing page end to end: design, copy, legal pages, lead capture for sales",
-    ],
-  },
-  {
-    label: "Mar 2026 onward",
-    accent: true,
-    items: [
-      "Production TypeScript alongside the engineers",
-      "Sign-up and sign-in",
-      "Customer-facing provisioning flows and most of the internal admin",
-    ],
-  },
-];
 
 const TIMELINE = [
   { at: "Aug 2025", what: "Joined" },
@@ -104,62 +74,38 @@ export default function Page() {
           {
             icon: <BadgeCheck size={15} />,
             title: "Provisioning",
-            text: "How a business gets a verified RCS agent. The brand and agent are registered and approved by third-party partners, so messages arrive from a verified, branded sender instead of a bare phone number.",
+            text: "Getting a business a verified RCS agent, registered and approved by third-party partners.",
           },
           {
             icon: <Blocks size={15} />,
             title: "Building",
-            text: "App-like experiences inside the messaging inbox people already use, built from rich, interactive features and connected to live business data through API integrations.",
+            text: "App-like experiences inside the inbox people already use, connected to live business data.",
           },
         ]}
         problem={[
-          "RCS Studio launched as a flow builder for developers.",
-          { text: "Customers arrived asking:", sub: ["What is RCS?", "How do I get started?", "How do I get an agent live?"] },
-          {
-            text: "Getting an agent live meant provisioning, and the product had no path for it yet:",
-            sub: ["Registering a brand and an agent", "Verification and approval by third-party partners", "Weeks of email, handled by hand"],
-          },
+          "Launched as a flow builder for developers.",
+          { text: "Decision makers asked:", sub: ["What is RCS?", "Why is it better than SMS?", "How do we get started?"] },
+          "Provisioning, the step that answers that, was missing.",
         ]}
         work={[
-          "Owned requirements, roadmap, and design as product designer and acting product manager.",
-          {
-            text: "Repositioned the product around provisioning right before beta:",
-            sub: ["Provisioning became the first step", "The builder became the second"],
-          },
-          "Built a prototype of the new flow and brought it to the operations team, which won over the skeptics.",
-          "Contributed to the provisioning flows in production code.",
+          "Owned requirements, roadmap, and design as designer and acting product manager.",
+          "Repositioned the product around provisioning right before beta, with the builder as step two.",
+          "Prototyped the new flow to win over the skeptics, then contributed to it in production code.",
         ]}
         result={[
-          {
-            text: "RCS Studio is now how every Vibes customer gets an RCS agent:",
-            sub: ["500-plus provisioned", "Weeks instead of months"],
-          },
+          "Now how every Vibes customer gets an RCS agent: 500-plus, in weeks instead of months.",
           "The company's first proof that customers will sign up and get started on their own.",
         ]}
         stats={[
           { value: "500+", label: "RCS agents provisioned through RCS Studio" },
           { value: "1–3 wks", label: "to provision, compared to several months for competitors" },
-          {
-            value: "3 firsts",
-            label: "for a twenty-year B2B company that had only ever sold through a sales team",
-            span: 2,
-            custom: (
-              <ul className="grid gap-1.5 sm:grid-cols-3">
-                {firsts.map((f) => (
-                  <li key={f.v} className="bubble-sm flex items-baseline gap-2 border border-rule bg-bg px-3 py-2">
-                    <span className="label text-accent">{f.k}</span>
-                    <span className="text-[13.5px] font-semibold leading-tight text-ink">{f.v}</span>
-                  </li>
-                ))}
-              </ul>
-            ),
-          },
+          { value: "3 firsts", label: "Public sign-up, self-serve product, and new product in roughly a decade" },
         ]}
         takeawaysLabel="What changed how I work"
         takeaways={[
-          "Prototype the argument. When the team disagrees, I build a proof of concept that combines the ideas on the table, or build them separately when they can't be reconciled, then a second one that captures the compromise we reach. The direction I was leaning is usually the easiest to execute and most of what survives.",
-          "Question the defaults. Mobile marketing has its standards and Vibes has its habits, and RCS Studio had to step outside both to find out what RCS could really do.",
-          "Prototype in the codebase. I open a merge request with the UI, and the engineers point their Claude Code session at it for the interface while they build the API hookups and logic behind it.",
+          "Prototype the argument. I build a proof of concept that combines the ideas on the table, then one that captures the compromise. What I was leaning toward usually survives.",
+          "Question the defaults. Mobile marketing has its standards and Vibes has its habits. RCS Studio had to step outside both.",
+          "Prototype in the codebase. I open the merge request with the UI, and the engineers build the logic behind it.",
         ]}
       />
 
@@ -168,24 +114,10 @@ export default function Page() {
           id="the-bet"
           title="The bet"
           layout="stack"
+          visualFirst
           visual={
-            <Artifact label="The thesis, as pitched">
-              <ol className="grid gap-3 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:items-center">
-                {thesis.map((t, i) => (
-                  <Fragment key={t.k}>
-                    {i > 0 && (
-                      <li aria-hidden="true" className="hidden justify-center text-muted sm:flex">
-                        <ArrowRight size={16} />
-                      </li>
-                    )}
-                    <li className="bubble-sm border border-rule bg-bg px-4 py-3">
-                      <div className="label mb-1 text-accent">{t.k}</div>
-                      <p className="text-[14.5px] font-semibold leading-snug text-ink">{t.v}</p>
-                    </li>
-                  </Fragment>
-                ))}
-              </ol>
-              <p className="mt-3 text-[12.5px] text-muted">So a hackathon project became a product.</p>
+            <Artifact label="The founding bet" pill="Three assumptions">
+              <TheBet />
             </Artifact>
           }
           deeper={
@@ -200,40 +132,41 @@ export default function Page() {
           }
         >
           <p>
-            A hackathon project became RCS Studio: a self-serve platform where any developer could sign up and build RCS message flows. For a company that had sold through a sales team for twenty years, that was a lot of firsts. I took over daily ownership in August 2025.
+            Vibes had sold B2B through a sales team for twenty years. The bet was that brands would move to RCS on their own and every new agent would need a builder for its rich features. So a hackathon project became RCS Studio, the company&apos;s first self-serve product. I joined in August 2025 as its product designer and acting product manager.
           </p>
         </StoryBeat>
 
         <StoryBeat
           id="the-question"
-          title="The question everyone asked"
+          title="Decision makers asked a different question"
+          layout="split"
           visual={
-            <Artifact label="Thesis vs. reality" pill="Abstracted">
-              <ThesisVsReality />
+            <Artifact label="Who was asking, and what for" pill="Abstracted">
+              <WhoWasAsking />
             </Artifact>
           }
           deeper={
             <>
               <p>
-                There was no single moment. The signal accumulated: early customer interviews, a lot of sales calls, usage data from early customers and self-serve users, and the competitive analysis I ran once the pattern was clear. Every conversation began with &ldquo;What is RCS?&rdquo; and &ldquo;How do I get started?&rdquo; Nobody arrived wanting to build a flow.
+                There was no single moment. The signal built up across early customer interviews, a lot of sales calls, usage data from early customers and self-serve users, and the competitive analysis I ran once the pattern was clear. A few technical builders did arrive wanting to build flows. They were rarely the people choosing whether their company adopted RCS.
               </p>
               <p>
-                Getting started meant provisioning: a brand and agent registered, verified, and approved by each carrier, over weeks of email. RCS was so new that the plumbing had to come first. We had built the second step of the product and skipped the first.
+                The people choosing wanted to understand RCS first: what it was, what it could do that SMS couldn&apos;t, and how to get started. Getting started meant provisioning, a brand and agent registered and approved by third-party partners over weeks of email. RCS was so new that the plumbing had to come first. We had built the second step of the product and skipped the first.
               </p>
             </>
           }
         >
           <p>
-            Every customer conversation opened with &ldquo;What is RCS?&rdquo; and &ldquo;How do I get started?&rdquo; Nobody arrived wanting to build a flow. Getting started meant provisioning, weeks of carrier email that nobody had productized. We had built the second step and skipped the first.
+            A few people did want to build flows, but they weren&apos;t the ones deciding. The people who signed off asked &ldquo;What is RCS?&rdquo;, &ldquo;Why is it better than SMS?&rdquo;, and &ldquo;How do we get started?&rdquo; Getting started meant provisioning: weeks of email with third-party partners, handled by hand. We had built the second step and skipped the first.
           </p>
         </StoryBeat>
 
         <StoryBeat
           id="two-customers"
-          title="Two customers, not one developer"
-          layout="wide"
+          title="Two customers, and the team behind them"
+          layout="split-reverse"
           visual={
-            <Artifact label="Who actually showed up" pill="Personas">
+            <Artifact label="Who the product is for now" pill="Personas">
               <ThreeUsers />
             </Artifact>
           }
@@ -250,51 +183,40 @@ export default function Page() {
           }
         >
           <p>
-            With provisioning as the first step, the product had two customers: marketing operations people who needed an agent for a campaign and had never written code, and the technical builders we had designed for. Behind both was our own operations team, doing the work by hand. Their tooling is{" "}
+            With provisioning first, the product had two customers. Marketing operations people needed an agent for a campaign and had never written code. Technical builders wanted the flow builder once an agent existed. Right before beta, I split the product around them. Behind both sat our operations team, doing the work by hand. Their tooling is{" "}
             <StoryLink href="/work/provisioning/">the next case study</StoryLink>.
           </p>
         </StoryBeat>
 
         <StoryBeat
           id="making-the-case"
-          title="Making the case"
-          layout="split-reverse"
+          title="A prototype instead of a debate"
+          layout="stack"
           visual={
-            <Artifact label="The reframe that aligned the team">
-              <div className="grid gap-3">
-                <div className="bubble-sm border border-dashed border-rule bg-bg p-4">
-                  <div className="label mb-1.5">A flow builder</div>
-                  <p className="text-[14px] text-muted">Competes with one feature of the incumbents.</p>
-                  <div className="mt-3 h-2 w-1/5 rounded-full bg-raised" />
-                </div>
-                <div className="bubble-sm border border-accent bg-accent-soft/40 p-4">
-                  <div className="label mb-1.5 text-accent">A provisioning platform</div>
-                  <p className="text-[14px] text-ink">Competes with the incumbents.</p>
-                  <div className="mt-3 h-2 w-full rounded-full bg-accent" />
-                </div>
-              </div>
+            <Artifact label="From prototype to reframe" pill="Abstract shapes">
+              <PrototypeToReframe />
             </Artifact>
           }
           deeper={
             <>
               <p>
-                The engineering manager pushed back, and leadership&apos;s vision was still to push the boundaries of RCS. A provisioning platform looked like a detour into operations tooling.
+                Not everyone agreed that provisioning should come first. The product had launched as a flow builder, and a provisioning platform was a different product with a different first screen.
               </p>
               <p>
-                I didn&apos;t argue it. I built a proof of concept of the provisioning flow, put it in front of our operations team, and brought their reaction back. That reaction is what moved the engineering manager. He was clear-eyed that a company our size would not out-build the big messaging incumbents, but we could be the fastest at the part everyone struggles with, because we understood it best. A flow builder competes with one feature of the incumbents. A provisioning platform competes on the thing customers actually get stuck on.
+                I didn&apos;t argue it. I built a prototype of the new flow and brought it to the operations team, the people doing provisioning by hand, and their reaction won over the skeptics. The reframe that stuck was this: a flow builder competes with one feature of the incumbents, and a provisioning platform competes with the incumbents.
               </p>
             </>
           }
         >
           <p>
-            The engineering manager pushed back. A provisioning platform looked like a detour into operations tooling. I didn&apos;t argue it. I built a proof of concept, put it in front of our operations team, and brought their reaction back. A flow builder competes with one feature of the incumbents. Provisioning competes on what customers actually get stuck on.
+            Not everyone agreed that provisioning should lead. Instead of arguing, I built a prototype of the provisioning flow and put it in front of our operations team. Their reaction won over the skeptics. The reframe was simple. A flow builder competes with one feature of the incumbents. A provisioning platform competes with the incumbents.
           </p>
         </StoryBeat>
 
         <StoryBeat
           id="the-builder"
-          title="The builder, demoted and simplified"
-          layout="stack"
+          title="Three steps to a working flow"
+          layout="wide"
           visual={
             <Artifact label="The builder, before and after" pill="Abstract shapes">
               <Simplify />
@@ -303,83 +225,66 @@ export default function Page() {
           deeper={
             <>
               <p>
-                The builder stayed, but as the second step, and a second step can&apos;t be the hardest part of the product. Internal interviews showed consistent confusion with the original state builder. Most beta users didn&apos;t use it correctly or at all, drop-off clustered inside it, and intake questions were mostly &ldquo;how does this work.&rdquo;
+                The builder stayed, but as the second step. Most beta users didn&apos;t use the original state builder correctly or at all, and someone who had just gotten an agent through provisioning shouldn&apos;t hit the hardest part of the product next.
               </p>
               <p>
-                I cut most of the optionality from the default path and moved advanced capability behind progressive disclosure, so three steps got people to a working flow. Today the builder is mostly a demo engine, with a handful of power users, and making it easier is still open work.
+                I cut optionality from the default path and moved advanced capability behind progressive disclosure, so three steps got people to a working flow. Today the builder is mostly a demo engine, with a handful of power users.
               </p>
             </>
           }
         >
           <p>
-            A second step can&apos;t be the hardest part of the product, and most beta users didn&apos;t use the state builder correctly or at all. I cut the optionality from the default path and moved advanced capability behind progressive disclosure, so three steps got people to a working flow.
+            The builder stayed as the second step, and a second step can&apos;t be the hardest part of the product. Most beta users didn&apos;t use the original state builder correctly or at all. I cut optionality from the default path and moved advanced capability behind progressive disclosure, so three steps got people to a working flow.
           </p>
         </StoryBeat>
 
         <StoryBeat
           id="a-new-look"
-          title="A look for different users"
+          title="Color saved for the next step"
           layout="split-reverse"
           visual={
-            <Artifact label="Type, spacing, color" pill="Abstract tiles">
+            <Artifact label="Same step, two systems" pill="Abstract tiles">
               <LookShift />
             </Artifact>
           }
           deeper={
             <>
               <p>
-                The inherited design system was built for a marketing product: large type, generous spacing, and a primary color plus several secondary colors used freely. A multi-step form for someone who has never heard of carrier approval needed a smaller scale, tighter spacing, and color reserved for the next step. The impetus was user feedback, internal and external; the liberties I took to answer it went past the existing system.
+                The inherited design system was built for a marketing product: large type, generous spacing, and a primary color plus several secondary colors used freely. RCS Studio walks people through provisioning one step at a time, so I went to a smaller scale and tighter spacing, and reserved color for the next step.
               </p>
               <p>
-                The drift got noticed, and the concern about two products diverging was fair. I reviewed each change with the head of design and fed what landed back into the shared system. Customers and sales described the result as elegant and modern, and that direction is what the company&apos;s next-generation products are now being designed on.
+                The drift got noticed. I reviewed each change with the head of design and fed what landed back into the shared system. Customers and sales called the result elegant and modern, and it is now the direction for the company&apos;s next-generation products.
               </p>
             </>
           }
         >
           <p>
-            The inherited design system was built for a marketing product: large type, loose spacing, color used freely. A multi-step form for someone who has never heard of carrier approval needed a smaller scale and color reserved for the next step. The drift got noticed. What landed went back into the shared system, and it now leads the company&apos;s next-generation products.
+            The inherited design system was built for a marketing product: large type, generous spacing, and color used freely. I went smaller and tighter, and reserved color for the next step. The drift got noticed, so I reviewed each change with the head of design and fed it back. It is now the direction for the company&apos;s next-generation products.
           </p>
         </StoryBeat>
 
         <StoryBeat
           id="what-it-proved"
           title="What it proved"
-          layout="wide"
+          layout="stack"
           visual={
-            <Artifact label="How the work changed shape">
-              <div className="grid gap-3 sm:grid-cols-2">
-                {shipped.map((s) => (
-                  <div
-                    key={s.label}
-                    className={`bubble-sm border p-4 ${s.accent ? "border-accent bg-accent-soft/40" : "border-rule bg-bg"}`}
-                  >
-                    <div className={`label mb-2 ${s.accent ? "text-accent" : ""}`}>{s.label}</div>
-                    <ul className="grid gap-1.5 text-[13px] text-body">
-                      {s.items.map((it) => (
-                        <li key={it} className="flex gap-2">
-                          <span aria-hidden="true" className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-muted" />
-                          {it}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
+            <Artifact label="What it proved">
+              <Proof />
             </Artifact>
           }
           deeper={
             <>
               <p>
-                For the first seven months I worked the way most product designers do: a Figma design doc for nearly every change, broken into epics and stories, with a roadmap the product organization still uses for executive reviews. From March 2026 I shipped production TypeScript alongside the engineers: sign-up, sign-in, and the customer-facing provisioning flows.
+                Anyone could sign up and spin up an agent in Test Mode, and launching it meant a conversation with sales. Some customers did exactly that. Others got an agent into Test Mode and never booked the call, which showed where the self-serve path still leaked.
               </p>
               <p>
-                We gated the last step on purpose. Anyone could sign up and spin up an agent in Test Mode, and launching it meant a conversation with sales. Some did exactly that. Others got an agent into Test Mode and never booked the call, which told us the self-serve path worked and where it still leaked.
+                My own work changed shape along the way. For the first seven months I worked from a Figma design doc for nearly every change, broken into epics and stories, with a roadmap the product organization still uses for executive reviews. From March 2026 I shipped production TypeScript alongside the engineers: sign-up, sign-in, and the customer-facing provisioning flows.
               </p>
             </>
           }
         >
           <p>
-            Seven months of Figma design docs and a roadmap the product organization still uses, then production TypeScript from March 2026: sign-up, sign-in, and the provisioning flows. We gated launch behind a sales conversation on purpose. Some booked the call. Others got an agent into Test Mode and never did, which showed where self-serve still leaked.
+            Anyone could sign up and get an agent into Test Mode on their own. Launching meant a conversation with sales. Some booked it. Some got to Test Mode and never did, which showed where self-serve still leaked. It is the company&apos;s first proof that customers will sign up and get started on their own.
           </p>
         </StoryBeat>
       </Beats>

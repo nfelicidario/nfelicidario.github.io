@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type React from "react";
 import type { ReactNode } from "react";
 import { ArrowLeft, ArrowRight, CalendarRange, Layers, UserRound, Users, type LucideIcon } from "lucide-react";
 import { PovBadge } from "./PovBadge";
@@ -215,8 +216,9 @@ export type Stat = {
 };
 
 export function Stats({ items }: { items: Stat[] }) {
+  const units = items.reduce((n, s) => n + (s.span ?? 1), 0);
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 md:[grid-template-columns:var(--stat-cols)]" style={{ "--stat-cols": `repeat(${units}, minmax(0, 1fr))` } as React.CSSProperties}>
       {items.map((s) => (
         <div key={s.label} className={`bubble border border-rule bg-surface p-4 ${s.span === 2 ? "col-span-2" : ""}`}>
           {s.custom ?? <div className="num font-display text-[26px] font-bold tracking-[-0.02em] text-ink">{s.value}</div>}

@@ -200,6 +200,27 @@ export function Beats({ children, label = "The story" }: { children: ReactNode; 
   const titles = useMemo(() => collectBeats(children), [children]);
   const [current, setCurrent] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLElement>(null);
+  // the side rail starts at the vertical centre of the first slide, then catches at the viewport centre
+  const [railOffset, setRailOffset] = useState<{ start: number; half: number } | null>(null);
+  useEffect(() => {
+    const root = rootRef.current;
+    const rail = railRef.current;
+    if (!root || !rail) return;
+    const first = root.querySelector<HTMLElement>("[data-beat]");
+    if (!first) return;
+    const measure = () => {
+      const rootTop = root.getBoundingClientRect().top;
+      const r = first.getBoundingClientRect();
+      const half = rail.offsetHeight / 2;
+      setRailOffset({ start: Math.max(0, r.top - rootTop + r.height / 2 - half), half });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(first);
+    ro.observe(rail);
+    return () => ro.disconnect();
+  }, [titles.length]);
   const ctx = useMemo(() => Object.fromEntries(titles.map((t, i) => [t.id, i])), [titles]);
 
   // Track the beat nearest the top of the viewport.
@@ -262,8 +283,13 @@ export function Beats({ children, label = "The story" }: { children: ReactNode; 
         {/* side rail, large screens */}
         <div className="absolute inset-y-0 left-0 hidden w-12 lg:block" aria-hidden={false}>
           <nav
+            ref={railRef}
             aria-label={`${label} progress`}
-            className="group sticky top-[28vh] flex w-12 flex-col items-center gap-3"
+            className="group sticky flex w-12 flex-col items-center gap-3"
+            style={{
+              marginTop: railOffset?.start ?? 0,
+              top: railOffset ? `calc(50vh - ${railOffset.half}px)` : "28vh",
+            }}
           >
             <span className="label num text-muted">
               {current + 1}
@@ -375,6 +401,7 @@ export function StoryBeat({
   visual,
   deeper,
   layout = "split",
+  visualFirst = false,
 }: {
   /** anchor id, e.g. "the-bet" */
   id: string;
@@ -390,10 +417,12 @@ export function StoryBeat({
    * a full-width visual. wide: visual takes two thirds, text one third.
    */
   layout?: BeatLayout;
+  /** stack only: the visual sits between the title and the body copy */
+  visualFirst?: boolean;
 }) {
   const n = (useContext(BeatsContext)[id] ?? 0) + 1;
   const num = String(n).padStart(2, "0");
-  const text = (
+  const heading = (
     <>
       <div className={`label mb-3 text-accent ${layout === "stack" ? "justify-center" : ""} flex items-center gap-2`}>
         <span className="num">{num}</span>
@@ -401,10 +430,20 @@ export function StoryBeat({
       <h2 id={`${id}-title`} className="text-[28px] font-bold text-ink md:text-[34px]">
         {title}
       </h2>
+    </>
+  );
+  const body = (
+    <>
       <div className={`mt-4 grid gap-3 text-[16.5px] leading-relaxed [&>p]:text-body ${layout === "stack" ? "mx-auto max-w-[58ch]" : "max-w-[46ch]"}`}>
         {children}
       </div>
       {deeper && <GoDeeper align={layout === "stack" ? "center" : "left"}>{deeper}</GoDeeper>}
+    </>
+  );
+  const text = (
+    <>
+      {heading}
+      {body}
     </>
   );
   const grid =
@@ -422,7 +461,13 @@ export function StoryBeat({
       className="scroll-mt-14 border-t border-rule py-16 first-of-type:border-t-0 md:min-h-[560px] md:py-24"
       aria-labelledby={`${id}-title`}
     >
-      {layout === "stack" ? (
+      {layout === "stack" && visualFirst ? (
+        <div className="grid gap-8">
+          <div className="text-center">{heading}</div>
+          <div className="min-w-0">{visual}</div>
+          <div className="text-center">{body}</div>
+        </div>
+      ) : layout === "stack" ? (
         <div className={grid}>
           <div className="text-center">{text}</div>
           <div className="min-w-0">{visual}</div>
