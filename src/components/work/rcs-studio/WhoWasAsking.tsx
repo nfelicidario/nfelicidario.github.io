@@ -50,7 +50,7 @@ export function WhoWasAsking() {
             <Briefcase size={14} aria-hidden="true" />
           </span>
           <div>
-            <div className="label text-accent">Decision makers</div>
+            <div className="label text-accent">Buyers</div>
             <div className="text-[12px] text-muted">the ones who sign off</div>
           </div>
         </div>

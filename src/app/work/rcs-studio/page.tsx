@@ -31,7 +31,16 @@ const meta = [
       </ul>
     ),
   },
-  { label: "Team", value: "Engineering manager and three engineers. No dedicated PM for most of the project." },
+  {
+    label: "Team",
+    value: (
+      <ul className="grid gap-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
+        <li>Engineering manager</li>
+        <li>Three engineers</li>
+        <li>No dedicated PM for most of the project</li>
+      </ul>
+    ),
+  },
   { label: "Timeline", value: <Span points={TIMELINE} direction="vertical" /> },
   {
     label: "Stack",
@@ -78,34 +87,46 @@ export default function Page() {
           },
           {
             icon: <Blocks size={15} />,
-            title: "Building",
-            text: "App-like experiences inside the inbox people already use, connected to live business data.",
+            title: "Flow building",
+            text: "App-like experiences built from rich RCS features and live business data, delivered inside the messaging app people already use.",
           },
         ]}
         problem={[
-          "Launched as a flow builder for developers.",
-          { text: "Decision makers asked:", sub: ["What is RCS?", "Why is it better than SMS?", "How do we get started?"] },
-          "Provisioning, the step that answers that, was missing.",
+          "Launched as a flow builder for developers",
+          { text: "Buyers asked:", sub: ["What is RCS?", "Why is it better than SMS?", "How do we get started?"] },
+          "Provisioning, which answers those questions, was missing",
         ]}
         work={[
-          "Owned requirements, roadmap, and design as designer and acting product manager.",
-          "Repositioned the product around provisioning right before beta, with the builder as step two.",
-          "Prototyped the new flow to win over the skeptics, then contributed to it in production code.",
+          "Owned requirements, roadmap, and design",
+          "Repositioned the product around provisioning, with the flow builder as step two",
+          "Prototyped the new flow to win over the skeptics",
+          "Contributed to the provisioning flows in production code",
         ]}
         result={[
-          "Now how every Vibes customer gets an RCS agent: 500-plus, in weeks instead of months.",
-          "The company's first proof that customers will sign up and get started on their own.",
+          { text: "Now how every Vibes customer gets an RCS agent", sub: ["500-plus provisioned", "Weeks instead of months"] },
+          "The company's first proof that customers will sign up and get started on their own",
+          "Provisioning now extends to TFN, with 10DLC and Short Code next",
+          "The design direction now leads the company's next-generation products",
         ]}
         stats={[
           { value: "500+", label: "RCS agents provisioned through RCS Studio" },
           { value: "1–3 wks", label: "to provision, compared to several months for competitors" },
-          { value: "3 firsts", label: "Public sign-up, self-serve product, and new product in roughly a decade" },
+          { value: "1st", label: "public sign-up and self-serve product at Vibes, ever" },
         ]}
         takeawaysLabel="What changed how I work"
         takeaways={[
-          "Prototype the argument. I build a proof of concept that combines the ideas on the table, then one that captures the compromise. What I was leaning toward usually survives.",
-          "Question the defaults. Mobile marketing has its standards and Vibes has its habits. RCS Studio had to step outside both.",
-          "Prototype in the codebase. I open the merge request with the UI, and the engineers build the logic behind it.",
+          {
+            lead: "Prototype the argument.",
+            text: "I build a proof of concept, or several, as a visual talking point, collaborate with the team on what works and what doesn't, and iterate.",
+          },
+          {
+            lead: "Push the boundaries.",
+            text: "Mobile marketing has its standards and Vibes has its habits. RCS Studio pushed past both: the company's first public sign-up, first self-serve product, and first new product in a decade.",
+          },
+          {
+            lead: "Prototype in the codebase.",
+            text: "I open a branch with the UI, and the engineers build off of it.",
+          },
         ]}
       />
 
@@ -138,7 +159,7 @@ export default function Page() {
 
         <StoryBeat
           id="the-question"
-          title="Decision makers asked a different question"
+          title="Buyers asked a different question"
           layout="split"
           visual={
             <Artifact label="Who was asking, and what for" pill="Abstracted">

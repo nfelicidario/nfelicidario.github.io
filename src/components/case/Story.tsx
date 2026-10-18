@@ -42,7 +42,7 @@ export type SixtySecondsProps = {
   workLabel?: string;
   result: Point[];
   stats?: Stat[];
-  takeaways?: ReactNode[];
+  takeaways?: (ReactNode | { lead: string; text: ReactNode })[];
   takeawaysLabel?: string;
 };
 
@@ -68,14 +68,14 @@ export function SixtySeconds({
         <h2 className="text-[20px] font-bold text-ink">The whole story in 60 seconds</h2>
 
         {(lede || terms) && (
-          <div className="mt-5 grid gap-5 md:grid-cols-[1fr_1.5fr] md:items-center md:gap-8">
+          <div className="mt-6 grid gap-5">
             {lede && (
-              <p className="max-w-[30ch] font-display text-[clamp(19px,1.9vw,23px)] font-semibold leading-[1.3] tracking-[-0.01em] text-ink">
+              <p className="mx-auto max-w-[36ch] text-center font-display text-[clamp(20px,2vw,25px)] font-semibold leading-[1.3] tracking-[-0.01em] text-ink">
                 {lede}
               </p>
             )}
             {terms && (
-              <dl className="grid gap-3 sm:grid-cols-2">
+              <dl className="mx-auto grid w-full max-w-3xl gap-3 sm:grid-cols-2">
                 {terms.map((t) => (
                   <div key={t.title} className="bubble-sm border border-rule bg-bg p-4">
                     <dt className="label flex items-center gap-2 text-ink">
@@ -133,12 +133,23 @@ export function SixtySeconds({
           <div className="mt-5 border-t border-rule pt-4">
             <div className="label mb-2">{takeawaysLabel}</div>
             <ul className="grid gap-2 text-[14.5px] text-body md:grid-cols-3 md:gap-4">
-              {takeaways.map((t, i) => (
-                <li key={i} className="flex gap-2.5">
-                  <span aria-hidden="true" className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                  <span>{t}</span>
-                </li>
-              ))}
+              {takeaways.map((t, i) => {
+                const lt = t && typeof t === "object" && "lead" in (t as object) ? (t as { lead: string; text: ReactNode }) : null;
+                return (
+                  <li key={i} className="flex gap-2.5">
+                    <span aria-hidden="true" className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                    <span>
+                      {lt ? (
+                        <>
+                          <strong className="font-semibold text-ink">{lt.lead}</strong> {lt.text}
+                        </>
+                      ) : (
+                        (t as ReactNode)
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}
@@ -279,9 +290,9 @@ export function Beats({ children, label = "The story" }: { children: ReactNode; 
 
   return (
     <BeatsContext.Provider value={ctx}>
-      <div ref={rootRef} className="relative mx-auto max-w-6xl lg:pl-20">
-        {/* side rail, large screens */}
-        <div className="absolute inset-y-0 left-0 hidden w-12 lg:block" aria-hidden={false}>
+      <div ref={rootRef} className="relative mx-auto max-w-6xl">
+        {/* side rail in the left gutter, only when the gutter has room for it */}
+        <div className="absolute inset-y-0 hidden w-12 xl:block" style={{ left: -72 }} aria-hidden={false}>
           <nav
             ref={railRef}
             aria-label={`${label} progress`}
@@ -337,7 +348,7 @@ export function Beats({ children, label = "The story" }: { children: ReactNode; 
         {/* compact top rail, small screens */}
         <nav
           aria-label={`${label} progress`}
-          className="sticky top-0 z-20 -mx-1 border-b border-rule bg-bg/85 px-1 py-2.5 backdrop-blur lg:hidden"
+          className="sticky top-0 z-20 -mx-1 border-b border-rule bg-bg/85 px-1 py-2.5 backdrop-blur xl:hidden"
         >
           <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
             <span className="label num text-muted">

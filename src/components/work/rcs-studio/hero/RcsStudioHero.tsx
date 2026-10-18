@@ -1554,7 +1554,8 @@ function Phone({ s, timed, still, dispatch }: { s: State; timed: boolean; still:
 
   const headerName = name || PREFILL.fallbackName;
   /** the demo agent wears the demo banner, a preview wears the preview note, the live agent nothing */
-  const banner = mode === "yours" ? <DemoBanner /> : mode === "preview" ? <DemoBanner text={PHONE_COPY.previewBanner} /> : undefined;
+  const banner =
+    mode === "yours" ? <DemoBanner /> : mode === "preview" && step !== "agent" ? <DemoBanner text={PHONE_COPY.previewBanner} /> : undefined;
   /** the intro's one-liner: the agent description once it exists, else the prefill it will get */
   const intro = (s.values.description || PREFILL.description(headerName)).slice(0, MAX.description);
   const logo = (size: string) => <LogoMark logo={s.logo} color={color} name={name} className={`h-full w-full ${size}`} />;
