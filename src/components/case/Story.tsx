@@ -417,8 +417,8 @@ function collectBeats(children: ReactNode): BeatInfo[] {
   const out: BeatInfo[] = [];
   Children.forEach(children, (c) => {
     if (c && typeof c === "object" && "props" in c) {
-      const p = (c as { props: { id?: string; title?: string } }).props;
-      if (p?.id && p?.title) out.push({ id: p.id, title: p.title });
+      const p = (c as { props: { id?: string; title?: string; subtitle?: string } }).props;
+      if (p?.id && p?.title) out.push({ id: p.id, title: p.subtitle ?? p.title });
     }
   });
   return out;
@@ -437,6 +437,8 @@ export function StoryBeat({
   layout = "split",
   visualFirst = false,
   after,
+  subtitle,
+  align = "center",
 }: {
   /** anchor id, e.g. "the-bet" */
   id: string;
@@ -456,25 +458,38 @@ export function StoryBeat({
   visualFirst?: boolean;
   /** full-width content under everything else, e.g. a timeline */
   after?: ReactNode;
+  /** a quieter second part of the heading, e.g. "The bets" after "Vibes goes all in on RCS"; also the rail's name for the slide */
+  subtitle?: string;
+  /** stack only: where the heading and body sit; split layouts are always left */
+  align?: "left" | "center";
 }) {
   const n = (useContext(BeatsContext)[id] ?? 0) + 1;
   const num = String(n).padStart(2, "0");
+  const centered = layout === "stack" && align === "center";
   const heading = (
     <>
-      <div className={`label mb-3 text-accent ${layout === "stack" ? "justify-center" : ""} flex items-center gap-2`}>
+      <div className={`label mb-3 text-accent ${centered ? "justify-center" : ""} flex items-center gap-2`}>
         <span className="num">{num}</span>
       </div>
       <h2 id={`${id}-title`} className="text-[28px] font-bold text-ink md:text-[34px]">
         {title}
+        {subtitle && (
+          <>
+            <span aria-hidden="true" className="mx-3 font-normal text-rule">
+              ·
+            </span>
+            <span className="font-medium text-muted">{subtitle}</span>
+          </>
+        )}
       </h2>
     </>
   );
   const body = (
     <>
-      <div className={`mt-4 grid gap-3 text-[16.5px] leading-relaxed [&>p]:text-body ${layout === "stack" ? "mx-auto max-w-[58ch]" : "max-w-[46ch]"}`}>
+      <div className={`mt-4 grid gap-3 text-[16.5px] leading-relaxed [&>p]:text-body ${centered ? "mx-auto max-w-[58ch]" : layout === "stack" ? "max-w-[64ch]" : "max-w-[46ch]"}`}>
         {children}
       </div>
-      {deeper && <GoDeeper align={layout === "stack" ? "center" : "left"}>{deeper}</GoDeeper>}
+      {deeper && <GoDeeper align={centered ? "center" : "left"}>{deeper}</GoDeeper>}
     </>
   );
   const text = (
@@ -500,13 +515,13 @@ export function StoryBeat({
     >
       {layout === "stack" && visualFirst ? (
         <div className="grid gap-8">
-          <div className="text-center">{heading}</div>
+          <div className={centered ? "text-center" : ""}>{heading}</div>
           <div className="min-w-0">{visual}</div>
-          <div className="text-center">{body}</div>
+          <div className={centered ? "text-center" : ""}>{body}</div>
         </div>
       ) : layout === "stack" ? (
         <div className={grid}>
-          <div className="text-center">{text}</div>
+          <div className={centered ? "text-center" : ""}>{text}</div>
           <div className="min-w-0">{visual}</div>
         </div>
       ) : (

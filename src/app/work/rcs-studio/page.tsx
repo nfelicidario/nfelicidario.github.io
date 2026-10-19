@@ -134,19 +134,13 @@ export default function Page() {
       <Beats>
         <StoryBeat
           id="the-bets"
-          title="The bets"
+          title="Vibes goes all in on RCS"
+          subtitle="The bets"
           layout="stack"
+          align="left"
           visualFirst
-          visual={
-            <Artifact>
-              <TheBet />
-            </Artifact>
-          }
-          after={
-            <div className="mx-auto max-w-4xl border-t border-rule pt-8">
-              <BetsTimeline />
-            </div>
-          }
+          visual={<TheBet />}
+          after={<BetsTimeline />}
         >
           <Bullets
             items={[
