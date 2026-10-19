@@ -196,6 +196,17 @@ export function Span({ points, direction = "horizontal" }: { points: { at: strin
   );
 }
 
+/** three to five bullets, the body of a beat */
+export function Bullets({ items }: { items: ReactNode[] }) {
+  return (
+    <ul className="grid gap-2 pl-5 text-left text-body marker:text-rule" style={{ listStyle: "disc" }}>
+      {items.map((it, i) => (
+        <li key={i}>{it}</li>
+      ))}
+    </ul>
+  );
+}
+
 /* ----------------------------------------------------------------- beats */
 
 type BeatInfo = { id: string; title: string };
@@ -407,6 +418,7 @@ export function StoryBeat({
   deeper,
   layout = "split",
   visualFirst = false,
+  after,
 }: {
   /** anchor id, e.g. "the-bet" */
   id: string;
@@ -424,6 +436,8 @@ export function StoryBeat({
   layout?: BeatLayout;
   /** stack only: the visual sits between the title and the body copy */
   visualFirst?: boolean;
+  /** full-width content under everything else, e.g. a timeline */
+  after?: ReactNode;
 }) {
   const n = (useContext(BeatsContext)[id] ?? 0) + 1;
   const num = String(n).padStart(2, "0");
@@ -483,6 +497,7 @@ export function StoryBeat({
           <div className={`min-w-0 md:sticky md:top-16 ${visualOrder}`}>{visual}</div>
         </div>
       )}
+      {after && <div className="mt-12">{after}</div>}
     </section>
   );
 }

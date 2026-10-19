@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { ArrowRightLeft, Blocks, CodeXml, Store } from "lucide-react";
 
-/* Slide 1: the four bets the company made, then the timeline that led to the project. */
+/* Slide 1: the four bets the company made (TheBet), and the timeline that led to the project (BetsTimeline). */
 
 const bets: { icon: ReactNode; text: string }[] = [
   { icon: <ArrowRightLeft size={16} />, text: "RCS will replace SMS" },
@@ -13,9 +13,9 @@ const bets: { icon: ReactNode; text: string }[] = [
 type Moment = { at: string; what: string; next?: boolean };
 
 const moments: Moment[] = [
-  { at: "Sep 2024", what: "Apple enables RCS in iOS 18" },
-  { at: "2025", what: "Vibes bets on RCS" },
-  { at: "2025", what: "A hackathon creates the project" },
+  { at: "Oct 2024", what: "Apple enables RCS for business messaging" },
+  { at: "Nov 2024", what: "Vibes bets on RCS" },
+  { at: "Jan 2025", what: "A hackathon creates the project" },
   { at: "Aug 2025", what: "I join" },
   { at: "Next", what: "Build the flow builder", next: true },
 ];
@@ -29,7 +29,7 @@ function Dot({ next }: { next?: boolean }) {
   );
 }
 
-function Timeline() {
+export function BetsTimeline() {
   const n = moments.length;
   const step = 100 / n;
   const center = (i: number) => `${step * i + step / 2}%`;
@@ -102,9 +102,6 @@ export function TheBet() {
           </li>
         ))}
       </ol>
-      <div className="mt-5 border-t border-rule pt-5">
-        <Timeline />
-      </div>
     </div>
   );
 }
