@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Artifact, CaseHero, Hindsight, NextCase, Outcome } from "@/components/case/CaseLayout";
 import { Beats, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
-import { BadgeCheck, Blocks } from "lucide-react";
+import { BadgeCheck, Network } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
 import { LookShift } from "@/components/work/rcs-studio/LookShift";
 import { Proof } from "@/components/work/rcs-studio/Proof";
@@ -83,10 +83,10 @@ export default function Page() {
           {
             icon: <BadgeCheck size={15} />,
             title: "Provisioning",
-            text: "Getting a business sender, such as an RCS agent, registered, verified, and approved by the appropriate third parties.",
+            text: "Getting a business sender (ex: RCS agent) registered, verified, and approved by the appropriate third parties.",
           },
           {
-            icon: <Blocks size={15} />,
+            icon: <Network size={15} />,
             title: "Flow building",
             text: "App-like experiences built from RCS features and data connections, delivered inside a user's native messaging app.",
           },
@@ -108,11 +108,11 @@ export default function Page() {
           "The design direction now leads the company's next-generation products",
         ]}
         stats={[
-          { value: "500+", label: "RCS agents provisioned through RCS Studio" },
-          { value: "1–3 wks", label: "to provision, compared to several months for competitors" },
           { value: "1st", label: "public sign-up at Vibes" },
           { value: "1st", label: "self-serve product at Vibes" },
           { value: "1st", label: "new Vibes product in roughly a decade" },
+          { value: "500+", label: "RCS agents provisioned through RCS Studio" },
+          { value: "1–3 wks", label: "to provision, compared to several months for competitors" },
         ]}
         takeawaysLabel="What changed how I work"
         takeaways={[
@@ -133,19 +133,19 @@ export default function Page() {
 
       <Beats>
         <StoryBeat
-          id="the-bet"
-          title="The bet"
+          id="the-bets"
+          title="The bets"
           layout="stack"
           visualFirst
           visual={
-            <Artifact label="The founding bet" pill="Three assumptions">
+            <Artifact>
               <TheBet />
             </Artifact>
           }
           deeper={
             <>
               <p>
-                RCS is the successor to SMS: branded senders, rich cards, carousels, suggested replies. The bet was that an industry shift to RCS was coming on its own, every brand would soon have an agent, and all of them would need a builder to use its rich features. So a hackathon project became RCS Studio, a self-serve platform where any developer could sign up and build RCS message flows.
+                RCS is the successor to SMS: branded senders, rich cards, carousels, suggested replies. Apple turned it on for iPhones in September 2024, and Vibes made four bets on what came next: RCS replaces SMS, every brand gets an agent, the industry needs a builder for the rich features, and developers lead the building, the way they do on a marketplace like Shopify&apos;s.
               </p>
               <p>
                 For a company that had sold B2B through a sales team for twenty years, this was a lot of firsts. I joined in August 2025 to take over daily ownership from the head of design, and was running it independently by my third month.
@@ -153,9 +153,11 @@ export default function Page() {
             </>
           }
         >
-          <p>
-            Vibes had sold B2B through a sales team for twenty years. The bet was that brands would move to RCS on their own and every new agent would need a builder for its rich features. So a hackathon project became RCS Studio, the company&apos;s first self-serve product. I joined in August 2025 as its product designer and acting product manager.
-          </p>
+          <ul className="grid gap-2 pl-5 text-left text-body marker:text-rule" style={{ listStyle: "disc" }}>
+            <li>Vibes believes in a future where RCS replaces SMS</li>
+            <li>A hackathon project around a flow builder laid the foundation for what is now RCS Studio</li>
+            <li>To back the bet that developers will lead, RCS Studio became Vibes&apos; first self-serve product</li>
+          </ul>
         </StoryBeat>
 
         <StoryBeat
