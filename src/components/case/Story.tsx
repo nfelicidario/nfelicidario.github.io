@@ -439,6 +439,7 @@ export function StoryBeat({
   after,
   subtitle,
   align = "center",
+  framed = false,
 }: {
   /** anchor id, e.g. "the-bet" */
   id: string;
@@ -458,35 +459,37 @@ export function StoryBeat({
   visualFirst?: boolean;
   /** full-width content under everything else, e.g. a timeline */
   after?: ReactNode;
-  /** a quieter second part of the heading, e.g. "The bets" after "Vibes goes all in on RCS"; also the rail's name for the slide */
+  /** the slide's short name, shown in the eyebrow after the number and used as the rail's name for the slide */
   subtitle?: string;
-  /** stack only: where the heading and body sit; split layouts are always left */
+  /** stack only: where the heading sits (the body stays a centred column); split layouts are always left */
   align?: "left" | "center";
+  /** draw the whole slide as an outlined card on the surface colour */
+  framed?: boolean;
 }) {
   const n = (useContext(BeatsContext)[id] ?? 0) + 1;
   const num = String(n).padStart(2, "0");
   const centered = layout === "stack" && align === "center";
   const heading = (
     <>
-      <div className={`label mb-3 text-accent ${centered ? "justify-center" : ""} flex items-center gap-2`}>
-        <span className="num">{num}</span>
+      <div className={`label mb-3 flex items-center gap-2 ${centered ? "justify-center" : ""}`}>
+        <span className="num text-accent">{num}</span>
+        {subtitle && (
+          <>
+            <span aria-hidden="true" className="text-muted">
+              ·
+            </span>
+            <span className="text-muted">{subtitle}</span>
+          </>
+        )}
       </div>
       <h2 id={`${id}-title`} className="text-[28px] font-bold text-ink md:text-[34px]">
         {title}
-        {subtitle && (
-          <>
-            <span aria-hidden="true" className="mx-3 font-normal text-rule">
-              ·
-            </span>
-            <span className="font-medium text-muted">{subtitle}</span>
-          </>
-        )}
       </h2>
     </>
   );
   const body = (
     <>
-      <div className={`mt-4 grid gap-3 text-[16.5px] leading-relaxed [&>p]:text-body ${centered ? "mx-auto max-w-[58ch]" : layout === "stack" ? "max-w-[64ch]" : "max-w-[46ch]"}`}>
+      <div className={`mt-4 grid gap-3 text-[16.5px] leading-relaxed [&>p]:text-body ${layout === "stack" ? "mx-auto max-w-[58ch]" : "max-w-[46ch]"}`}>
         {children}
       </div>
       {deeper && <GoDeeper align={centered ? "center" : "left"}>{deeper}</GoDeeper>}
@@ -513,24 +516,26 @@ export function StoryBeat({
       className="scroll-mt-14 border-t border-rule py-16 first-of-type:border-t-0 md:min-h-[560px] md:py-24"
       aria-labelledby={`${id}-title`}
     >
-      {layout === "stack" && visualFirst ? (
-        <div className="grid gap-8">
-          <div className={centered ? "text-center" : ""}>{heading}</div>
-          <div className="min-w-0">{visual}</div>
-          <div className={centered ? "text-center" : ""}>{body}</div>
-        </div>
-      ) : layout === "stack" ? (
-        <div className={grid}>
-          <div className={centered ? "text-center" : ""}>{text}</div>
-          <div className="min-w-0">{visual}</div>
-        </div>
-      ) : (
-        <div className={grid}>
-          <div className={textOrder}>{text}</div>
-          <div className={`min-w-0 md:sticky md:top-16 ${visualOrder}`}>{visual}</div>
-        </div>
-      )}
-      {after && <div className="mt-12">{after}</div>}
+      <div className={framed ? "bubble border border-rule bg-surface p-5 sm:p-8 md:p-10" : ""}>
+        {layout === "stack" && visualFirst ? (
+          <div className="grid gap-8">
+            <div className={centered ? "text-center" : ""}>{heading}</div>
+            <div className="min-w-0">{visual}</div>
+            <div className={centered ? "text-center" : ""}>{body}</div>
+          </div>
+        ) : layout === "stack" ? (
+          <div className={grid}>
+            <div className={centered ? "text-center" : ""}>{text}</div>
+            <div className="min-w-0">{visual}</div>
+          </div>
+        ) : (
+          <div className={grid}>
+            <div className={textOrder}>{text}</div>
+            <div className={`min-w-0 md:sticky md:top-16 ${visualOrder}`}>{visual}</div>
+          </div>
+        )}
+        {after && <div className="mt-12">{after}</div>}
+      </div>
     </section>
   );
 }

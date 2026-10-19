@@ -138,6 +138,7 @@ export default function Page() {
           subtitle="The bets"
           layout="stack"
           align="left"
+          framed
           visualFirst
           visual={<TheBet />}
           after={<BetsTimeline />}

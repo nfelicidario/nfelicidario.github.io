@@ -1,13 +1,11 @@
-import type { ReactNode } from "react";
-import { ArrowRightLeft, Blocks, CodeXml, Store } from "lucide-react";
 
 /* Slide 1: the four bets the company made (TheBet), and the timeline that led to the project (BetsTimeline). */
 
-const bets: { icon: ReactNode; text: string }[] = [
-  { icon: <ArrowRightLeft size={16} />, text: "RCS will replace SMS" },
-  { icon: <Store size={16} />, text: "Every brand will have an RCS agent" },
-  { icon: <Blocks size={16} />, text: "The industry will need a builder to create RCS experiences" },
-  { icon: <CodeXml size={16} />, text: "Developers will lead the building of flows, like a Shopify marketplace" },
+const bets: { text: string; example?: string }[] = [
+  { text: "RCS will replace SMS" },
+  { text: "Every brand will have an RCS agent" },
+  { text: "The industry will need a builder to create RCS experiences" },
+  { text: "Developers will lead the building of flows", example: "ex: Shopify marketplace" },
 ];
 
 type Moment = { at: string; what: string; next?: boolean };
@@ -15,8 +13,8 @@ type Moment = { at: string; what: string; next?: boolean };
 const moments: Moment[] = [
   { at: "Oct 2024", what: "Apple enables RCS for business messaging" },
   { at: "Nov 2024", what: "Vibes bets on RCS" },
-  { at: "Jan 2025", what: "A hackathon creates the project" },
-  { at: "Aug 2025", what: "I join" },
+  { at: "Jan 2025", what: "Hackathon kicks off flow builder project" },
+  { at: "Aug 2025", what: "Nolan joins the team" },
   { at: "Next", what: "Build the flow builder", next: true },
 ];
 
@@ -92,13 +90,13 @@ export function TheBet() {
       <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {bets.map((b, i) => (
           <li key={b.text} className="bubble-sm flex flex-col gap-3 border border-rule bg-bg p-4">
-            <div className="flex items-center justify-between">
-              <span aria-hidden="true" className="grid h-8 w-8 place-items-center rounded-full bg-accent-soft text-accent">
-                {b.icon}
-              </span>
-              <span className="num text-[11px] text-muted">Bet {i + 1}</span>
-            </div>
-            <p className="text-[15px] font-semibold leading-snug text-ink">{b.text}</p>
+            <span className="num grid h-7 w-7 place-items-center rounded-full bg-accent-soft text-[12px] font-semibold text-accent">
+              {i + 1}
+            </span>
+            <p className="text-[15px] font-semibold leading-snug text-ink">
+              {b.text}
+              {b.example && <span className="mt-1 block text-[13px] font-normal text-muted">{b.example}</span>}
+            </p>
           </li>
         ))}
       </ol>
