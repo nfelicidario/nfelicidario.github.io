@@ -44,6 +44,8 @@ export type SixtySecondsProps = {
   stats?: Stat[];
   takeaways?: (ReactNode | { lead: string; text: ReactNode })[];
   takeawaysLabel?: string;
+  /** centred heading above the card */
+  heading?: string;
 };
 
 export function SixtySeconds({
@@ -56,6 +58,7 @@ export function SixtySeconds({
   stats,
   takeaways,
   takeawaysLabel = "If you remember three things",
+  heading = "Summary",
 }: SixtySecondsProps) {
   const cells = [
     { k: "The problem", icon: <CircleAlert size={15} />, items: problem },
@@ -63,9 +66,9 @@ export function SixtySeconds({
     { k: "The result", icon: <Trophy size={15} />, items: result },
   ];
   return (
-    <section className="mx-auto max-w-6xl pb-6" aria-label="The whole story in sixty seconds">
-      <div className="bubble border border-rule bg-surface p-5 md:p-7">
-        <h2 className="text-[20px] font-bold text-ink">The whole story in 60 seconds</h2>
+    <section className="mx-auto max-w-6xl pt-14 pb-6 md:pt-16" aria-label={heading}>
+      <h2 className="text-center text-[clamp(26px,3vw,34px)] font-bold tracking-[-0.02em] text-ink">{heading}</h2>
+      <div className="bubble mt-8 border border-rule bg-surface p-5 md:p-7">
 
         {(lede || terms) && (
           <div className="mt-6 grid gap-5">
@@ -212,7 +215,17 @@ export function Bullets({ items }: { items: ReactNode[] }) {
 type BeatInfo = { id: string; title: string };
 const BeatsContext = createContext<Record<string, number>>({});
 
-export function Beats({ children, label = "The story" }: { children: ReactNode; label?: string }) {
+export function Beats({
+  children,
+  label = "The story",
+  heading = "The full story",
+}: {
+  children: ReactNode;
+  /** used for the rail's accessible name */
+  label?: string;
+  /** centred heading above the first slide; empty string hides it */
+  heading?: string;
+}) {
   const titles = useMemo(() => collectBeats(children), [children]);
   const [current, setCurrent] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -296,6 +309,11 @@ export function Beats({ children, label = "The story" }: { children: ReactNode; 
   return (
     <BeatsContext.Provider value={ctx}>
       <div ref={rootRef} className="relative mx-auto max-w-6xl">
+        {heading && (
+          <h2 className="pt-10 text-center text-[clamp(26px,3vw,34px)] font-bold tracking-[-0.02em] text-ink md:pt-12">
+            {heading}
+          </h2>
+        )}
         {/* side rail in the left gutter, only when the gutter has room for it */}
         <div className="absolute inset-y-0 hidden w-12 xl:block" style={{ left: -72 }} aria-hidden={false}>
           <nav
