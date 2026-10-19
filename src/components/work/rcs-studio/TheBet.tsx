@@ -89,11 +89,11 @@ export function TheBet() {
     <div>
       <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {bets.map((b, i) => (
-          <li key={b.text} className="bubble-sm flex flex-col gap-3 border border-rule bg-bg p-4">
-            <span className="num grid h-7 w-7 place-items-center rounded-full bg-accent-soft text-[12px] font-semibold text-accent">
+          <li key={b.text} className="bubble-sm flex items-start gap-3 border border-rule bg-bg p-4">
+            <span className="num grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent-soft text-[12px] font-semibold text-accent">
               {i + 1}
             </span>
-            <p className="text-[15px] font-semibold leading-snug text-ink">
+            <p className="pt-[3px] text-[15px] font-semibold leading-snug text-ink">
               {b.text}
               {b.example && <span className="mt-1 block text-[13px] font-normal text-muted">{b.example}</span>}
             </p>

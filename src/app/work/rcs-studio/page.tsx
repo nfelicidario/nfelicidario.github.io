@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Artifact, CaseHero, Hindsight, NextCase, Outcome } from "@/components/case/CaseLayout";
+import { Artifact, CaseHero, NextCase } from "@/components/case/CaseLayout";
 import { Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
 import { BadgeCheck, Network } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
@@ -138,7 +138,6 @@ export default function Page() {
           subtitle="The bets"
           layout="stack"
           align="left"
-          framed
           visualFirst
           visual={<TheBet />}
           after={<BetsTimeline />}
@@ -154,7 +153,8 @@ export default function Page() {
 
         <StoryBeat
           id="the-question"
-          title="Buyers asked a different question"
+          title="What even is RCS?"
+          subtitle="The problem"
           layout="split"
           visual={
             <Artifact label="Who was asking, and what for" pill="Abstracted">
@@ -176,6 +176,7 @@ export default function Page() {
         <StoryBeat
           id="two-customers"
           title="Two customers, and the team behind them"
+          subtitle="The customers"
           layout="split-reverse"
           visual={
             <Artifact label="Who the product is for now" pill="Personas">
@@ -200,7 +201,9 @@ export default function Page() {
         <StoryBeat
           id="making-the-case"
           title="A prototype instead of a debate"
+          subtitle="The pivot"
           layout="stack"
+          align="left"
           visual={
             <Artifact label="From prototype to reframe" pill="Abstract shapes">
               <PrototypeToReframe />
@@ -220,6 +223,7 @@ export default function Page() {
         <StoryBeat
           id="the-builder"
           title="Three steps to a working flow"
+          subtitle="The builder"
           layout="wide"
           visual={
             <Artifact label="The builder, before and after" pill="Abstract shapes">
@@ -241,6 +245,7 @@ export default function Page() {
         <StoryBeat
           id="a-new-look"
           title="Color saved for the next step"
+          subtitle="The look"
           layout="split-reverse"
           visual={
             <Artifact label="Same step, two systems" pill="Abstract tiles">
@@ -262,7 +267,9 @@ export default function Page() {
         <StoryBeat
           id="what-it-proved"
           title="What it proved"
+          subtitle="The proof"
           layout="stack"
+          align="left"
           visual={
             <Artifact label="What it proved">
               <Proof />
@@ -279,29 +286,28 @@ export default function Page() {
             ]}
           />
         </StoryBeat>
+
+        <StoryBeat id="the-outcome" title="Self-serve is now the direction" subtitle="The outcome" layout="stack" align="left">
+          <Bullets
+            items={[
+              "RCS Studio is now the portal for every RCS agent Vibes provisions",
+              "It proved that customers would sign up and get an agent running on their own, something the company had never seen",
+              <>That changed the company&apos;s direction, and I&apos;m now working with the head of product on a company-wide self-serve entry point</>,
+            ]}
+          />
+        </StoryBeat>
+
+        <StoryBeat id="hindsight" title={"What I'd do differently"} subtitle="With hindsight" layout="stack" align="left">
+          <Bullets
+            items={[
+              <>Build RCS Studio as a surface of Vibes&apos; existing products, not a standalone brand on its own domain</>,
+              "The early vision tried to be too much, and the industry was never going to adopt RCS as fast as we believed",
+              "Build a theming layer on day one, so the design exploration was contained instead of noticed",
+              <>The self-serve work I&apos;m doing now is partly both corrections, and I&apos;m glad to be the one building it</>,
+            ]}
+          />
+        </StoryBeat>
       </Beats>
-
-      <Outcome align="center">
-        <p>
-          RCS Studio is now the portal for every RCS agent Vibes provisions. More importantly, it proved that
-          customers would sign up and get an agent running on their own, something the company had never
-          seen. That changed its direction, and I&apos;m now working with the head of product on a company-wide
-          self-serve entry point.
-        </p>
-      </Outcome>
-
-      <Hindsight align="center">
-        <p>
-          I&apos;d have built RCS Studio as a surface of Vibes&apos; existing products, not a standalone brand on
-          its own domain. The early vision tried to be too much, and the industry was never going to adopt RCS
-          as fast as we believed.
-        </p>
-        <p>
-          I&apos;d also have built a theming layer on day one, so the design exploration was contained instead
-          of noticed. The self-serve work I&apos;m doing now is partly both corrections, and I&apos;m glad to be
-          the one building it.
-        </p>
-      </Hindsight>
 
       <NextCase slug="provisioning" />
     </div>

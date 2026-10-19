@@ -231,22 +231,32 @@ export function Beats({
   const rootRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLElement>(null);
   // the side rail starts at the vertical centre of the first slide, then catches at the viewport centre
-  const [railOffset, setRailOffset] = useState<{ start: number; half: number } | null>(null);
+  const [railOffset, setRailOffset] = useState<{ start: number; end: number; half: number } | null>(null);
   useEffect(() => {
     const root = rootRef.current;
     const rail = railRef.current;
     if (!root || !rail) return;
-    const first = root.querySelector<HTMLElement>("[data-beat]");
-    if (!first) return;
+    const beats = root.querySelectorAll<HTMLElement>("[data-beat]");
+    const first = beats[0];
+    const last = beats[beats.length - 1];
+    if (!first || !last) return;
     const measure = () => {
-      const rootTop = root.getBoundingClientRect().top;
-      const r = first.getBoundingClientRect();
+      const rootRect = root.getBoundingClientRect();
+      const f = first.getBoundingClientRect();
+      const l = last.getBoundingClientRect();
       const half = rail.offsetHeight / 2;
-      setRailOffset({ start: Math.max(0, r.top - rootTop + r.height / 2 - half), half });
+      // the sticky rail stops where its container ends, so end the container half a rail below the last slide's centre
+      setRailOffset({
+        start: Math.max(0, f.top - rootRect.top + f.height / 2 - half),
+        end: Math.max(0, rootRect.bottom - (l.top + l.height / 2 + half)),
+        half,
+      });
     };
     measure();
     const ro = new ResizeObserver(measure);
+    ro.observe(root);
     ro.observe(first);
+    ro.observe(last);
     ro.observe(rail);
     return () => ro.disconnect();
   }, [titles.length]);
@@ -315,7 +325,7 @@ export function Beats({
           </h2>
         )}
         {/* side rail in the left gutter, only when the gutter has room for it */}
-        <div className="absolute inset-y-0 hidden w-12 xl:block" style={{ left: -72 }} aria-hidden={false}>
+        <div className="absolute top-0 hidden w-12 xl:block" style={{ left: -72, bottom: railOffset?.end ?? 0 }} aria-hidden={false}>
           <nav
             ref={railRef}
             aria-label={`${label} progress`}
@@ -439,15 +449,15 @@ export function StoryBeat({
   after,
   subtitle,
   align = "center",
-  framed = false,
+  framed = true,
 }: {
   /** anchor id, e.g. "the-bet" */
   id: string;
   title: string;
   /** two or three lines; one idea */
   children: ReactNode;
-  /** the one big visual for this beat */
-  visual: ReactNode;
+  /** the one big visual for this beat; a slide without one is just heading and bullets */
+  visual?: ReactNode;
   /** the long version, shown behind "Go deeper" */
   deeper?: ReactNode;
   /**
@@ -463,22 +473,20 @@ export function StoryBeat({
   subtitle?: string;
   /** stack only: where the heading sits (the body stays a centred column); split layouts are always left */
   align?: "left" | "center";
-  /** draw the whole slide as an outlined card on the surface colour */
+  /** draw the whole slide as an outlined card on the surface colour (default); false for the older open layout */
   framed?: boolean;
 }) {
   const n = (useContext(BeatsContext)[id] ?? 0) + 1;
-  const num = String(n).padStart(2, "0");
+  const num = String(n);
   const centered = layout === "stack" && align === "center";
   const heading = (
     <>
-      <div className={`label mb-3 flex items-center gap-2 ${centered ? "justify-center" : ""}`}>
-        <span className="num text-accent">{num}</span>
+      <div className={`label mb-3 flex items-center gap-2 text-muted ${centered ? "justify-center" : ""}`}>
+        <span className="num">{num}</span>
         {subtitle && (
           <>
-            <span aria-hidden="true" className="text-muted">
-              ·
-            </span>
-            <span className="text-muted">{subtitle}</span>
+            <span aria-hidden="true">·</span>
+            <span>{subtitle}</span>
           </>
         )}
       </div>
@@ -513,11 +521,16 @@ export function StoryBeat({
     <section
       id={id}
       data-beat
-      className="scroll-mt-14 border-t border-rule py-16 first-of-type:border-t-0 md:min-h-[560px] md:py-24"
+      className={framed ? "scroll-mt-14 py-4 md:py-5" : "scroll-mt-14 border-t border-rule py-16 first-of-type:border-t-0 md:min-h-[560px] md:py-24"}
       aria-labelledby={`${id}-title`}
     >
       <div className={framed ? "bubble border border-rule bg-surface p-5 sm:p-8 md:p-10" : ""}>
-        {layout === "stack" && visualFirst ? (
+        {!visual ? (
+          <div className="grid">
+            <div className={centered ? "text-center" : ""}>{heading}</div>
+            <div className={centered ? "text-center" : ""}>{body}</div>
+          </div>
+        ) : layout === "stack" && visualFirst ? (
           <div className="grid gap-8">
             <div className={centered ? "text-center" : ""}>{heading}</div>
             <div className="min-w-0">{visual}</div>
