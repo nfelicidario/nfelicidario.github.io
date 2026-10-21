@@ -199,6 +199,21 @@ export function Span({ points, direction = "horizontal" }: { points: { at: strin
   );
 }
 
+/** a one-line callout that states the slide's point, e.g. the problem */
+export function Banner({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
+  return (
+    <div className="bubble-sm flex items-start gap-3 border border-accent bg-accent-soft/40 p-4 sm:items-center sm:gap-4 sm:p-5">
+      <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-bg">
+        {icon}
+      </span>
+      <div>
+        <div className="label text-accent">{label}</div>
+        <p className="mt-0.5 text-[16px] font-semibold leading-snug text-ink sm:text-[17px]">{children}</p>
+      </div>
+    </div>
+  );
+}
+
 /** three to five bullets, the body of a beat */
 export function Bullets({ items }: { items: ReactNode[] }) {
   return (

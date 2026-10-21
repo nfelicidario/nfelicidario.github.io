@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
 import { Artifact, CaseHero, NextCase } from "@/components/case/CaseLayout";
-import { Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
-import { BadgeCheck, Network } from "lucide-react";
+import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
+import { BadgeCheck, CircleAlert, Network } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
 import { LookShift } from "@/components/work/rcs-studio/LookShift";
 import { Proof } from "@/components/work/rcs-studio/Proof";
-import { PrototypeToReframe } from "@/components/work/rcs-studio/PrototypeToReframe";
 import { BetsTimeline, TheBet } from "@/components/work/rcs-studio/TheBet";
-import { WhoWasAsking } from "@/components/work/rcs-studio/WhoWasAsking";
 import { RcsStudioStage } from "@/components/work/rcs-studio/hero/RcsStudioStage";
 import { Simplify } from "@/components/work/rcs-studio/Simplify";
-import { ThreeUsers } from "@/components/work/rcs-studio/ThreeUsers";
+import { TheSolution } from "@/components/work/rcs-studio/TheSolution";
 import { VibesLogo } from "@/components/VibesLogo";
 
 export const metadata: Metadata = { title: "RCS Studio" };
@@ -155,11 +153,13 @@ export default function Page() {
           id="the-question"
           title="What even is RCS?"
           subtitle="The problem"
-          layout="split"
+          layout="stack"
+          align="left"
+          visualFirst
           visual={
-            <Artifact label="Who was asking, and what for" pill="Abstracted">
-              <WhoWasAsking />
-            </Artifact>
+            <Banner icon={<CircleAlert size={17} />} label="The problem">
+              RCS Studio launched as a flow builder, but a business can&apos;t send anything until its agent is provisioned. Nobody had built that part.
+            </Banner>
           }
         >
           <Bullets
@@ -168,54 +168,29 @@ export default function Page() {
               <>The buyers who signed off asked: What is RCS? Why is it better than SMS? How do we get started?</>,
               "Getting started meant provisioning: a brand and agent registered and approved by third-party partners, over weeks of email handled by hand",
               "The signal built up across customer interviews, sales calls, usage data, and a competitive analysis",
-              "We had built the second step of the product and skipped the first",
             ]}
           />
         </StoryBeat>
 
         <StoryBeat
-          id="two-customers"
-          title="Two customers, and the team behind them"
-          subtitle="The customers"
-          layout="split-reverse"
-          visual={
-            <Artifact label="Who the product is for now" pill="Personas">
-              <ThreeUsers />
-            </Artifact>
-          }
-        >
-          <Bullets
-            items={[
-              "With provisioning first, the product had two customers instead of one",
-              "Marketing operations people needed an agent for a campaign and had never written code",
-              "Technical builders wanted the flow builder once an agent existed",
-              "Right before beta, I split the product around those two",
-              <>
-                Behind both sat our operations team, provisioning by hand. Their tooling is{" "}
-                <StoryLink href="/work/provisioning/">the next case study</StoryLink>
-              </>,
-            ]}
-          />
-        </StoryBeat>
-
-        <StoryBeat
-          id="making-the-case"
-          title="A prototype instead of a debate"
-          subtitle="The pivot"
+          id="the-solution"
+          title="Provisioning first, then the builder"
+          subtitle="The solution"
           layout="stack"
           align="left"
-          visual={
-            <Artifact label="From prototype to reframe" pill="Abstract shapes">
-              <PrototypeToReframe />
-            </Artifact>
-          }
+          visualFirst
+          visual={<TheSolution />}
         >
           <Bullets
             items={[
-              "Not everyone agreed that provisioning should lead: the product had launched as a flow builder, and a provisioning platform has a different first screen",
-              "Instead of arguing, I built a prototype of the provisioning flow",
+              "Not everyone agreed that provisioning should lead, so instead of arguing I built a prototype of the provisioning flow",
               "I put it in front of the operations team, the people provisioning by hand, and their reaction won over the skeptics",
               "The reframe that stuck: a flow builder competes with one feature of the incumbents, while a provisioning platform competes with the incumbents",
+              "With provisioning first, the product had two customers: marketing operations people who had never written code, and technical builders who wanted the flow builder once an agent existed",
+              <>
+                Right before beta, I split the product around those two. Behind both sat our operations team, whose tooling is{" "}
+                <StoryLink href="/work/provisioning/">the next case study</StoryLink>
+              </>,
             ]}
           />
         </StoryBeat>
