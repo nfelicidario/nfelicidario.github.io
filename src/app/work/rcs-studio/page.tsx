@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { Artifact, CaseHero, NextCase, Stats } from "@/components/case/CaseLayout";
+import { Artifact, CaseHero, NextCase } from "@/components/case/CaseLayout";
 import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
-import { CircleAlert } from "lucide-react";
+import { Activity, Braces, CircleAlert, ClipboardList } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
 import { Proof } from "@/components/work/rcs-studio/Proof";
 import { BetsTimeline, TheBet } from "@/components/work/rcs-studio/TheBet";
@@ -10,6 +10,7 @@ import { SignalSources } from "@/components/work/rcs-studio/SignalSources";
 import { AgentTracking } from "@/components/work/rcs-studio/AgentTracking";
 import { ApiAccess } from "@/components/work/rcs-studio/ApiAccess";
 import { AuditToForm } from "@/components/work/rcs-studio/AuditToForm";
+import { Outcomes } from "@/components/work/rcs-studio/Outcomes";
 import { ProvisioningApiExplorer } from "@/components/work/rcs-studio/ProvisioningApiExplorer";
 import { TheSolution } from "@/components/work/rcs-studio/TheSolution";
 import { VibesLogo } from "@/components/VibesLogo";
@@ -82,16 +83,20 @@ export default function Page() {
         lede="RCS Studio starts as a flow builder, giving users the ability to create app-like experiences from RCS features and data connections, delivered inside their native messaging app."
         problem={[
           <>Users can&apos;t send flows to customers without a live RCS agent</>,
-          <>Provisioning, getting an RCS agent live, is complex, manual, and doesn&apos;t scale</>,
+          <>Provisioning (getting an RCS agent live) is complex, manual, and doesn&apos;t scale</>,
           "It cost deals and kept us out of the conversation for larger ones",
         ]}
         work={[
-          "Owned requirements, roadmap, and design",
+          "Owned requirements, roadmap, and design, and contributed to the provisioning flows in production code",
           {
-            text: "Repositioned the product around provisioning and delivered it for customers:",
-            sub: ["Customer form", "Tracking", "API experience"],
+            text: "Repositioned the product around provisioning:",
+            plain: true,
+            sub: [
+              <span key="form" className="inline-flex items-center gap-2"><ClipboardList size={14} className="text-accent" aria-hidden="true" />Customer form</span>,
+              <span key="tracking" className="inline-flex items-center gap-2"><Activity size={14} className="text-accent" aria-hidden="true" />Tracking</span>,
+              <span key="api" className="inline-flex items-center gap-2"><Braces size={14} className="text-accent" aria-hidden="true" />API experience</span>,
+            ],
           },
-          "Contributed to the provisioning flows in production code",
         ]}
         result={[
           "Vibes' first proof that customers want to sign up and get started on their own",
@@ -176,14 +181,6 @@ export default function Page() {
           align="left"
           visualFirst
           visual={<TheSolution />}
-          after={
-            <Stats
-              items={[
-                { value: "100%", label: "of RCS agents are now provisioned through RCS Studio" },
-                { value: "88%", label: "of provisioning accounts moved fully into RCS Studio within weeks" },
-              ]}
-            />
-          }
         >
           <Bullets
             items={[
@@ -198,20 +195,15 @@ export default function Page() {
 
         <StoryBeat
           id="task-audit"
-          title="From a bare form to a guided one"
-          subtitle="Feature · Customer form"
+          title="Customer form"
+          tagline="From a bare form to a guided one"
+          icon={<ClipboardList size={20} />}
+          subtitle="Feature"
+          railTitle="Customer form"
           layout="stack"
           align="left"
           visualFirst
           visual={<AuditToForm />}
-          after={
-            <Stats
-              items={[
-                { value: "172", label: "agents submitted through the new launch flow, May to Oct 2026" },
-                { value: "96%", label: "of them submitted without help from Vibes staff" },
-              ]}
-            />
-          }
         >
           <Bullets
             items={[
@@ -228,20 +220,15 @@ export default function Page() {
 
         <StoryBeat
           id="task-tracking"
-          title="Know where your agent is"
-          subtitle="Feature · Tracking"
+          title="Tracking"
+          tagline="Know where your agent is"
+          icon={<Activity size={20} />}
+          subtitle="Feature"
+          railTitle="Tracking"
           layout="stack"
           align="left"
           visualFirst
           visual={<AgentTracking />}
-          after={
-            <Stats
-              items={[
-                { value: "14 days", label: "median from submission to a live RCS agent" },
-                { value: "1st", label: "self-serve automated provisioning at Vibes" },
-              ]}
-            />
-          }
         >
           <Bullets
             items={[
@@ -255,23 +242,16 @@ export default function Page() {
 
         <StoryBeat
           id="task-apis"
-          title="Provision and send by API"
-          subtitle="Feature · API experience"
+          title="API experience"
+          tagline="Provision and send by API"
+          icon={<Braces size={20} />}
+          subtitle="Feature"
+          railTitle="API experience"
           layout="stack"
           align="left"
           visualFirst
           visual={<ApiAccess />}
-          after={
-            <div className="grid gap-8">
-              <Stats
-                items={[
-                  { value: "37%", label: "of agents submitted via the API, as of Oct 2026" },
-                  { value: "1st", label: "provisioning API at Vibes" },
-                ]}
-              />
-              <ProvisioningApiExplorer />
-            </div>
-          }
+          after={<ProvisioningApiExplorer />}
         >
           <Bullets
             items={[
@@ -306,7 +286,15 @@ export default function Page() {
           />
         </StoryBeat>
 
-        <StoryBeat id="the-outcome" title="Self-serve is now the direction" subtitle="The outcome" layout="stack" align="left">
+        <StoryBeat
+          id="the-outcome"
+          title="Self-serve is now the direction"
+          subtitle="The outcome"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={<Outcomes />}
+        >
           <Bullets
             items={[
               "RCS Studio is now the portal for every RCS agent Vibes provisions",

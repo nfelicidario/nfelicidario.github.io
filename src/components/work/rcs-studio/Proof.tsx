@@ -13,9 +13,7 @@ const cards: Card[] = [
   {
     icon: FlaskConical,
     claim: "Self-serve lets customers try first",
-    evidence:
-      "Test Mode put a working agent in a customer's hands before any conversation about launching: a median of about two minutes from sign-up to Test Mode, and a test message on their phone in under five.",
-    stat: "~2 min",
+    evidence: "Test Mode put a working agent in a customer's hands, minutes after sign-up and before any conversation about launching.",
   },
   {
     icon: ShieldCheck,
@@ -25,9 +23,7 @@ const cards: Card[] = [
   {
     icon: Timer,
     claim: "Provisioning was the product",
-    evidence:
-      "500+ agents provisioned through RCS Studio, in one to three weeks versus several months for competitors. 172 went through the new launch flow in its first five months, 96% of them without help from Vibes staff.",
-    stat: "500+",
+    evidence: "Every RCS agent Vibes provisions now goes through RCS Studio, almost all of them without help from Vibes staff.",
   },
 ];
 
@@ -88,7 +84,7 @@ export function Proof() {
         </div>
         <div className="mt-1 grid grid-cols-[7fr_4fr] gap-3 text-[12.5px] text-muted">
           <p>Figma design docs, epics, stories, and a roadmap</p>
-          <p className="text-body">Production TypeScript: 67 MRs, 8 prototypes shipped as features, zero reverts</p>
+          <p className="text-body">Production TypeScript: sign-up, sign-in, provisioning flows</p>
         </div>
       </div>
     </div>

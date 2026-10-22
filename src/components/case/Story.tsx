@@ -30,7 +30,7 @@ import { Stats, type Stat } from "./CaseLayout";
 
 export type Term = { icon: ReactNode; title: string; text: ReactNode; tag?: string };
 /** a bullet, optionally with sub-bullets */
-export type Point = ReactNode | { text: ReactNode; sub: ReactNode[] };
+export type Point = ReactNode | { text: ReactNode; sub: ReactNode[]; /** no markers, e.g. icon rows */ plain?: boolean };
 
 export type SixtySecondsProps = {
   /** one line on what the product is, set large */
@@ -92,12 +92,15 @@ export function SixtySeconds({
               </div>
               <ul className="mt-3 grid gap-1.5 pl-4 text-[14px] leading-snug text-body marker:text-rule" style={{ listStyle: "disc" }}>
                 {c.items.map((it, j) => {
-                  const pt = it && typeof it === "object" && "sub" in (it as object) ? (it as { text: ReactNode; sub: ReactNode[] }) : null;
+                  const pt = it && typeof it === "object" && "sub" in (it as object) ? (it as { text: ReactNode; sub: ReactNode[]; plain?: boolean }) : null;
                   return (
                     <li key={j}>
                       {pt ? pt.text : (it as ReactNode)}
                       {pt && (
-                        <ul className="mt-1 grid gap-1 pl-4 text-[13.5px] text-muted marker:text-rule" style={{ listStyle: "circle" }}>
+                        <ul
+                          className={`mt-1.5 grid gap-1.5 text-[13.5px] marker:text-rule ${pt.plain ? "text-body" : "pl-4 text-muted"}`}
+                          style={{ listStyle: pt.plain ? "none" : "circle" }}
+                        >
                           {pt.sub.map((sb, k) => (
                             <li key={k}>{sb}</li>
                           ))}
@@ -229,12 +232,15 @@ export function Bullets({ items }: { items: Point[] }) {
   return (
     <ul className="grid gap-2 pl-5 text-left text-body marker:text-rule" style={{ listStyle: "disc" }}>
       {items.map((it, i) => {
-        const pt = it && typeof it === "object" && "sub" in (it as object) ? (it as { text: ReactNode; sub: ReactNode[] }) : null;
+        const pt = it && typeof it === "object" && "sub" in (it as object) ? (it as { text: ReactNode; sub: ReactNode[]; plain?: boolean }) : null;
         return (
           <li key={i}>
             {pt ? pt.text : (it as ReactNode)}
             {pt && (
-              <ul className="mt-1.5 grid gap-1 pl-5 text-[15px] text-muted marker:text-rule" style={{ listStyle: "circle" }}>
+              <ul
+                className={`mt-1.5 grid gap-1.5 text-[15px] marker:text-rule ${pt.plain ? "text-body" : "pl-5 text-muted"}`}
+                style={{ listStyle: pt.plain ? "none" : "circle" }}
+              >
                 {pt.sub.map((sb, k) => (
                   <li key={k}>{sb}</li>
                 ))}
@@ -464,8 +470,8 @@ function collectBeats(children: ReactNode): BeatInfo[] {
   const out: BeatInfo[] = [];
   Children.forEach(children, (c) => {
     if (c && typeof c === "object" && "props" in c) {
-      const p = (c as { props: { id?: string; title?: string; subtitle?: string } }).props;
-      if (p?.id && p?.title) out.push({ id: p.id, title: p.subtitle ?? p.title });
+      const p = (c as { props: { id?: string; title?: string; subtitle?: string; railTitle?: string } }).props;
+      if (p?.id && p?.title) out.push({ id: p.id, title: p.railTitle ?? p.subtitle ?? p.title });
     }
   });
   return out;
@@ -487,6 +493,8 @@ export function StoryBeat({
   subtitle,
   align = "center",
   framed = true,
+  icon,
+  tagline,
 }: {
   /** anchor id, e.g. "the-bet" */
   id: string;
@@ -512,6 +520,12 @@ export function StoryBeat({
   align?: "left" | "center";
   /** draw the whole slide as an outlined card on the surface colour (default); false for the older open layout */
   framed?: boolean;
+  /** an icon beside the title, e.g. for a feature slide */
+  icon?: ReactNode;
+  /** a quieter line under the title */
+  tagline?: string;
+  /** the rail's name for the slide when the subtitle is generic (e.g. "Feature"); read by Beats, not rendered here */
+  railTitle?: string;
 }) {
   const n = (useContext(BeatsContext)[id] ?? 0) + 1;
   const num = String(n);
@@ -527,9 +541,15 @@ export function StoryBeat({
           </>
         )}
       </div>
-      <h2 id={`${id}-title`} className="text-[28px] font-bold text-ink md:text-[34px]">
+      <h2 id={`${id}-title`} className={`text-[28px] font-bold text-ink md:text-[34px] ${icon ? "flex items-center gap-3" : ""}`}>
+        {icon && (
+          <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft text-accent md:h-11 md:w-11">
+            {icon}
+          </span>
+        )}
         {title}
       </h2>
+      {tagline && <p className="mt-1.5 text-[17px] text-muted md:text-[19px]">{tagline}</p>}
     </>
   );
   const body = (
