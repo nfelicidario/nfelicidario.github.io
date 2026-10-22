@@ -3,13 +3,13 @@ import { Artifact, CaseHero, NextCase } from "@/components/case/CaseLayout";
 import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
 import { CircleAlert } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
-import { LookShift } from "@/components/work/rcs-studio/LookShift";
 import { Proof } from "@/components/work/rcs-studio/Proof";
 import { BetsTimeline, TheBet } from "@/components/work/rcs-studio/TheBet";
 import { RcsStudioStage } from "@/components/work/rcs-studio/hero/RcsStudioStage";
-import { Simplify } from "@/components/work/rcs-studio/Simplify";
 import { SignalSources } from "@/components/work/rcs-studio/SignalSources";
-import { TheChange } from "@/components/work/rcs-studio/TheChange";
+import { AgentTracking } from "@/components/work/rcs-studio/AgentTracking";
+import { ApiAccess } from "@/components/work/rcs-studio/ApiAccess";
+import { AuditToForm } from "@/components/work/rcs-studio/AuditToForm";
 import { TheSolution } from "@/components/work/rcs-studio/TheSolution";
 import { VibesLogo } from "@/components/VibesLogo";
 
@@ -80,14 +80,22 @@ export default function Page() {
       <SixtySeconds
         lede="RCS Studio starts as a flow builder, giving users the ability to create app-like experiences from RCS features and data connections, delivered inside their native messaging app."
         problem={[
-          <>After trying the app, prospects asked: &ldquo;Cool demo, now how do I send to customers?&rdquo;</>,
-          <>Our answer was complex, manual, and didn&apos;t scale</>,
+          <>Users can&apos;t send flows to customers without a live RCS agent</>,
+          <>Provisioning, getting an RCS agent live, is complex, manual, and doesn&apos;t scale</>,
           "It cost deals and kept us out of the conversation for larger ones",
         ]}
         work={[
           "Owned requirements, roadmap, and design",
-          "Repositioned the product around provisioning: getting an RCS agent live",
+          "Repositioned the product around provisioning",
           "Prototyped the new provisioning experience to win over the skeptics",
+          {
+            text: "Delivered provisioning for customers in three tasks:",
+            sub: [
+              "Audited the process, then replaced a bare form with a guided one",
+              "Agent tracking: a launch timeline and brand, agent, and campaign statuses",
+              "APIs and self-serve credentials for provisioning and messaging",
+            ],
+          },
           "Contributed to the provisioning flows in production code",
         ]}
         result={[
@@ -166,7 +174,7 @@ export default function Page() {
 
         <StoryBeat
           id="the-solution"
-          title="Repositioned around getting an agent live"
+          title="Provisioning for customers"
           subtitle="The solution"
           layout="stack"
           align="left"
@@ -178,28 +186,28 @@ export default function Page() {
               "Not everyone agreed that provisioning should lead, so instead of arguing I built a prototype of the provisioning flow",
               "I put it in front of the operations team, the people provisioning by hand, and their reaction won over the skeptics",
               "The reframe that stuck: a flow builder competes with one feature of the incumbents, while a provisioning platform competes with the incumbents",
-              "Provisioning became step one for everyone: customers get an agent live through a guided form, and the operations team gets one place to see submissions instead of email threads",
-              "Right before beta, I split the product around its two target users: the technical developers it was built for, and marketing operations people who had never written code",
+              "Provisioning became step one for everyone: customers get an agent live on their own, and the operations team gets one place to see submissions instead of email threads",
+              "Three tasks followed: an audit that led to a guided form, agent tracking, and APIs with self-serve credentials",
             ]}
           />
         </StoryBeat>
 
         <StoryBeat
-          id="the-change"
-          title="A guided form in front, a read layer behind"
-          subtitle="What changed"
+          id="task-audit"
+          title="From a bare form to a guided one"
+          subtitle="Task 1 · Audit"
           layout="stack"
           align="left"
           visualFirst
-          visual={<TheChange />}
+          visual={<AuditToForm />}
         >
           <Bullets
             items={[
-              "The prototype became a guided submission form: step-by-step instructions and validation guardrails, so customers get it right the first time",
-              "Before this, our operations team had essentially no automated solution around provisioning, which kept Vibes from closing, or even entering the conversation on, large-scale deals",
-              "For them I built a read layer over customer submissions: they take the data and send it to the relevant parties, manually for now",
+              "I audited how a customer actually got an agent live: a bare form with no validation and no guidance, instructions in supporting Word documents, and corrections over email threads",
+              "The audit set the next step: a guided form with step-by-step instructions and validation guardrails, so submissions come in right the first time",
+              "Each field explains what the third-party partners will check, so the customer fixes problems before review instead of after",
               <>
-                Automating that side is its own story, told in{" "}
+                Behind it, a read layer over submissions for the operations team, who had no tooling at all. Automating their side is{" "}
                 <StoryLink href="/work/provisioning/">the next case study</StoryLink>
               </>,
             ]}
@@ -207,43 +215,39 @@ export default function Page() {
         </StoryBeat>
 
         <StoryBeat
-          id="the-builder"
-          title="Three steps to a working flow"
-          subtitle="The builder"
-          layout="wide"
-          visual={
-            <Artifact label="The builder, before and after" pill="Abstract shapes">
-              <Simplify />
-            </Artifact>
-          }
+          id="task-tracking"
+          title="Know where your agent is"
+          subtitle="Task 2 · Tracking"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={<AgentTracking />}
         >
           <Bullets
             items={[
-              <>The builder stayed as the second step, and a second step can&apos;t be the hardest part of the product</>,
-              <>Most beta users didn&apos;t use the original state builder correctly, or at all</>,
-              "I cut optionality from the default path and moved advanced capability behind progressive disclosure",
-              "Three steps now get people to a working flow",
-              "Today the builder is mostly a demo engine, with a handful of power users",
+              "Before, the only way to know where an agent stood was to ask, and every status update was an email",
+              "A launch progression timeline shows the whole path from submission to live, and where the agent is on it today",
+              "Brand, agent, and campaign each carry their own status, because each is reviewed separately by the third-party partners",
+              "Every status says what happens next and who is holding it, so customers stop asking and the operations team stops answering",
             ]}
           />
         </StoryBeat>
 
         <StoryBeat
-          id="a-new-look"
-          title="Smaller type, tighter spacing, one color"
-          subtitle="Design direction"
+          id="task-apis"
+          title="Provision and send by API"
+          subtitle="Task 3 · APIs"
           layout="stack"
           align="left"
           visualFirst
-          visual={<LookShift />}
+          visual={<ApiAccess />}
         >
           <Bullets
             items={[
-              "The inherited design system was built for a marketing product: large type, generous spacing, and color used freely",
-              "RCS Studio walks people through provisioning one step at a time, so I went smaller and tighter and reserved color for the next step",
-              "The drift got noticed, so I reviewed each change with the head of design and fed what landed back into the shared system",
-              "Customers and sales called the result elegant and modern",
-              <>It is now the direction for the company&apos;s next-generation products</>,
+              "Technical developers wanted to provision and send without touching the UI",
+              "A self-serve credential experience: create, label, and rotate keys for Test or Live, with no ticket to anyone",
+              "A provisioning API that mirrors the form, so a brand, agent, and campaign can be registered and tracked from code",
+              "A messaging API that unlocks once the agent is live, which is also where the flow builder lives on, as step two",
             ]}
           />
         </StoryBeat>

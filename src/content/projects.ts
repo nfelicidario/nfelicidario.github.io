@@ -8,8 +8,8 @@ export type Project = {
   /** two cool hues, used as a fallback behind the media */
   hues: [string, string];
   status?: "live" | "draft";
-  /** recorded hero loop, shown grayscale until hover */
-  gif: string;
+  /** recorded hero loop, shown grayscale until hover; the hues alone when missing */
+  gif?: string;
   /** what it is, two lines */
   bullets: string[];
   /** what happened, two lines */
@@ -58,6 +58,25 @@ export const projects: Project[] = [
     status: "draft",
   },
   {
+    slug: "design-system",
+    title: "Design system",
+    bullets: [
+      "A quieter system for step-by-step products, grown out of RCS Studio.",
+      "Smaller type, tighter spacing, one color for the next step.",
+    ],
+    outcomes: [
+      "Reviewed with the head of design and fed back into the shared system.",
+      "Now the direction for Vibes' next-generation products.",
+    ],
+    summary:
+      "The inherited system was built for a marketing product. I grew a quieter one inside RCS Studio, reviewed each change, and it became the direction for what comes next.",
+    org: "Vibes",
+    years: "2025–26",
+    metric: "Next-gen direction",
+    hues: ["#7c5cd6", "#241a4a"],
+    status: "draft",
+  },
+  {
     slug: "making-the-team-faster",
     title: "Agentic SDLC",
     gif: "/work/making-the-team-faster/hero.gif",
@@ -75,6 +94,22 @@ export const projects: Project[] = [
     years: "2025–26",
     metric: "½ the org on Linear",
     hues: ["#5b7bd6", "#1b2a4a"],
+    status: "draft",
+  },
+  {
+    slug: "self-serve-entry",
+    title: "Self-serve entry point",
+    bullets: [
+      "One self-serve entry point for Vibes, with the head of product.",
+      "Built as a surface of the existing products, with a theming layer from day one.",
+    ],
+    outcomes: ["In progress. This page grows as the work ships."],
+    summary:
+      "RCS Studio proved customers will start on their own. Now the same idea for the whole company, with both of RCS Studio's corrections built in.",
+    org: "Vibes",
+    years: "2026",
+    metric: "In progress",
+    hues: ["#d06a2c", "#3d1d0a"],
     status: "draft",
   },
   {

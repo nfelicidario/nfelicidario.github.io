@@ -21,13 +21,15 @@ export function ProjectCard({ p, index }: { p: Project; index: number }) {
             background: `radial-gradient(120% 90% at 18% 12%, ${p.hues[0]}, ${p.hues[1]} 70%)`,
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={p.gif}
-            alt=""
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover object-top grayscale transition-[filter] duration-500 group-hover:grayscale-0"
-          />
+          {p.gif && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={p.gif}
+              alt=""
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover object-top grayscale transition-[filter] duration-500 group-hover:grayscale-0"
+            />
+          )}
         </div>
         <div>
           <h3 className="text-[22px] font-bold text-ink">{p.title}</h3>
