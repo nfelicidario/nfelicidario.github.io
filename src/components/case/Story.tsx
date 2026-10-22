@@ -81,7 +81,7 @@ export function SixtySeconds({
           </div>
         )}
 
-        <ol className={`grid gap-3 md:grid-cols-3 ${lede || terms ? "mt-5 border-t border-rule pt-5" : "mt-5"}`}>
+        <ol className={`grid gap-3 md:grid-cols-3 ${lede || terms ? "mt-7" : "mt-5"}`}>
           {cells.map((c) => (
             <li key={c.k} className="bubble-sm border border-rule bg-bg px-4 py-4">
               <div className="flex items-center gap-2.5">

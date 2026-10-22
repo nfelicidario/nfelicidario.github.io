@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Artifact, CaseHero, NextCase } from "@/components/case/CaseLayout";
-import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink, TermTiles } from "@/components/case/Story";
-import { BadgeCheck, CircleAlert, Network } from "lucide-react";
+import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
+import { CircleAlert } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
 import { LookShift } from "@/components/work/rcs-studio/LookShift";
 import { Proof } from "@/components/work/rcs-studio/Proof";
@@ -78,16 +78,15 @@ export default function Page() {
       />
 
       <SixtySeconds
-        lede="RCS Studio is Vibes' self-serve platform for getting a business onto RCS, the richer successor to SMS."
+        lede="RCS Studio starts as a flow builder, giving users the ability to create app-like experiences from RCS features and data connections, delivered inside their native messaging app."
         problem={[
-          "Launched as a flow builder for developers",
-          <>After trying the app, prospects asked: &ldquo;Okay, how do I send to customers?&rdquo;</>,
-          <>The answer, provisioning, was complex, manual, and didn&apos;t scale</>,
-          "It cost a deal, and kept Vibes out of the conversation on others",
+          <>After trying the app, prospects asked: &ldquo;Cool demo, now how do I send to customers?&rdquo;</>,
+          <>Our answer was complex, manual, and didn&apos;t scale</>,
+          "It cost deals, and kept us out of the conversation for larger deals and RFPs",
         ]}
         work={[
           "Owned requirements, roadmap, and design",
-          "Repositioned the product around provisioning, with the flow builder as step two",
+          "Repositioned the product around provisioning: getting an RCS agent live",
           "Prototyped the new provisioning experience to win over the skeptics",
           "Contributed to the provisioning flows in production code",
         ]}
@@ -148,34 +147,18 @@ export default function Page() {
           align="left"
           visualFirst
           visual={
-            <div className="grid gap-4">
-              <Banner icon={<CircleAlert size={17} />} label="The problem">
-                Users can&apos;t send anything to customers until their RCS agent is provisioned.
-              </Banner>
-              <TermTiles
-                terms={[
-                  {
-                    icon: <Network size={15} />,
-                    title: "Flow building",
-                    tag: "Original focus",
-                    text: "App-like experiences built from RCS features and data connections, delivered inside a user's native messaging app.",
-                  },
-                  {
-                    icon: <BadgeCheck size={15} />,
-                    title: "Provisioning",
-                    text: "Getting a business sender (ex: RCS agent) registered, verified, and approved by the appropriate third parties.",
-                  },
-                ]}
-              />
-            </div>
+            <Banner icon={<CircleAlert size={17} />} label="The problem">
+              Users can&apos;t send anything to customers until their RCS agent is provisioned.
+            </Banner>
           }
           after={<ProvisioningSteps />}
         >
           <Bullets
             items={[
-              "Until it is provisioned, RCS Studio is essentially an in-depth demo",
+              "Without a live RCS agent, RCS Studio is essentially an in-depth demo",
               "Technical builders were not the ones buying",
-              { text: "Buyers asked:", sub: ["What is RCS?", "Why is it better than SMS?", "How do we get started?"] },
+              <>Prospects&apos; first question after the demo: &ldquo;Cool demo, now how do I send to customers?&rdquo;</>,
+              <>Our answer was complex, manual, and didn&apos;t scale, so it cost deals and kept us out of the conversation for larger deals and RFPs</>,
             ]}
           />
         </StoryBeat>
