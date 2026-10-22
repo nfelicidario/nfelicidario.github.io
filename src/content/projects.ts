@@ -99,13 +99,9 @@ export const projects: Project[] = [
   {
     slug: "self-serve-entry",
     title: "Self-serve entry point",
-    bullets: [
-      "One self-serve entry point for Vibes, with the head of product.",
-      "Built as a surface of the existing products, with a theming layer from day one.",
-    ],
-    outcomes: ["In progress. This page grows as the work ships."],
-    summary:
-      "RCS Studio proved customers will start on their own. Now the same idea for the whole company, with both of RCS Studio's corrections built in.",
+    bullets: ["In progress. Written last."],
+    outcomes: ["Not yet."],
+    summary: "In progress. This case study is written last.",
     org: "Vibes",
     years: "2026",
     metric: "In progress",

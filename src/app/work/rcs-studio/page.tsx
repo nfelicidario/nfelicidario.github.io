@@ -10,6 +10,7 @@ import { SignalSources } from "@/components/work/rcs-studio/SignalSources";
 import { AgentTracking } from "@/components/work/rcs-studio/AgentTracking";
 import { ApiAccess } from "@/components/work/rcs-studio/ApiAccess";
 import { AuditToForm } from "@/components/work/rcs-studio/AuditToForm";
+import { ProvisioningApiExplorer } from "@/components/work/rcs-studio/ProvisioningApiExplorer";
 import { TheSolution } from "@/components/work/rcs-studio/TheSolution";
 import { VibesLogo } from "@/components/VibesLogo";
 
@@ -86,15 +87,9 @@ export default function Page() {
         ]}
         work={[
           "Owned requirements, roadmap, and design",
-          "Repositioned the product around provisioning",
-          "Prototyped the new provisioning experience to win over the skeptics",
           {
-            text: "Delivered provisioning for customers in three tasks:",
-            sub: [
-              "Audited the process, then replaced a bare form with a guided one",
-              "Agent tracking: a launch timeline and brand, agent, and campaign statuses",
-              "APIs and self-serve credentials for provisioning and messaging",
-            ],
+            text: "Repositioned the product around provisioning and delivered it for customers:",
+            sub: ["Customer form", "Tracking", "API experience"],
           },
           "Contributed to the provisioning flows in production code",
         ]}
@@ -187,7 +182,7 @@ export default function Page() {
               "I put it in front of the operations team, the people provisioning by hand, and their reaction won over the skeptics",
               "The reframe that stuck: a flow builder competes with one feature of the incumbents, while a provisioning platform competes with the incumbents",
               "Provisioning became step one for everyone: customers get an agent live on their own, and the operations team gets one place to see submissions instead of email threads",
-              "Three tasks followed: an audit that led to a guided form, agent tracking, and APIs with self-serve credentials",
+              "Three features followed: the customer form, tracking, and the API experience",
             ]}
           />
         </StoryBeat>
@@ -195,7 +190,7 @@ export default function Page() {
         <StoryBeat
           id="task-audit"
           title="From a bare form to a guided one"
-          subtitle="Task 1 · Audit"
+          subtitle="Feature · Customer form"
           layout="stack"
           align="left"
           visualFirst
@@ -217,7 +212,7 @@ export default function Page() {
         <StoryBeat
           id="task-tracking"
           title="Know where your agent is"
-          subtitle="Task 2 · Tracking"
+          subtitle="Feature · Tracking"
           layout="stack"
           align="left"
           visualFirst
@@ -236,11 +231,12 @@ export default function Page() {
         <StoryBeat
           id="task-apis"
           title="Provision and send by API"
-          subtitle="Task 3 · APIs"
+          subtitle="Feature · API experience"
           layout="stack"
           align="left"
           visualFirst
           visual={<ApiAccess />}
+          after={<ProvisioningApiExplorer />}
         >
           <Bullets
             items={[
