@@ -28,7 +28,7 @@ import { Stats, type Stat } from "./CaseLayout";
 
 /* ------------------------------------------------------------ 60 seconds */
 
-export type Term = { icon: ReactNode; title: string; text: ReactNode };
+export type Term = { icon: ReactNode; title: string; text: ReactNode; tag?: string };
 /** a bullet, optionally with sub-bullets */
 export type Point = ReactNode | { text: ReactNode; sub: ReactNode[] };
 
@@ -77,21 +77,7 @@ export function SixtySeconds({
                 {lede}
               </p>
             )}
-            {terms && (
-              <dl className="mx-auto grid w-full max-w-3xl gap-3 sm:grid-cols-2">
-                {terms.map((t) => (
-                  <div key={t.title} className="bubble-sm border border-rule bg-bg p-4">
-                    <dt className="label flex items-center gap-2 text-ink">
-                      <span className="grid h-7 w-7 place-items-center rounded-full bg-accent-soft text-accent" aria-hidden="true">
-                        {t.icon}
-                      </span>
-                      {t.title}
-                    </dt>
-                    <dd className="mt-2 text-[13.5px] leading-snug text-body">{t.text}</dd>
-                  </div>
-                ))}
-              </dl>
-            )}
+            {terms && <TermTiles terms={terms} className="mx-auto w-full max-w-3xl" />}
           </div>
         )}
 
@@ -196,6 +182,30 @@ export function Span({ points, direction = "horizontal" }: { points: { at: strin
         ))}
       </ol>
     </div>
+  );
+}
+
+/** definition tiles: icon, term, one-line meaning, optional tag */
+export function TermTiles({ terms, className = "" }: { terms: Term[]; className?: string }) {
+  return (
+    <dl className={`grid gap-3 sm:grid-cols-2 ${className}`}>
+      {terms.map((t) => (
+        <div key={t.title} className="bubble-sm border border-rule bg-bg p-4">
+          <dt className="label flex items-center gap-2 text-ink">
+            <span className="grid h-7 w-7 place-items-center rounded-full bg-accent-soft text-accent" aria-hidden="true">
+              {t.icon}
+            </span>
+            {t.title}
+            {t.tag && (
+              <span className="ml-auto rounded-full border border-rule bg-surface px-2 py-0.5 text-[11px] font-medium tracking-normal normal-case text-muted">
+                {t.tag}
+              </span>
+            )}
+          </dt>
+          <dd className="mt-2 text-[13.5px] leading-snug text-body">{t.text}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 

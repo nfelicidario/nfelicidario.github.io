@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Artifact, CaseHero, NextCase } from "@/components/case/CaseLayout";
-import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
+import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink, TermTiles } from "@/components/case/Story";
 import { BadgeCheck, CircleAlert, Network } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
 import { LookShift } from "@/components/work/rcs-studio/LookShift";
@@ -71,7 +71,7 @@ export default function Page() {
         pov="Customer"
         brand={<VibesLogo className="h-full w-auto" />}
         title="We built the second step first"
-        lede="RCS Studio launched as a tool for building RCS message flows. But a customer can't send anything until their agent is provisioned, and nobody had built that part. I repositioned the product around getting an agent live, and it became the way every Vibes customer gets one."
+        lede="RCS Studio launched as a tool for building RCS message flows. But a customer can't send anything until their agent is provisioned, and that part had been an afterthought. I repositioned the product around getting an agent live, and it became the way every Vibes customer gets one."
         meta={meta}
         intro={<RcsIntro meta={meta} />}
         stage={<RcsStudioStage />}
@@ -79,22 +79,11 @@ export default function Page() {
 
       <SixtySeconds
         lede="RCS Studio is Vibes' self-serve platform for getting a business onto RCS, the richer successor to SMS."
-        terms={[
-          {
-            icon: <BadgeCheck size={15} />,
-            title: "Provisioning",
-            text: "Getting a business sender (ex: RCS agent) registered, verified, and approved by the appropriate third parties.",
-          },
-          {
-            icon: <Network size={15} />,
-            title: "Flow building",
-            text: "App-like experiences built from RCS features and data connections, delivered inside a user's native messaging app.",
-          },
-        ]}
         problem={[
           "Launched as a flow builder for developers",
-          { text: "Buyers asked:", sub: ["What is RCS?", "Why is it better than SMS?", "How do we get started?"] },
-          "Provisioning was missing",
+          <>After trying the app, prospects asked: &ldquo;Okay, how do I send to customers?&rdquo;</>,
+          <>The answer, provisioning, was complex, manual, and didn&apos;t scale</>,
+          "It cost a deal, and kept Vibes out of the conversation on others",
         ]}
         work={[
           "Owned requirements, roadmap, and design",
@@ -159,9 +148,26 @@ export default function Page() {
           align="left"
           visualFirst
           visual={
-            <Banner icon={<CircleAlert size={17} />} label="The problem">
-              Users can&apos;t send anything to customers until their RCS agent is provisioned.
-            </Banner>
+            <div className="grid gap-4">
+              <Banner icon={<CircleAlert size={17} />} label="The problem">
+                Users can&apos;t send anything to customers until their RCS agent is provisioned.
+              </Banner>
+              <TermTiles
+                terms={[
+                  {
+                    icon: <Network size={15} />,
+                    title: "Flow building",
+                    tag: "Original focus",
+                    text: "App-like experiences built from RCS features and data connections, delivered inside a user's native messaging app.",
+                  },
+                  {
+                    icon: <BadgeCheck size={15} />,
+                    title: "Provisioning",
+                    text: "Getting a business sender (ex: RCS agent) registered, verified, and approved by the appropriate third parties.",
+                  },
+                ]}
+              />
+            </div>
           }
           after={<ProvisioningSteps />}
         >
