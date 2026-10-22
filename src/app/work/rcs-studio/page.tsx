@@ -8,6 +8,8 @@ import { Proof } from "@/components/work/rcs-studio/Proof";
 import { BetsTimeline, TheBet } from "@/components/work/rcs-studio/TheBet";
 import { RcsStudioStage } from "@/components/work/rcs-studio/hero/RcsStudioStage";
 import { Simplify } from "@/components/work/rcs-studio/Simplify";
+import { ProvisioningSteps } from "@/components/work/rcs-studio/ProvisioningSteps";
+import { TheChange } from "@/components/work/rcs-studio/TheChange";
 import { TheSolution } from "@/components/work/rcs-studio/TheSolution";
 import { VibesLogo } from "@/components/VibesLogo";
 
@@ -158,16 +160,16 @@ export default function Page() {
           visualFirst
           visual={
             <Banner icon={<CircleAlert size={17} />} label="The problem">
-              RCS Studio launched as a flow builder, but a business can&apos;t send anything until its agent is provisioned. Nobody had built that part.
+              Users can&apos;t send anything to customers until their RCS agent is provisioned.
             </Banner>
           }
+          after={<ProvisioningSteps />}
         >
           <Bullets
             items={[
-              <>A few technical builders did arrive wanting to build flows, but they weren&apos;t the ones deciding</>,
-              <>The buyers who signed off asked: What is RCS? Why is it better than SMS? How do we get started?</>,
-              "Getting started meant provisioning: a brand and agent registered and approved by third-party partners, over weeks of email handled by hand",
-              "The signal built up across customer interviews, sales calls, usage data, and a competitive analysis",
+              "Until it is provisioned, RCS Studio is essentially an in-depth demo",
+              "Technical builders were not the ones buying",
+              { text: "Buyers asked:", sub: ["What is RCS?", "Why is it better than SMS?", "How do we get started?"] },
             ]}
           />
         </StoryBeat>
@@ -186,9 +188,28 @@ export default function Page() {
               "Not everyone agreed that provisioning should lead, so instead of arguing I built a prototype of the provisioning flow",
               "I put it in front of the operations team, the people provisioning by hand, and their reaction won over the skeptics",
               "The reframe that stuck: a flow builder competes with one feature of the incumbents, while a provisioning platform competes with the incumbents",
-              "With provisioning first, the product had two customers: marketing operations people who had never written code, and technical builders who wanted the flow builder once an agent existed",
+              "With provisioning first, the product had two target users: the technical developers it was built for, and marketing operations people who had never written code",
+              "Right before beta, I split the product around those two",
+            ]}
+          />
+        </StoryBeat>
+
+        <StoryBeat
+          id="the-change"
+          title="A guided form in front, a read layer behind"
+          subtitle="What changed"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={<TheChange />}
+        >
+          <Bullets
+            items={[
+              "The prototype became a guided submission form: step-by-step instructions and validation guardrails, so customers get it right the first time",
+              "Before this, our operations team had essentially no automated solution around provisioning, which kept Vibes from closing, or even entering the conversation on, large-scale deals",
+              "For them I built a read layer over customer submissions: they take the data and send it to the relevant parties, manually for now",
               <>
-                Right before beta, I split the product around those two. Behind both sat our operations team, whose tooling is{" "}
+                Automating that side is its own story, told in{" "}
                 <StoryLink href="/work/provisioning/">the next case study</StoryLink>
               </>,
             ]}

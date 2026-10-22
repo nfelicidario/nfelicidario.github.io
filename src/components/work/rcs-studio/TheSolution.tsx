@@ -2,68 +2,89 @@ import Link from "next/link";
 import { ArrowDown, ArrowRight, CodeXml, Megaphone, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-/* Slide 3: the reframe (flow builder → provisioning platform) and who the product serves now. */
+/* Slide 3: the reframe (flow builder → provisioning platform) and the target users. */
 
-const pill = "rounded-full px-2.5 py-0.5 text-[11.5px] font-medium whitespace-nowrap";
-const on = "bg-accent text-bg";
-const off = "border border-rule bg-surface text-muted";
-const missing = "border border-dashed border-rule bg-transparent text-muted";
+type Tone = "on" | "outline" | "missing";
 
-type Customer = { name: string; line: string; Icon: LucideIcon; builds: boolean };
+const tile: Record<Tone, string> = {
+  on: "border-accent bg-accent text-bg",
+  outline: "border-rule bg-surface text-ink",
+  missing: "border-dashed border-rule bg-transparent text-muted",
+};
 
-const customers: Customer[] = [
-  { name: "Marketing operations", line: "Needs an agent for a campaign. Has never written code.", Icon: Megaphone, builds: false },
-  { name: "Technical builders", line: "Wants the flow builder once an agent exists.", Icon: CodeXml, builds: true },
-];
-
-function Steps({ first, second }: { first: string; second: string }) {
+function StepTile({ n, label, tone }: { n: number; label: string; tone: Tone }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <span className={`${pill} ${first}`}>1 Provision</span>
-      <span aria-hidden="true" className="h-px w-3 bg-rule" />
-      <span className={`${pill} ${second}`}>2 Build</span>
+    <div className={`flex min-w-0 flex-1 items-center gap-2 rounded-[10px] border px-3 py-2.5 ${tile[tone]}`}>
+      <span
+        className={`num grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold ${
+          tone === "on" ? "bg-bg/20 text-bg" : tone === "outline" ? "bg-accent-soft text-accent" : "border border-dashed border-rule text-muted"
+        }`}
+      >
+        {n}
+      </span>
+      <span className="text-[13.5px] font-semibold">{label}</span>
     </div>
   );
 }
 
+function Track({ provision, build }: { provision: Tone; build: Tone }) {
+  return (
+    <div className="flex items-center gap-2">
+      <StepTile n={1} label="Provision" tone={provision} />
+      <span aria-hidden="true" className="h-px w-4 shrink-0 bg-rule" />
+      <StepTile n={2} label="Build" tone={build} />
+    </div>
+  );
+}
+
+type User = { name: string; line: string; Icon: LucideIcon; builds: boolean; tag?: string };
+
+const users: User[] = [
+  { name: "Technical developers", line: "Want the flow builder once an agent exists.", Icon: CodeXml, builds: true, tag: "Original target user" },
+  { name: "Marketing operations", line: "Need an agent for a campaign. Have never written code.", Icon: Megaphone, builds: false },
+];
+
 export function TheSolution() {
   return (
     <div className="grid gap-4">
-      <div className="grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-stretch">
-        <div className="bubble-sm border border-dashed border-rule bg-bg p-4">
-          <div className="label">Launched as</div>
-          <div className="mt-1 text-[18px] font-bold leading-tight text-ink">A flow builder</div>
-          <p className="mt-1 text-[13px] text-muted">Competes with one feature of the incumbents</p>
-          <div className="mt-3">
-            <Steps first={missing} second={on} />
+      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-stretch">
+        <div className="bubble-sm flex flex-col gap-4 border border-dashed border-rule bg-bg p-5">
+          <div>
+            <div className="label">Launched as</div>
+            <div className="mt-1 text-[20px] font-bold leading-tight text-ink">A flow builder</div>
           </div>
+          <Track provision="missing" build="on" />
         </div>
         <div aria-hidden="true" className="flex items-center justify-center text-muted">
-          <ArrowRight size={18} className="hidden sm:block" />
-          <ArrowDown size={18} className="sm:hidden" />
+          <ArrowRight size={18} className="hidden md:block" />
+          <ArrowDown size={18} className="md:hidden" />
         </div>
-        <div className="bubble-sm border border-accent bg-accent-soft/40 p-4">
-          <div className="label text-accent">Repositioned as</div>
-          <div className="mt-1 text-[18px] font-bold leading-tight text-ink">A provisioning platform</div>
-          <p className="mt-1 text-[13px] text-body">Competes with the incumbents, with the builder as step two</p>
-          <div className="mt-3">
-            <Steps first={on} second={on} />
+        <div className="bubble-sm flex flex-col gap-4 border border-accent bg-accent-soft/40 p-5">
+          <div>
+            <div className="label text-accent">Repositioned as</div>
+            <div className="mt-1 text-[20px] font-bold leading-tight text-ink">A provisioning platform</div>
           </div>
+          <Track provision="on" build="outline" />
         </div>
       </div>
 
-      <div className="label mt-2">Who it serves now</div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {customers.map(({ name, line, Icon, builds }) => (
+      <div className="label mt-2">Target users</div>
+      <div className="grid gap-3 md:grid-cols-2">
+        {users.map(({ name, line, Icon, builds, tag }) => (
           <div key={name} className="bubble-sm flex gap-3 border border-rule bg-bg p-4">
             <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-bg">
               <Icon size={16} aria-hidden="true" />
             </span>
-            <div className="min-w-0">
-              <div className="text-[14.5px] font-semibold text-ink">{name}</div>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className="text-[14.5px] font-semibold text-ink">{name}</span>
+                {tag && (
+                  <span className="rounded-full border border-rule bg-surface px-2 py-0.5 text-[11px] font-medium text-muted">{tag}</span>
+                )}
+              </div>
               <p className="mt-0.5 text-[13px] leading-snug text-body">{line}</p>
-              <div className="mt-2.5">
-                <Steps first={on} second={builds ? on : off} />
+              <div className="mt-3 max-w-[280px]">
+                <Track provision="on" build={builds ? "on" : "outline"} />
               </div>
             </div>
           </div>

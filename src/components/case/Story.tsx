@@ -214,13 +214,25 @@ export function Banner({ icon, label, children }: { icon: ReactNode; label: stri
   );
 }
 
-/** three to five bullets, the body of a beat */
-export function Bullets({ items }: { items: ReactNode[] }) {
+/** three to five bullets, the body of a beat; a bullet can carry sub-bullets */
+export function Bullets({ items }: { items: Point[] }) {
   return (
     <ul className="grid gap-2 pl-5 text-left text-body marker:text-rule" style={{ listStyle: "disc" }}>
-      {items.map((it, i) => (
-        <li key={i}>{it}</li>
-      ))}
+      {items.map((it, i) => {
+        const pt = it && typeof it === "object" && "sub" in (it as object) ? (it as { text: ReactNode; sub: ReactNode[] }) : null;
+        return (
+          <li key={i}>
+            {pt ? pt.text : (it as ReactNode)}
+            {pt && (
+              <ul className="mt-1.5 grid gap-1 pl-5 text-[15px] text-muted marker:text-rule" style={{ listStyle: "circle" }}>
+                {pt.sub.map((sb, k) => (
+                  <li key={k}>{sb}</li>
+                ))}
+              </ul>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }
