@@ -8,7 +8,7 @@ import { Proof } from "@/components/work/rcs-studio/Proof";
 import { BetsTimeline, TheBet } from "@/components/work/rcs-studio/TheBet";
 import { RcsStudioStage } from "@/components/work/rcs-studio/hero/RcsStudioStage";
 import { Simplify } from "@/components/work/rcs-studio/Simplify";
-import { ProvisioningSteps } from "@/components/work/rcs-studio/ProvisioningSteps";
+import { SignalSources } from "@/components/work/rcs-studio/SignalSources";
 import { TheChange } from "@/components/work/rcs-studio/TheChange";
 import { TheSolution } from "@/components/work/rcs-studio/TheSolution";
 import { VibesLogo } from "@/components/VibesLogo";
@@ -82,7 +82,7 @@ export default function Page() {
         problem={[
           <>After trying the app, prospects asked: &ldquo;Cool demo, now how do I send to customers?&rdquo;</>,
           <>Our answer was complex, manual, and didn&apos;t scale</>,
-          "It cost deals, and kept us out of the conversation for larger deals and RFPs",
+          "It cost deals and kept us out of the conversation for larger ones",
         ]}
         work={[
           "Owned requirements, roadmap, and design",
@@ -141,7 +141,7 @@ export default function Page() {
 
         <StoryBeat
           id="the-question"
-          title="What even is RCS?"
+          title="A demo that couldn't send"
           subtitle="The problem"
           layout="stack"
           align="left"
@@ -151,21 +151,22 @@ export default function Page() {
               Users can&apos;t send anything to customers until their RCS agent is provisioned.
             </Banner>
           }
-          after={<ProvisioningSteps />}
+          after={<SignalSources />}
         >
           <Bullets
             items={[
               "Without a live RCS agent, RCS Studio is essentially an in-depth demo",
               "Technical builders were not the ones buying",
               <>Prospects&apos; first question after the demo: &ldquo;Cool demo, now how do I send to customers?&rdquo;</>,
-              <>Our answer was complex, manual, and didn&apos;t scale, so it cost deals and kept us out of the conversation for larger deals and RFPs</>,
+              <>Our answer was complex, manual, and didn&apos;t scale, so it cost deals and kept us out of the conversation for larger ones</>,
+              "Provisioning was the unlock: once a customer could get an agent live on their own, the demo became a product and the flow builder became step two",
             ]}
           />
         </StoryBeat>
 
         <StoryBeat
           id="the-solution"
-          title="Provisioning first, then the builder"
+          title="Repositioned around getting an agent live"
           subtitle="The solution"
           layout="stack"
           align="left"
@@ -177,8 +178,8 @@ export default function Page() {
               "Not everyone agreed that provisioning should lead, so instead of arguing I built a prototype of the provisioning flow",
               "I put it in front of the operations team, the people provisioning by hand, and their reaction won over the skeptics",
               "The reframe that stuck: a flow builder competes with one feature of the incumbents, while a provisioning platform competes with the incumbents",
-              "With provisioning first, the product had two target users: the technical developers it was built for, and marketing operations people who had never written code",
-              "Right before beta, I split the product around those two",
+              "Provisioning became step one for everyone: customers get an agent live through a guided form, and the operations team gets one place to see submissions instead of email threads",
+              "Right before beta, I split the product around its two target users: the technical developers it was built for, and marketing operations people who had never written code",
             ]}
           />
         </StoryBeat>
@@ -229,14 +230,12 @@ export default function Page() {
 
         <StoryBeat
           id="a-new-look"
-          title="Color saved for the next step"
-          subtitle="The look"
-          layout="split-reverse"
-          visual={
-            <Artifact label="Same step, two systems" pill="Abstract tiles">
-              <LookShift />
-            </Artifact>
-          }
+          title="Smaller type, tighter spacing, one color"
+          subtitle="Design direction"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={<LookShift />}
         >
           <Bullets
             items={[

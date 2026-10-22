@@ -1,112 +1,73 @@
-import Link from "next/link";
-import { ArrowDown, ArrowRight, CodeXml, Megaphone, Users } from "lucide-react";
+import { ArrowDown, ArrowRight, Blocks, CodeXml, Mail, ShieldCheck, UserRound, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-/* Slide 3: the reframe (flow builder → provisioning platform) and the target users. */
+/* Slide 3: the product's shape before and after. Provisioning moves from email threads outside the
+   product to step one inside it, for customers and for the operations team. */
 
-type Tone = "on" | "outline" | "missing";
-
-const tile: Record<Tone, string> = {
-  on: "border-accent bg-accent text-bg",
-  outline: "border-rule bg-surface text-ink",
-  missing: "border-dashed border-rule bg-transparent text-muted",
-};
-
-function StepTile({ n, label, tone }: { n: number; label: string; tone: Tone }) {
+function Row({ Icon, title, line, tone }: { Icon: LucideIcon; title: string; line: string; tone: "accent" | "plain" | "muted" }) {
+  const box =
+    tone === "accent" ? "border-accent bg-accent-soft/50" : tone === "plain" ? "border-rule bg-surface" : "border-dashed border-rule bg-transparent";
+  const icon = tone === "accent" ? "bg-accent text-bg" : tone === "plain" ? "bg-raised text-ink" : "bg-transparent text-muted";
   return (
-    <div className={`flex min-w-0 flex-1 items-center gap-2 rounded-[10px] border px-3 py-2.5 ${tile[tone]}`}>
-      <span
-        className={`num grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold ${
-          tone === "on" ? "bg-bg/20 text-bg" : tone === "outline" ? "bg-accent-soft text-accent" : "border border-dashed border-rule text-muted"
-        }`}
-      >
-        {n}
+    <div className={`flex items-center gap-3 rounded-[10px] border px-3 py-2.5 ${box}`}>
+      <span aria-hidden="true" className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${icon}`}>
+        <Icon size={15} />
       </span>
-      <span className="text-[13.5px] font-semibold">{label}</span>
+      <div className="min-w-0">
+        <div className={`text-[13.5px] font-semibold ${tone === "muted" ? "text-muted" : "text-ink"}`}>{title}</div>
+        <div className="text-[12px] leading-snug text-muted">{line}</div>
+      </div>
     </div>
   );
 }
 
-function Track({ provision, build }: { provision: Tone; build: Tone }) {
+function Product({ label, children, accent }: { label: string; children: React.ReactNode; accent?: boolean }) {
   return (
-    <div className="flex items-center gap-2">
-      <StepTile n={1} label="Provision" tone={provision} />
-      <span aria-hidden="true" className="h-px w-4 shrink-0 bg-rule" />
-      <StepTile n={2} label="Build" tone={build} />
+    <div className={`rounded-[12px] border p-3 ${accent ? "border-accent bg-surface" : "border-rule bg-surface"}`}>
+      <div className={`label mb-2 ${accent ? "text-accent" : ""}`}>{label}</div>
+      <div className="grid gap-2">{children}</div>
     </div>
   );
 }
-
-type User = { name: string; line: string; Icon: LucideIcon; builds: boolean; tag?: string };
-
-const users: User[] = [
-  { name: "Technical developers", line: "Want the flow builder once an agent exists.", Icon: CodeXml, builds: true, tag: "Original target user" },
-  { name: "Marketing operations", line: "Need an agent for a campaign. Have never written code.", Icon: Megaphone, builds: false },
-];
 
 export function TheSolution() {
   return (
-    <div className="grid gap-4">
-      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-stretch">
-        <div className="bubble-sm flex flex-col gap-4 border border-dashed border-rule bg-bg p-5">
-          <div>
-            <div className="label">Launched as</div>
-            <div className="mt-1 text-[20px] font-bold leading-tight text-ink">A flow builder</div>
-          </div>
-          <Track provision="missing" build="on" />
+    <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-stretch">
+      {/* before */}
+      <div className="bubble-sm flex flex-col gap-3 border border-dashed border-rule bg-bg p-4">
+        <div>
+          <div className="label">Before</div>
+          <div className="mt-0.5 text-[18px] font-bold leading-tight text-ink">A flow builder, with provisioning outside it</div>
         </div>
-        <div aria-hidden="true" className="flex items-center justify-center text-muted">
-          <ArrowRight size={18} className="hidden md:block" />
-          <ArrowDown size={18} className="md:hidden" />
-        </div>
-        <div className="bubble-sm flex flex-col gap-4 border border-accent bg-accent-soft/40 p-5">
-          <div>
-            <div className="label text-accent">Repositioned as</div>
-            <div className="mt-1 text-[20px] font-bold leading-tight text-ink">A provisioning platform</div>
-          </div>
-          <Track provision="on" build="outline" />
+        <Product label="RCS Studio">
+          <Row Icon={Blocks} title="Flow builder" line="For technical developers. Nothing to send from until an agent exists." tone="plain" />
+        </Product>
+        <div className="grid gap-2">
+          <div className="label text-muted">Outside the product, by hand</div>
+          <Row Icon={Mail} title="Email threads" line="Customers send details. The operations team forwards them on." tone="muted" />
+          <Row Icon={Users} title="Operations team" line="No tooling. Weeks per agent, and no room to scale." tone="muted" />
         </div>
       </div>
 
-      <div className="label mt-2">Target users</div>
-      <div className="grid gap-3 md:grid-cols-2">
-        {users.map(({ name, line, Icon, builds, tag }) => (
-          <div key={name} className="bubble-sm flex gap-3 border border-rule bg-bg p-4">
-            <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-bg">
-              <Icon size={16} aria-hidden="true" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <span className="text-[14.5px] font-semibold text-ink">{name}</span>
-                {tag && (
-                  <span className="rounded-full border border-rule bg-surface px-2 py-0.5 text-[11px] font-medium text-muted">{tag}</span>
-                )}
-              </div>
-              <p className="mt-0.5 text-[13px] leading-snug text-body">{line}</p>
-              <div className="mt-3 max-w-[280px]">
-                <Track provision="on" build={builds ? "on" : "outline"} />
-              </div>
-            </div>
-          </div>
-        ))}
+      <div aria-hidden="true" className="flex items-center justify-center text-muted">
+        <ArrowRight size={18} className="hidden md:block" />
+        <ArrowDown size={18} className="md:hidden" />
       </div>
 
-      <div className="bubble-sm flex flex-wrap items-center gap-3 border border-rule bg-bg p-4">
-        <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-raised text-ink">
-          <Users size={16} aria-hidden="true" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="label">Behind both · internal</div>
-          <div className="text-[14.5px] font-semibold text-ink">Our operations team</div>
-          <p className="text-[13px] text-body">Did the provisioning work by hand, over weeks of email.</p>
+      {/* after */}
+      <div className="bubble-sm flex flex-col gap-3 border border-accent bg-accent-soft/30 p-4">
+        <div>
+          <div className="label text-accent">After</div>
+          <div className="mt-0.5 text-[18px] font-bold leading-tight text-ink">A provisioning platform, with the builder as step two</div>
         </div>
-        <Link
-          href="/work/provisioning/"
-          className="ml-auto inline-flex items-center gap-1 rounded-full border border-rule px-3 py-1 text-[12.5px] text-body transition-colors hover:border-accent hover:text-accent"
-        >
-          Next case study
-          <ArrowRight size={12} aria-hidden="true" />
-        </Link>
+        <Product label="RCS Studio" accent>
+          <Row Icon={ShieldCheck} title="1 · Provision" line="Everyone starts here. Get an RCS agent live." tone="accent" />
+          <div className="ml-4 grid gap-2 border-l-2 border-accent-soft pl-3">
+            <Row Icon={UserRound} title="Customers" line="A guided form. Agent live on their own." tone="plain" />
+            <Row Icon={Users} title="Operations team" line="One place to see and act on submissions." tone="plain" />
+          </div>
+          <Row Icon={CodeXml} title="2 · Build" line="The flow builder, for technical developers, the original target user." tone="plain" />
+        </Product>
       </div>
     </div>
   );
