@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Artifact, CaseHero, NextCase } from "@/components/case/CaseLayout";
+import { Artifact, CaseHero, NextCase, Stats } from "@/components/case/CaseLayout";
 import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
 import { CircleAlert } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
@@ -95,6 +95,7 @@ export default function Page() {
         ]}
         result={[
           "Vibes' first proof that customers want to sign up and get started on their own",
+          "Vibes' first provisioning API, already carrying about a third of submissions",
           "Provisioning now extends to TFN, with 10DLC and Short Code next",
           "The design direction now leads the company's next-generation products",
         ]}
@@ -175,6 +176,14 @@ export default function Page() {
           align="left"
           visualFirst
           visual={<TheSolution />}
+          after={
+            <Stats
+              items={[
+                { value: "100%", label: "of RCS agents are now provisioned through RCS Studio" },
+                { value: "88%", label: "of provisioning accounts moved fully into RCS Studio within weeks" },
+              ]}
+            />
+          }
         >
           <Bullets
             items={[
@@ -195,6 +204,14 @@ export default function Page() {
           align="left"
           visualFirst
           visual={<AuditToForm />}
+          after={
+            <Stats
+              items={[
+                { value: "172", label: "agents submitted through the new launch flow, May to Oct 2026" },
+                { value: "96%", label: "of them submitted without help from Vibes staff" },
+              ]}
+            />
+          }
         >
           <Bullets
             items={[
@@ -217,6 +234,14 @@ export default function Page() {
           align="left"
           visualFirst
           visual={<AgentTracking />}
+          after={
+            <Stats
+              items={[
+                { value: "14 days", label: "median from submission to a live RCS agent" },
+                { value: "1st", label: "self-serve automated provisioning at Vibes" },
+              ]}
+            />
+          }
         >
           <Bullets
             items={[
@@ -236,7 +261,17 @@ export default function Page() {
           align="left"
           visualFirst
           visual={<ApiAccess />}
-          after={<ProvisioningApiExplorer />}
+          after={
+            <div className="grid gap-8">
+              <Stats
+                items={[
+                  { value: "37%", label: "of agents submitted via the API, as of Oct 2026" },
+                  { value: "1st", label: "provisioning API at Vibes" },
+                ]}
+              />
+              <ProvisioningApiExplorer />
+            </div>
+          }
         >
           <Bullets
             items={[
@@ -275,6 +310,7 @@ export default function Page() {
           <Bullets
             items={[
               "RCS Studio is now the portal for every RCS agent Vibes provisions",
+              "The bet is paying off: RCS message volume on Vibes grew 100× in twelve months",
               "It proved that customers would sign up and get an agent running on their own, something the company had never seen",
               <>That changed the company&apos;s direction, and I&apos;m now working with the head of product on a company-wide self-serve entry point</>,
             ]}
