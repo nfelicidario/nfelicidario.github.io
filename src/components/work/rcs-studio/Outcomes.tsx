@@ -3,7 +3,7 @@ import { Stats } from "@/components/case/CaseLayout";
 /* Slide 8: every number in one place. Counts carry their as-of month. */
 
 const growth = [
-  { at: "May 2026", n: 3 },
+  { at: "May 2026 (from the 15th)", n: 3 },
   { at: "Jul 2026", n: 48 },
   { at: "Sep 2026", n: 156 },
   { at: "Oct 2026", n: 172 },
@@ -34,7 +34,7 @@ export function Outcomes() {
         <div className="bubble border border-rule bg-surface p-4">
           <div className="flex items-baseline justify-between gap-3">
             <div className="label">Agents through the new launch flow</div>
-            <div className="num text-[12px] text-muted">cumulative</div>
+            <div className="num text-[12px] text-muted">cumulative, since the flow shipped on May 15, 2026</div>
           </div>
           <div className="mt-4 grid h-36 grid-cols-4 items-end gap-3" role="img" aria-label="Agents through the launch flow: 3 in May 2026, 48 by July, 156 by September, 172 in October">
             {growth.map((g, i) => (

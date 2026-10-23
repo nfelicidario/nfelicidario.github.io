@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Artifact, CaseHero, NextCase } from "@/components/case/CaseLayout";
 import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
-import { Activity, Braces, CircleAlert, ClipboardList } from "lucide-react";
+import { ArrowDownToDot, CircleAlert, CodeXml, ListTodo } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
 import { Proof } from "@/components/work/rcs-studio/Proof";
 import { BetsTimeline, TheBet } from "@/components/work/rcs-studio/TheBet";
@@ -92,9 +92,9 @@ export default function Page() {
             text: "Repositioned the product around provisioning:",
             plain: true,
             sub: [
-              <span key="form" className="inline-flex items-center gap-2"><ClipboardList size={14} className="text-accent" aria-hidden="true" />Customer form</span>,
-              <span key="tracking" className="inline-flex items-center gap-2"><Activity size={14} className="text-accent" aria-hidden="true" />Tracking</span>,
-              <span key="api" className="inline-flex items-center gap-2"><Braces size={14} className="text-accent" aria-hidden="true" />API experience</span>,
+              <span key="form" className="inline-flex items-center gap-2"><ListTodo size={14} className="text-accent" aria-hidden="true" />Customer form</span>,
+              <span key="tracking" className="inline-flex items-center gap-2"><ArrowDownToDot size={14} className="text-accent" aria-hidden="true" />Tracking</span>,
+              <span key="api" className="inline-flex items-center gap-2"><CodeXml size={14} className="text-accent" aria-hidden="true" />API experience</span>,
             ],
           },
         ]}
@@ -197,7 +197,7 @@ export default function Page() {
           id="task-audit"
           title="Customer form"
           tagline="From a bare form to a guided one"
-          icon={<ClipboardList size={20} />}
+          icon={<ListTodo size={20} />}
           subtitle="Feature"
           railTitle="Customer form"
           layout="stack"
@@ -222,7 +222,7 @@ export default function Page() {
           id="task-tracking"
           title="Tracking"
           tagline="Know where your agent is"
-          icon={<Activity size={20} />}
+          icon={<ArrowDownToDot size={20} />}
           subtitle="Feature"
           railTitle="Tracking"
           layout="stack"
@@ -244,7 +244,7 @@ export default function Page() {
           id="task-apis"
           title="API experience"
           tagline="Provision and send by API"
-          icon={<Braces size={20} />}
+          icon={<CodeXml size={20} />}
           subtitle="Feature"
           railTitle="API experience"
           layout="stack"

@@ -306,7 +306,7 @@ export const vibesAdminStills: { render: ReactNode; caption: string }[] = [
   },
   {
     render: <HeroView s={still(F.old + 7)} timed still />,
-    caption: "The old way, screen 8 of 14: the AT&T portal. Portal 3 of 10, email 4 of 6, day 12 of 21.",
+    caption: "The old way, screen 8 of 14: the AT&T portal. Portal 3 of 10, email 4 of 6.",
   },
   {
     render: <HeroView s={still(F.vision)} timed still />,
@@ -648,7 +648,7 @@ const SCREEN_ICONS: Record<ScreenIcon, typeof Mail> = {
 function tallyText(t: Tally) {
   const h = Math.floor(t.minutes / 60);
   const m = t.minutes % 60;
-  return `Portal ${t.portal} of ${TALLY_MAX.portal} · Email ${t.email} of ${TALLY_MAX.email} · Day ${t.day} of ${TALLY_MAX.day} · ${h} h ${m} m of Ops time`;
+  return `Portal ${t.portal} of ${TALLY_MAX.portal} · Email ${t.email} of ${TALLY_MAX.email} · ${h} h ${m} m of Ops time`;
 }
 
 function OldWayCard({ s, still, dispatch }: PaneProps) {
