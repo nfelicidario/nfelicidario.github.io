@@ -146,3 +146,44 @@ button:not(:disabled), [role="button"]:not([aria-disabled="true"]) { cursor: poi
 @keyframes pov-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
 .pov-pulse { animation: pov-pulse 2.4s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .pov-pulse { animation: none; } }
+
+/* Define: a word with a definition (see Story.tsx) */
+.define {
+  cursor: help;
+  text-decoration: underline dotted transparent;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s;
+  outline: none;
+}
+li:hover .define, p:hover .define { text-decoration-color: var(--muted); }
+.define:hover, .define:focus-visible { text-decoration-color: var(--accent); }
+.define-tip {
+  pointer-events: none;
+  position: absolute;
+  bottom: 100%;
+  left: -6px;
+  z-index: 20;
+  margin-bottom: 8px;
+  width: max-content;
+  max-width: 30ch;
+  padding: 8px 12px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+  text-align: left;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s, transform 0.15s;
+}
+.define-tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 14px;
+  border: 6px solid transparent;
+  border-top-color: var(--ink);
+}
+.define:hover + .define-tip, .define:focus-visible + .define-tip { opacity: 1; transform: translateY(0); }

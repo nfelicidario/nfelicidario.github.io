@@ -23,16 +23,15 @@ import {
 } from "@/components/phone";
 import {
   BadgeCheck,
-  BotMessageSquare,
-  Building2,
+  BuildingComplex,
   Check,
   ChevronDown,
   ChevronRight,
   CircleAlert,
-  ClipboardCheck,
   Clock,
   FilePen,
   Info,
+  Megaphone,
   Rocket,
   RotateCcw,
   SkipForward,
@@ -182,10 +181,10 @@ const FOOTER_STEPS = STEP_ORDER.map((st) => STEP_LABELS[st]);
 const STEP_START = STEP_ORDER.map((st) => FRAMES.findIndex((f) => f.step === st));
 
 /** the three provisioning steps, with the icon each wears in the pane header */
-const PROVISION_STEPS: { step: Step; icon: typeof Building2 }[] = [
-  { step: "brand", icon: Building2 },
-  { step: "agent", icon: BotMessageSquare },
-  { step: "campaign", icon: ClipboardCheck },
+const PROVISION_STEPS: { step: Step; icon: typeof BuildingComplex }[] = [
+  { step: "brand", icon: BuildingComplex },
+  { step: "agent", icon: BadgeCheck },
+  { step: "campaign", icon: Megaphone },
 ];
 
 /* ------------------------------------------------------------- mock data */

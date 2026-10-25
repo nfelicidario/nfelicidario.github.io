@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Artifact, CaseHero, NextCase } from "@/components/case/CaseLayout";
-import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
+import { CaseHero, NextCase } from "@/components/case/CaseLayout";
+import { Banner, Beats, Bullets, Define, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
 import { ArrowDownToDot, CircleAlert, CodeXml, ListTodo } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
 import { Proof } from "@/components/work/rcs-studio/Proof";
@@ -83,7 +83,12 @@ export default function Page() {
         lede="RCS Studio starts as a flow builder, giving users the ability to create app-like experiences from RCS features and data connections, delivered inside their native messaging app."
         problem={[
           <>Users can&apos;t send flows to customers without a live RCS agent</>,
-          <>Provisioning (getting an RCS agent live) is complex, manual, and doesn&apos;t scale</>,
+          <>
+            <Define def="Getting an RCS agent live: registering the brand, the agent, and its first campaign with the third-party partners who approve them.">
+              Provisioning
+            </Define>{" "}
+            is complex, manual, and doesn&apos;t scale
+          </>,
           "It cost deals and kept us out of the conversation for larger ones",
         ]}
         work={[
@@ -165,7 +170,7 @@ export default function Page() {
           <Bullets
             items={[
               "Without a live RCS agent, RCS Studio is essentially an in-depth demo",
-              "Technical builders were not the ones buying",
+              "Developers were not the ones buying",
               <>Prospects&apos; first question after the demo: &ldquo;Cool demo, now how do I send to customers?&rdquo;</>,
               <>Our answer was complex, manual, and didn&apos;t scale, so it cost deals and kept us out of the conversation for larger ones</>,
               "Provisioning was the unlock: once a customer could get an agent live on their own, the demo became a product and the flow builder became step two",
@@ -269,11 +274,7 @@ export default function Page() {
           subtitle="The proof"
           layout="stack"
           align="left"
-          visual={
-            <Artifact label="What it proved">
-              <Proof />
-            </Artifact>
-          }
+          visual={<Proof />}
         >
           <Bullets
             items={[

@@ -227,6 +227,25 @@ export function Banner({ icon, label, children }: { icon: ReactNode; label: stri
   );
 }
 
+/**
+ * A word the reader may not know. The dotted underline shows when the sentence (its `li` or `p`) is
+ * hovered; hovering or focusing the word shows the definition in a tooltip. Styles live in globals.css
+ * under `.define` so the sentence-hover rule can reach the word.
+ */
+export function Define({ children, def }: { children: ReactNode; def: ReactNode }) {
+  const id = useId();
+  return (
+    <span className="relative inline-block">
+      <span tabIndex={0} aria-describedby={id} className="define">
+        {children}
+      </span>
+      <span role="tooltip" id={id} className="define-tip bubble-sm">
+        {def}
+      </span>
+    </span>
+  );
+}
+
 /** three to five bullets, the body of a beat; a bullet can carry sub-bullets */
 export function Bullets({ items }: { items: Point[] }) {
   return (

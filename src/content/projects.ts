@@ -22,8 +22,8 @@ export const projects: Project[] = [
     title: "RCS Studio",
     gif: "/work/rcs-studio/hero.gif",
     bullets: [
-      "Self-serve product for provisioning and building RCS agents.",
-      "Owned requirements, roadmap, design, and production code.",
+      "Self-serve product for building business RCS flows.",
+      "Owned requirements, roadmap, and design, and contributed production code.",
     ],
     outcomes: [
       "GA in July 2026, Vibes' first self-serve product ever.",

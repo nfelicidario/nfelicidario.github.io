@@ -54,7 +54,7 @@ export function CaseHero({
             {product}
           </h1>
         )}
-        <div className="mb-3 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+        <div className="mb-4 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
           <Link
             href="/#work"
             className="label inline-flex w-fit items-center gap-1 text-muted transition-colors hover:text-ink"
@@ -63,7 +63,11 @@ export function CaseHero({
             Work
           </Link>
           <div className="justify-self-center">
-            {pov && <PovBadge label={pov} />}
+            {product && intro ? (
+              <h1 className="text-center text-[clamp(22px,2.6vw,30px)] font-bold tracking-[-0.02em] text-ink">{product}</h1>
+            ) : (
+              pov && <PovBadge label={pov} />
+            )}
           </div>
           <div className="justify-self-end">
             {brand ? (
@@ -75,6 +79,11 @@ export function CaseHero({
             )}
           </div>
         </div>
+        {pov && product && intro && (
+          <div className="mb-3 flex justify-center">
+            <PovBadge label={pov} />
+          </div>
+        )}
         {stage}
         {intro ?? (
           <div className="mt-14 grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start md:mt-16">

@@ -1,4 +1,4 @@
-import { BadgeCheck, Bot, Check, ClipboardCheck, Clock } from "lucide-react";
+import { BadgeCheck, BuildingComplex, Check, Clock, Megaphone } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 /* Slide 5: a launch timeline and three statuses, so a customer can see where their agent is. Mock states. */
@@ -9,9 +9,9 @@ const CURRENT = 2; // the stage in progress
 type Status = { label: string; Icon: LucideIcon; state: "done" | "active" | "todo"; value: string; next: string };
 
 const statuses: Status[] = [
-  { label: "Brand", Icon: BadgeCheck, state: "done", value: "Approved", next: "Nothing to do" },
-  { label: "Agent", Icon: Bot, state: "active", value: "In review", next: "With third-party partners, 3 to 5 business days" },
-  { label: "Campaign", Icon: ClipboardCheck, state: "todo", value: "Not started", next: "Opens once the agent is verified" },
+  { label: "Brand", Icon: BuildingComplex, state: "done", value: "Approved", next: "Nothing to do" },
+  { label: "Agent", Icon: BadgeCheck, state: "active", value: "In review", next: "With third-party partners, 3 to 5 business days" },
+  { label: "Campaign", Icon: Megaphone, state: "todo", value: "Not started", next: "Opens once the agent is verified" },
 ];
 
 const pill: Record<Status["state"], string> = {

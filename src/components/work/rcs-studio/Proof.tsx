@@ -17,8 +17,8 @@ const cards: Card[] = [
   },
   {
     icon: ShieldCheck,
-    claim: "Testing builds launch confidence",
-    evidence: "Customers who booked a launch had already tried their own agent in Test Mode.",
+    claim: "Testing builds confidence",
+    evidence: "Self-serve and enterprise customers alike reach the aha moment sooner when they can test how the app fits into their workflow.",
   },
   {
     icon: Timer,
