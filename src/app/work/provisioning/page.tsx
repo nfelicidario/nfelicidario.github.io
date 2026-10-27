@@ -1,34 +1,68 @@
 import type { Metadata } from "next";
 import { VibesLogo } from "@/components/VibesLogo";
-import { Artifact, Beat, CaseHero, Hindsight, NextCase, Outcome, Tldr } from "@/components/case/CaseLayout";
+import { CaseHero, MetaBand, NextCase } from "@/components/case/CaseLayout";
+import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
+import { BookOpen, CircleAlert, FileOutput, ListChecks, UserCog } from "lucide-react";
 import { Gate } from "@/components/Gate";
 import blob from "@/content/gated/provisioning.json";
 import { VibesAdminStage } from "@/components/work/provisioning/hero/VibesAdminStage";
-import { IntakeForm } from "@/components/work/provisioning/IntakeForm";
-import { RequestsVsSubmissions } from "@/components/work/provisioning/RequestsVsSubmissions";
 import { Generalizes } from "@/components/work/provisioning/Generalizes";
+import { RequestsVsSubmissions } from "@/components/work/provisioning/RequestsVsSubmissions";
+import { OpsToday } from "@/components/work/provisioning/slides/OpsToday";
+import { Pillars, ThreeFeatureSets } from "@/components/work/provisioning/slides/Pillars";
+import { AuditMap } from "@/components/work/provisioning/slides/AuditMap";
+import { AccountManagement } from "@/components/work/provisioning/slides/AccountManagement";
+import { CaptureToBrief } from "@/components/work/provisioning/slides/CaptureToBrief";
+import { SubmissionsSearch } from "@/components/work/provisioning/slides/SubmissionsSearch";
+import { AdminOutcomes } from "@/components/work/provisioning/slides/AdminOutcomes";
+import { FutureFeatures } from "@/components/work/provisioning/slides/FutureFeatures";
 
 export const metadata: Metadata = {
-  title: "The user nobody designed for",
+  title: "Vibes Admin",
   description:
     "Provisioning at Vibes ran on ten portals and an inbox. I shadowed operations, then designed and shipped the customer intake and the internal admin that replaced it.",
 };
 
-const processSteps: { step: string; written: boolean }[] = [
-  { step: "Customer emails a request to the shared inbox", written: true },
-  { step: "Register the brand and agent in the registry console", written: true },
-  { step: "Resize the logo and banner to each console's limits", written: false },
-  { step: "Email details to the verification vendor", written: true },
-  { step: "Email campaign details to each carrier, one template each", written: false },
-  { step: "Chase the customer for every missing field", written: false },
-  { step: "Track every request by hand in a spreadsheet", written: false },
-  { step: "Build the weekly status report for the customer", written: false },
+const TIMELINE = [
+  { at: "Late 2025", what: "Shadowing" },
+  { at: "Early 2026", what: "Accounts" },
+  { at: "2026", what: "Shipping" },
 ];
 
-const aiAssists = [
-  { name: "Prefill from website URL", what: "Reads the customer's site and drafts brand and agent details for them to correct.", stage: "Beta" },
-  { name: "Campaign review suggestions", what: "Checks campaign fields against carrier best practices before anything is submitted.", stage: "Testing" },
-  { name: "Image optimization", what: "Fits uploaded logos and banners to each console's size and ratio limits.", stage: "Testing" },
+const meta = [
+  {
+    label: "Role",
+    value: (
+      <ul className="grid gap-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
+        <li>Product designer</li>
+        <li>Builder, in production code</li>
+      </ul>
+    ),
+  },
+  {
+    label: "Team",
+    value: (
+      <ul className="grid gap-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
+        <li>Operations team, my closest partner</li>
+        <li>Engineering manager</li>
+        <li>Three engineers</li>
+      </ul>
+    ),
+  },
+  { label: "Timeline", value: <Span points={TIMELINE} direction="vertical" /> },
+  {
+    label: "Stack",
+    value: (
+      <ul className="grid grid-cols-2 gap-x-4 gap-y-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
+        <li>Figma</li>
+        <li>React</li>
+        <li>TypeScript</li>
+        <li>Claude Code</li>
+        <li>Linear</li>
+        <li>GitLab</li>
+      </ul>
+    ),
+  },
 ];
 
 export default function ProvisioningPage() {
@@ -41,249 +75,272 @@ export default function ProvisioningPage() {
         brand={<VibesLogo className="h-full w-auto" />}
         title="The user nobody designed for"
         lede="Every RCS agent a customer created still had to be provisioned by hand across ten portals and an inbox. I made our operations team my closest partner, then designed and shipped the customer intake and the internal admin that replaced the inbox."
-        meta={[
-          { label: "Role", value: "Product designer and builder" },
-          { label: "Partners", value: "Messaging operations, the engineering manager, three engineers" },
-          { label: "Timeline", value: "Late 2025 to present" },
-          { label: "Stack", value: "TypeScript, React, Claude Code" },
-        ]}
+        meta={meta}
+        intro={<MetaBand meta={meta} />}
         stage={<VibesAdminStage />}
       />
 
-      <Tldr
-        items={[
-          "Every RCS agent at Vibes used to be provisioned by hand: ten portals, coordinated over email, no validation, no visibility for the customer.",
-          "I designed and shipped a guided customer intake and the internal admin that replaced it.",
-          "Operations effort per request went from 8 hours to 90 minutes, measured by the operations director. Portals per request from 10 to 6, on the way to 1.",
-          "The pattern is now the standard for every sender type Vibes offers. Toll-free shipped to alpha on it; 10DLC and short code are next.",
+      <SixtySeconds
+        lede={
+          <>
+            <strong>Vibes Admin</strong> is the internal tool our operations team uses to provision every sender a customer requests. It
+            captures the request, cleans it, and turns it into the submissions each third-party partner needs
+          </>
+        }
+        problem={[
+          "Every RCS agent was provisioned by hand across ten portals and an inbox",
+          "Ops copied customer emails into partner forms, chased missing fields, and tracked it all in a spreadsheet",
+          "It couldn't scale, it wasted hours on every request, and it invited human error on both sides",
+        ]}
+        work={[
+          "Shadowed and interviewed the operations team, then owned the design and shipped the provisioning pages in production code",
+          {
+            text: "Modernized the operational process, supported by three feature sets to start:",
+            plain: true,
+            sub: [
+              <span key="accounts" className="inline-flex items-center gap-2"><UserCog size={14} className="text-accent" aria-hidden="true" />Account management</span>,
+              <span key="brief" className="inline-flex items-center gap-2"><FileOutput size={14} className="text-accent" aria-hidden="true" />Capture to brief</span>,
+              <span key="subs" className="inline-flex items-center gap-2"><ListChecks size={14} className="text-accent" aria-hidden="true" />Submissions and search</span>,
+            ],
+          },
+        ]}
+        result={[
+          "Every agent Vibes provisions now comes in through the new flow, as structured data instead of an email",
+          "About an hour cut from every agent's provisioning time",
+          "The same shape now provisions toll-free, with 10DLC and Short Code next",
+          "The split between customer requests and partner submissions became the company's standard",
+        ]}
+        stats={[
+          { value: "10 → 6", label: "portals per request, with 1 as the target" },
+          { value: "~1 hr", label: "cut from every RCS agent's provisioning time" },
+          { value: "100%", label: "of agents provisioned through the new flow" },
+          { value: "88%", label: "of provisioning accounts moved in within weeks" },
+          { value: "4 → 7", label: "people on the operations team, as demand grew" },
+        ]}
+        takeawaysLabel="Changes to how I work"
+        takeaways={[
+          {
+            lead: "Shadow before you sketch.",
+            text: "The map had steps nobody had written down. I would not have found them in a requirements doc.",
+          },
+          {
+            lead: "Collect it, then transform it.",
+            text: "Structured input is the foundation. Once a request is data, every automation after it becomes possible.",
+          },
+          {
+            lead: "The branch is the spec.",
+            text: "I prototype in the codebase, and the engineers point their sessions at my branch. Output matches the prototype, with real data behind it.",
+          },
         ]}
       />
 
-      <Beat
-        chapter="Chapter 1 · The user nobody designed for"
-        title="Ten portals, a spreadsheet, and an inbox"
-        artifact={
-          <Artifact label="What the customer never saw" pill="Abstract">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="bubble-sm border border-rule bg-raised p-3">
-                <div className="label mb-2">The customer saw</div>
-                <ul className="grid gap-1.5 text-[13px] text-body">
-                  <li>A &quot;create agent&quot; button</li>
-                  <li>An email thread</li>
-                  <li>A wait with no status</li>
-                </ul>
-              </div>
-              <div className="bubble-sm border border-rule bg-surface p-3">
-                <div className="label mb-2">Operations did</div>
-                <ul className="grid gap-1.5 text-[13px] text-body">
-                  <li>Registered the brand and agent in a console</li>
-                  <li>Emailed a verification vendor</li>
-                  <li>Emailed each carrier a different template</li>
-                  <li>Chased every missing field by hand</li>
-                  <li>Tracked it all in a spreadsheet</li>
-                </ul>
-              </div>
+      <Beats>
+        <StoryBeat
+          id="the-problem"
+          title="Every agent, by hand"
+          subtitle="The problem"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={
+            <Banner icon={<BookOpen size={17} />} label="Provisioning">
+              Getting a sender live: registering the brand, the sender, and its first campaign with the third-party partners who approve them.
+              For RCS the sender is an agent; for SMS it is a toll-free number, a 10DLC number, or a short code.
+            </Banner>
+          }
+          after={
+            <div className="grid gap-5">
+              <OpsToday />
+              <Banner icon={<CircleAlert size={17} />} label="The problem">
+                It can&apos;t scale, it wastes hours on every request, and it&apos;s prone to human error, on the customer&apos;s side and on ours.
+              </Banner>
             </div>
-          </Artifact>
-        }
-      >
-        <p>
-          RCS Studio was built for customers, but every agent a customer created still had to be provisioned by our messaging operations team. A brand and agent registered in one console, details emailed to a verification vendor, campaign information emailed to each carrier, and every missing field chased with the customer over email.
-        </p>
-        <p>Ten portals, a spreadsheet, and tribal knowledge. The customer saw none of it.</p>
-      </Beat>
+          }
+        >
+          <Bullets
+            items={[
+              "RCS Studio gave customers a product, but every agent they created still had to be provisioned by our operations team",
+              "Ops copied each request into a registry console, a verification vendor's inbox, and each carrier's portal or email template",
+              "Every missing field was chased over email, and every request was tracked by hand in a spreadsheet",
+              "The customer saw a button, an email thread, and a wait with no status",
+            ]}
+          />
+        </StoryBeat>
 
-      <Beat
-        chapter="Chapter 2 · Learning the process"
-        title="I ran the process myself until I could draw it"
-        reverse
-        artifact={
-          <Artifact label="Process map, condensed" pill="From shadowing">
-            <ol className="grid gap-1.5">
-              {processSteps.map((s, i) => (
-                <li key={s.step} className="grid grid-cols-[22px_1fr_auto] items-center gap-2 text-[13px]">
-                  <span className="num text-muted">{i + 1}.</span>
-                  <span className="text-body">{s.step}</span>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${
-                      s.written ? "bg-raised text-muted" : "bg-warn-soft text-warn"
-                    }`}
-                  >
-                    {s.written ? "documented" : "unwritten"}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          </Artifact>
-        }
-      >
-        <p>
-          Operations became my closest partner. I shadowed provisioning requests end to end, interviewed the team, and ran the flow myself in a test environment with mock data until I could draw the whole thing from memory.
-        </p>
-        <p>The map had steps nobody had written down.</p>
-      </Beat>
+        <StoryBeat
+          id="the-solution"
+          title="Modernize the operational process"
+          subtitle="The solution"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={<Pillars />}
+          after={<ThreeFeatureSets />}
+        >
+          <Bullets
+            items={[
+              "Not everyone agreed. The view at the top, held loosely, was that an ever-changing ops process shouldn't be turned into software",
+              {
+                text: "My stance: the process was a disaster, the tribal knowledge had to come out, and modernizing it was the only way to scale and chase larger business",
+                sub: ["I built out the admin page idea with the engineering manager, the vision became visible, and the argument ended"],
+              },
+              "Due to the nature of the industry, the steps with third-party partners stay manual for now, so the plan modernizes everything around them",
+            ]}
+          />
+        </StoryBeat>
 
-      <Beat
-        chapter="Chapter 3 · The argument"
-        title="Don't build software around a process that keeps changing"
-        artifact={
-          <Artifact label="The pushback, and the answer">
-            <blockquote className="grid gap-4">
-              <p className="bubble border border-rule bg-raised px-4 py-3 text-[15px] text-body">
-                &quot;It changes every month. Build it and we&apos;ll be rebuilding it.&quot;
-              </p>
-              <p className="bubble-me justify-self-end border border-accent bg-accent-soft px-4 py-3 text-[15px] text-ink">
-                &quot;It changes because it lives in people&apos;s heads. Write it down as software and it stops changing by accident.&quot;
-              </p>
-            </blockquote>
-            <p className="mt-3 text-[12px] text-muted">Paraphrased from the conversations, not a transcript.</p>
-          </Artifact>
-        }
-      >
-        <p>
-          The pushback, held loosely by the CTO and the engineering manager, was reasonable: don&apos;t build software around a process that keeps changing. My position was that it kept changing because it lived in people&apos;s heads, and the company couldn&apos;t scale RCS on an inbox.
-        </p>
-        <p>
-          I didn&apos;t win it in a meeting. I worked out the admin concept with the engineering manager until the vision was something you could look at.
-        </p>
-      </Beat>
+        <StoryBeat
+          id="the-audit"
+          title="I ran the process until I could draw it"
+          subtitle="The audit"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={<AuditMap />}
+        >
+          <Bullets
+            items={[
+              "Operations became my closest partner: I shadowed requests end to end, interviewed the team, and ran the flow in a test environment with mock data",
+              "The map had steps nobody had written down, and a wait of about a week on verification in the middle of it",
+              "The finding that set the scope: because the partner steps stay manual, validating, cleaning, and guiding customer input is itself a huge improvement",
+            ]}
+          />
+        </StoryBeat>
 
-      <Beat
-        chapter="Chapter 4 · The customer side"
-        title="A guided intake instead of an email thread"
-        reverse
-        artifact={
-          <Artifact label="Guided intake, abstracted" pill="Mock data">
-            <IntakeForm />
-          </Artifact>
-        }
-      >
-        <p>
-          The intake replaced email with a guided form: inline validation, field-level explanations, a progress tracker through the stages, and copy written for someone who has never heard of carrier approval. Submitted requests show up in a table of sender types with a status.
-        </p>
-        <p>
-          Statuses are coarse today because the upstream systems were never built to report them. As those integrations land, the customer gets stage-level detail and next steps.
-        </p>
-      </Beat>
+        <StoryBeat
+          id="feature-accounts"
+          title="Account management"
+          note="Accounts, users, and a way in"
+          icon={<UserCog size={20} />}
+          subtitle="Feature set"
+          railTitle="Account management"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={<AccountManagement />}
+        >
+          <Bullets
+            items={[
+              "Ops needed to create and edit customer accounts without an engineer, and to add users to them",
+              "I designed the accounts page in Figma, early 2026, before the team worked in code",
+              "Adding a user runs through a makeshift impersonation: ops signs in as the account to set it up, until a real invite flow ships",
+              "It is a high-level view today, on purpose, because the provisioning pages carried the urgency",
+            ]}
+          />
+        </StoryBeat>
 
-      <Beat
-        chapter="Chapter 5 · Requests versus submissions"
-        title="One request, several submissions"
-        artifact={
-          <Artifact label="Data model" pill="Diagram">
-            <RequestsVsSubmissions />
-          </Artifact>
-        }
-      >
-        <p>
-          The insight that changed the architecture came late: a customer makes one request, but operations makes several submissions, one per third party, each with its own contract.
-        </p>
-        <p>
-          I helped shape the structure so that each third-party form is a template prefilled from the customer&apos;s request, and operations only adds what&apos;s missing. It removes the copy-and-paste entirely.
-        </p>
-      </Beat>
+        <StoryBeat
+          id="feature-brief"
+          title="Capture to brief"
+          note="Input, edits, and a PDF brief"
+          icon={<FileOutput size={20} />}
+          subtitle="Feature set"
+          railTitle="Capture to brief"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={<CaptureToBrief />}
+        >
+          <Bullets
+            items={[
+              "I designed the capture: every customer field, from the guided form or the API, lands in one structured record instead of an email",
+              "Ops can edit the record in place, so a correction is a field change, not another thread",
+              "The record transforms into a PDF brief, the document compliance review and the partners actually need",
+              "I shipped the provisioning pages and the details page in production code",
+            ]}
+          />
+        </StoryBeat>
 
-      <Beat
-        chapter="Chapter 6 · Built in code"
-        title="The prototype branch was the spec"
-        reverse
-        artifact={
-          <Artifact label="How submissions shipped">
-            <ol className="grid gap-2 sm:grid-cols-3">
-              {[
-                { k: "My branch", v: "Submissions prototyped in code with mock data, deployed to a shared environment." },
-                { k: "Their sessions", v: "Engineers pointed Claude Code at the branch and wired the real API and data model." },
-                { k: "Production", v: "What shipped looks identical to the prototype." },
-              ].map((s, i) => (
-                <li key={s.k} className={`bubble-sm border p-3 ${i === 2 ? "border-accent bg-accent-soft" : "border-rule bg-raised"}`}>
-                  <div className="label mb-1">{s.k}</div>
-                  <p className="text-[13px] text-body">{s.v}</p>
-                </li>
-              ))}
-            </ol>
-          </Artifact>
-        }
-      >
-        <p>
-          I shipped the provisioning pages and the details page in production. For submissions, I prototyped the flow in code with mock data, and the engineers pointed their Claude Code sessions at my branch.
-        </p>
-        <p>What shipped looks identical, with the real API and data model behind it.</p>
-      </Beat>
+        <StoryBeat
+          id="feature-submissions"
+          title="Submissions and search"
+          note="One request, several submissions"
+          icon={<ListChecks size={20} />}
+          subtitle="Feature set"
+          railTitle="Submissions and search"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={<RequestsVsSubmissions />}
+          after={<SubmissionsSearch />}
+        >
+          <Bullets
+            items={[
+              "One customer request becomes several partner submissions, each with its own template and a few fields of its own",
+              "I prototyped the submissions page in code, and my branch was what the engineers pointed their sessions at",
+              "Templates prefill each partner's form from the main submission, so ops adds only what is missing instead of copying and pasting",
+              "Advanced search finds any request or submission by customer, sender type, partner, or status",
+            ]}
+          />
+        </StoryBeat>
 
-      <Beat
-        chapter="Chapter 7 · It generalizes"
-        title="A brand, a campaign, and the sender-specific details"
-        artifact={
-          <Artifact label="Same shape, two sender types" pill="Diagram">
-            <Generalizes />
-          </Artifact>
-        }
-      >
-        <p>
-          Toll-free provisioning reused the brand concept and the campaign review step and shipped to alpha in a fraction of the time. The target shape for every sender type is now the same: a brand, a campaign, and the sender-specific details.
-        </p>
-        <p>10DLC and short code follow.</p>
-      </Beat>
+        <StoryBeat
+          id="inside-the-admin"
+          title="Inside the admin"
+          subtitle="The prototype"
+          layout="stack"
+          align="left"
+          visual={<Gate blob={blob} title="Provisioning admin, recreated with mock data" />}
+        >
+          <Bullets items={["The admin, recreated with mock data. It is behind a passphrase, since it shows internal workflows."]} />
+        </StoryBeat>
 
-      <Beat
-        chapter="Chapter 8 · AI in the flow"
-        title="Three assists, none of them shipped yet"
-        reverse
-        artifact={
-          <Artifact label="AI assists" pill="In beta or testing">
-            <ul className="grid gap-2">
-              {aiAssists.map((a) => (
-                <li key={a.name} className="bubble-sm grid grid-cols-[1fr_auto] items-start gap-3 border border-rule bg-raised p-3">
-                  <div>
-                    <div className="text-[13.5px] font-semibold text-ink">{a.name}</div>
-                    <p className="mt-0.5 text-[12.5px] text-body">{a.what}</p>
-                  </div>
-                  <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent">{a.stage}</span>
-                </li>
-              ))}
-            </ul>
-          </Artifact>
-        }
-      >
-        <p>
-          Three AI assists are in beta or testing: prefilling agent details from the customer&apos;s website URL, reviewing campaign fields against best practices before submission, and optimizing uploaded logos and banners.
-        </p>
-        <p>Each one is designed as a draft the customer or operations can overwrite, not an answer.</p>
-      </Beat>
+        <StoryBeat
+          id="the-outcome"
+          title="Operations time is going down"
+          subtitle="The outcome"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={<AdminOutcomes />}
+        >
+          <Bullets
+            items={[
+              "Every agent Vibes provisions now comes in through the new flow, as structured data",
+              "The operations team grew from four to seven on this work as demand grew, without the process breaking",
+              "Customers see statuses instead of an email thread",
+              <>
+                The customer side of this story is the <StoryLink href="/work/rcs-studio/">RCS Studio</StoryLink> case study
+              </>,
+            ]}
+          />
+        </StoryBeat>
 
-      <Beat chapter="Chapter 9 · The admin side" title="The admin, recreated">
-        <p>
-          The admin surfaces everything a customer submitted, by API or by form, in one place, with accounts management alongside: create, edit, upgrade, impersonate, suspend. Operations exports or copies from there instead of hunting across portals.
-        </p>
-        <p>
-          Because it is an internal, auth-walled tool, the recreation below is passphrase protected and uses mock data only.
-        </p>
-      </Beat>
-      <section className="mx-auto max-w-6xl pb-14 md:pb-16">
-        <Gate blob={blob} title="Provisioning admin, recreated with mock data" />
-      </section>
+        <StoryBeat
+          id="whats-next"
+          title={"What's next"}
+          subtitle="Still going"
+          railTitle="What's next"
+          layout="stack"
+          align="left"
+          visualFirst
+          visual={<FutureFeatures />}
+          after={
+            <div>
+              <div className="label mb-3">Every sender type, one shape</div>
+              <Generalizes />
+            </div>
+          }
+        >
+          <Bullets
+            items={[
+              "Toll-free is in alpha on the same shape, with 10DLC and Short Code next",
+              "Every sender type becomes brand, campaign, and sender-specific details, so each new one ships faster than the last",
+              "Advanced templates, triage support, and provisioning requests are the next three feature sets",
+            ]}
+          />
+        </StoryBeat>
 
-      <Outcome
-        stats={[
-          { value: "8h → 90m", label: "operations effort per request, measured by the operations director" },
-          { value: "10 → 6", label: "portals per request, with 1 as the target" },
-          { value: "4 → 7", label: "operations team on this work, as demand grew" },
-          { value: "3", label: "AI assists in beta or testing" },
-        ]}
-      >
-        <p>
-          The operations director measured the before and after. Demand grew and the team on this work grew with it, without the process breaking.
-        </p>
-      </Outcome>
-
-      <Hindsight>
-        <p>
-          I&apos;d have separated customer requests from third-party submissions on day one. It&apos;s the abstraction the whole process hangs on, and it took months to see.
-        </p>
-        <p>
-          Finding it earlier would have saved the operations team real time, and it turned out to be a gap across the company, not just this product.
-        </p>
-      </Hindsight>
+        <StoryBeat id="hindsight" title={"What I'd do differently"} subtitle="With hindsight" layout="stack" align="left">
+          <Bullets
+            items={[
+              "Separate customer requests from third-party submissions on day one. It is the abstraction the whole process hangs on, and it took months to see",
+              "Finding it earlier would have saved the operations team real time, and it turned out to be a gap across the company, not just this product",
+              "Abstract and standardize from the beginning, so each sender type is a variation instead of a new process",
+            ]}
+          />
+        </StoryBeat>
+      </Beats>
 
       <NextCase slug="making-the-team-faster" />
     </div>

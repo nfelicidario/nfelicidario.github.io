@@ -121,6 +121,19 @@ export function CaseHero({
   );
 }
 
+/** the ruled band of role, team, timeline, and stack under a hero whose product name sits in the header row */
+export function MetaBand({ meta }: { meta: Meta[] }) {
+  return (
+    <div className="mt-12 md:mt-14">
+      <MetaList
+        meta={meta}
+        columns={4}
+        className="border-y border-rule py-5 md:gap-x-8 md:[&>div+div]:border-l md:[&>div+div]:border-rule md:[&>div+div]:pl-6"
+      />
+    </div>
+  );
+}
+
 /** the role / team / timeline / stack list with its icons; `columns` 1, 2, or 4 */
 export function MetaList({ meta, className = "", columns = 2 }: { meta: Meta[]; className?: string; columns?: 1 | 2 | 4 }) {
   const cols = columns === 1 ? "grid-cols-1" : columns === 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2";
