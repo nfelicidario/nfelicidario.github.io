@@ -183,8 +183,8 @@ export default function Page() {
                   <Quote key="q">Cool demo, now how do I send to customers?</Quote>,
                 ],
               },
-              <>Our answer was complex, manual, and didn&apos;t scale, so it cost deals and kept us out of the conversation for larger ones</>,
-              "Provisioning was the unlock: once a customer could get an agent live on their own, the demo became a product and the flow builder became step two",
+              <>Our answer was provisioning, but our provisioning process was complex, manual, and didn&apos;t scale, so it cost deals and kept us out of the conversation for larger ones</>,
+              "Modernizing provisioning was the unlock: once a customer could get an agent live on their own, the demo became a product and the flow builder became step two",
             ]}
           />
         </StoryBeat>
@@ -311,6 +311,19 @@ export default function Page() {
               "The bet is paying off: RCS message volume on Vibes grew 100× in twelve months",
               "It proved that customers would sign up and get an agent running on their own, something the company had never seen",
               <>That changed the company&apos;s direction, and I&apos;m now working with the head of product on a company-wide self-serve entry point</>,
+            ]}
+          />
+        </StoryBeat>
+
+        <StoryBeat id="whats-next" title={"What's next"} subtitle="Still going" railTitle="What's next" layout="stack" align="left">
+          <Bullets
+            items={[
+              "Provisioning is expanding beyond RCS: TFN is live, with 10DLC and Short Code next",
+              "The API experience keeps improving toward one abstracted, standardized API across every sender type",
+              <>
+                RCS Studio is being rebranded under a new product name, which is where the{" "}
+                <StoryLink href="/work/self-serve-entry/">self-serve entry point</StoryLink> case study picks up
+              </>,
             ]}
           />
         </StoryBeat>

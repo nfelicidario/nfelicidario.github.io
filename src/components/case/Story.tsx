@@ -399,7 +399,7 @@ export function Beats({
     <BeatsContext.Provider value={ctx}>
       <div ref={rootRef} className="relative mx-auto max-w-6xl">
         {heading && (
-          <h2 className="pt-8 pb-4 text-center text-[clamp(26px,3vw,34px)] font-bold tracking-[-0.02em] text-ink md:pt-10 md:pb-3">
+          <h2 className="pt-22 pb-4 text-center text-[clamp(26px,3vw,34px)] font-bold tracking-[-0.02em] text-ink md:pt-26 md:pb-3">
             {heading}
           </h2>
         )}
