@@ -679,7 +679,7 @@ export function StoryLink({ href, children }: { href: string; children: ReactNod
   return (
     <Link
       href={href}
-      className="text-body underline decoration-rule underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
+      className="text-ink underline decoration-transparent underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
     >
       {children}
     </Link>

@@ -12,7 +12,7 @@ import { ApiAccess } from "@/components/work/rcs-studio/ApiAccess";
 import { AuditToForm } from "@/components/work/rcs-studio/AuditToForm";
 import { Outcomes } from "@/components/work/rcs-studio/Outcomes";
 import { ProvisioningApiExplorer } from "@/components/work/rcs-studio/ProvisioningApiExplorer";
-import { TheSolution } from "@/components/work/rcs-studio/TheSolution";
+import { TheSolution, ThreeFeatures } from "@/components/work/rcs-studio/TheSolution";
 import { VibesLogo } from "@/components/VibesLogo";
 
 export const metadata: Metadata = { title: "RCS Studio" };
@@ -80,7 +80,6 @@ export default function Page() {
       />
 
       <SixtySeconds
-        ledeLabel="What it is"
         lede={
           <>
             <strong>RCS Studio</strong> started as a flow builder for creating app-like experiences from RCS features and data
@@ -100,7 +99,7 @@ export default function Page() {
         work={[
           "Owned requirements, roadmap, and design, and contributed to the provisioning flows in production code",
           {
-            text: "Repositioned the product around provisioning:",
+            text: "Repositioned the product around provisioning, supported by three main features to start:",
             plain: true,
             sub: [
               <span key="form" className="inline-flex items-center gap-2"><ListTodo size={14} className="text-accent" aria-hidden="true" />Customer form</span>,
@@ -110,10 +109,10 @@ export default function Page() {
           },
         ]}
         result={[
-          "Vibes' first proof that customers want to sign up and get started on their own",
+          "Vibes' first proof that prospects and customers have an appetite for self-serve",
           "Vibes' first provisioning API, already carrying about a third of submissions",
           "Provisioning now extends to TFN, with 10DLC and Short Code next",
-          "The design direction now leads the company's next-generation products",
+          "Now the way every RCS agent at Vibes gets provisioned, and the model for a company-wide self-serve entry point",
         ]}
         stats={[
           { value: "1st", label: "public sign-up at Vibes" },
@@ -122,15 +121,15 @@ export default function Page() {
           { value: "500+", label: "RCS agents provisioned through RCS Studio" },
           { value: "1–3 wks", label: "to provision, compared to several months for competitors" },
         ]}
-        takeawaysLabel="What changed how I work"
+        takeawaysLabel="Changes to how I work"
         takeaways={[
           {
             lead: "Prototype the argument.",
-            text: "I build a proof of concept, or several, as a visual talking point, collaborate with the team on what works and what doesn't, and iterate.",
+            text: "I build the proof of concept, or several, as a visual talking point, collaborate with the team and stakeholders on what works and what doesn't, and iterate.",
           },
           {
             lead: "Push the boundaries.",
-            text: "Mobile marketing has its standards and Vibes has its habits. RCS Studio pushed past both and unlocked a lot of new findings.",
+            text: "The industry has its standards and Vibes has its own practices too. Throughout RCS Studio's evolution, pushing past these conventions unlocked a lot of new findings.",
           },
           {
             lead: "Prototype in the codebase.",
@@ -181,9 +180,7 @@ export default function Page() {
                 text: "The first question after the demo:",
                 plain: true,
                 sub: [
-                  <Quote key="q" by="The same question, every time">
-                    &ldquo;Cool demo, now how do I send to customers?&rdquo;
-                  </Quote>,
+                  <Quote key="q">Cool demo, now how do I send to customers?</Quote>,
                 ],
               },
               <>Our answer was complex, manual, and didn&apos;t scale, so it cost deals and kept us out of the conversation for larger ones</>,
@@ -200,14 +197,23 @@ export default function Page() {
           align="left"
           visualFirst
           visual={<TheSolution />}
+          after={<ThreeFeatures />}
         >
           <Bullets
             items={[
               "Not everyone agreed that provisioning should lead, so instead of arguing I built a prototype of the provisioning flow",
-              "I put it in front of the operations team, the people provisioning by hand, and their overwhelmingly positive reactions won over the skeptics",
-              "What won them over: build this out, and we save significant operations time and can scale every sender type we offer, not just RCS",
-              "Provisioning became step one for everyone: customers get an agent live on their own, and the operations team gets every submission collected as structured data instead of email threads. Once we can collect it, we can transform it, and that set the foundation for streamlining their work",
-              "Three features followed: the customer form, tracking, and the API experience",
+              {
+                text: "I put it in front of the operations team, the people provisioning by hand, and their overwhelmingly positive reactions won over the skeptics",
+                sub: ["Build this out, and we save significant operations time and can scale every sender type we offer, not just RCS"],
+              },
+              {
+                text: "Provisioning became step one for everyone",
+                sub: [
+                  "Customers get an agent live on their own",
+                  "The operations team gets every submission collected as structured data instead of email threads",
+                  "Once we can collect it, we can transform it, which set the foundation for streamlining their work",
+                ],
+              },
             ]}
           />
         </StoryBeat>
@@ -227,11 +233,11 @@ export default function Page() {
           <Bullets
             items={[
               "I audited how a customer actually got an agent live: a bare form with no validation and no guidance, instructions in supporting Word documents, and corrections over email threads",
-              "The audit set the next step: a guided form with step-by-step instructions and validation guardrails, so submissions come in right the first time",
-              "Each field explains what the third-party partners will check, so the customer fixes problems before review instead of after",
+              "I designed a guided form with step-by-step instructions and validation guardrails, so submissions come in right the first time",
+              "I gave confusing fields supporting instructions and abstracted difficult decisions into easier choices",
               <>
-                Behind it, a read layer over submissions for the operations team, who had no tooling at all. Automating their side is{" "}
-                <StoryLink href="/work/provisioning/">the next case study</StoryLink>
+                Behind it, I designed a read layer over submissions for our operations team, who had very little tooling. See the story in the{" "}
+                <StoryLink href="/work/provisioning/">Vibes Admin</StoryLink> case study
               </>,
             ]}
           />
@@ -252,9 +258,9 @@ export default function Page() {
           <Bullets
             items={[
               "Before, the only way to know where an agent stood was to ask, and every status update was an email",
-              "A launch progression timeline shows the whole path from submission to live, and where the agent is on it today",
-              "Brand, agent, and campaign each carry their own status, because each is reviewed separately by the third-party partners",
-              "Every status says what happens next and who is holding it, so customers stop asking and the operations team stops answering",
+              "I designed a launch progression timeline that shows the whole path from submission to live, and where the agent is on it today",
+              "I gave brand, agent, and campaign their own status, because each is reviewed separately by the third-party partners",
+              "Every status says what happens next and who is holding it, so customers get the answers they want, when they need them",
             ]}
           />
         </StoryBeat>
@@ -275,9 +281,9 @@ export default function Page() {
           <Bullets
             items={[
               "Technical developers wanted to provision and send without touching the UI",
-              "A self-serve credential experience: create, label, and rotate keys for Test or Live, with no ticket to anyone",
-              "A provisioning API that mirrors the form, so a brand, agent, and campaign can be registered and tracked from code",
-              "A messaging API that unlocks once the agent is live, which is also where the flow builder lives on, as step two",
+              "I designed a self-serve credential experience: create, label, and rotate keys for Test or Live, with no ticket to anyone",
+              "I specified a provisioning API that mirrors the form, so a brand, agent, and campaign can be registered and tracked from code",
+              "The messaging API unlocks once the agent is live, which is also where the flow builder lives on, as step two",
             ]}
           />
         </StoryBeat>

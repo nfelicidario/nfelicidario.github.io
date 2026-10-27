@@ -11,7 +11,7 @@ type Status = { label: string; Icon: LucideIcon; state: "done" | "active" | "tod
 const statuses: Status[] = [
   { label: "Brand", Icon: BuildingComplex, state: "done", value: "Approved", next: "Nothing to do" },
   { label: "Agent", Icon: BadgeCheck, state: "active", value: "In review", next: "With third-party partners, 3 to 5 business days" },
-  { label: "Campaign", Icon: Megaphone, state: "todo", value: "Not started", next: "Opens once the agent is verified" },
+  { label: "Campaign", Icon: Megaphone, state: "todo", value: "Not started", next: "Ready to fill out now, reviewed after the agent is verified" },
 ];
 
 const pill: Record<Status["state"], string> = {

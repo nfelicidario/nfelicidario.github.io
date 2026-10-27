@@ -1,4 +1,5 @@
-import { ArrowDown, ArrowRight } from "lucide-react";
+import { ArrowDown, ArrowDownToDot, ArrowRight, CodeXml, ListTodo } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 /* Slide 3: the product's shape before and after, in one row. */
 
@@ -51,6 +52,34 @@ export function TheSolution() {
           <Step n={2} label="Flow Building" tone="outline" note="The flow builder, as step two" />
         </div>
       </div>
+    </div>
+  );
+}
+
+const features: { Icon: LucideIcon; title: string; text: string }[] = [
+  { Icon: ListTodo, title: "Customer form", text: "From a bare form to a guided one" },
+  { Icon: ArrowDownToDot, title: "Tracking", text: "Know where your agent is" },
+  { Icon: CodeXml, title: "API experience", text: "Provision and send by API" },
+];
+
+/** the three features that followed, under the slide 3 bullets; each is a slide of its own */
+export function ThreeFeatures() {
+  return (
+    <div>
+      <div className="label mb-3">3 Features:</div>
+      <ul className="grid gap-3 sm:grid-cols-3">
+        {features.map(({ Icon, title, text }) => (
+          <li key={title} className="bubble-sm flex items-center gap-3 border border-rule bg-bg p-4">
+            <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
+              <Icon size={17} />
+            </span>
+            <span>
+              <span className="block text-[15px] font-semibold leading-tight text-ink">{title}</span>
+              <span className="mt-0.5 block text-[13px] text-muted">{text}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
