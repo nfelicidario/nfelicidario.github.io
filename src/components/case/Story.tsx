@@ -13,7 +13,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ChevronDown, CircleAlert, Hammer, Keyboard, Trophy } from "lucide-react";
+import { ChevronDown, CircleAlert, Hammer, Keyboard, Quote as QuoteIcon, Trophy } from "lucide-react";
 import { Stats, type Stat } from "./CaseLayout";
 
 /**
@@ -33,8 +33,10 @@ export type Term = { icon: ReactNode; title: string; text: ReactNode; tag?: stri
 export type Point = ReactNode | { text: ReactNode; sub: ReactNode[]; /** no markers, e.g. icon rows */ plain?: boolean };
 
 export type SixtySecondsProps = {
-  /** one line on what the product is, set large */
+  /** one line on what the product is, set large and light; bold the product name inside it */
   lede?: ReactNode;
+  /** small label over the lede, e.g. "What it is" */
+  ledeLabel?: string;
   /** the two or three terms a reader needs, as tiles */
   terms?: Term[];
   problem: Point[];
@@ -50,6 +52,7 @@ export type SixtySecondsProps = {
 
 export function SixtySeconds({
   lede,
+  ledeLabel,
   terms,
   problem,
   work,
@@ -73,9 +76,12 @@ export function SixtySeconds({
         {(lede || terms) && (
           <div className="mt-6 grid gap-5">
             {lede && (
-              <p className="mx-auto max-w-[36ch] text-center font-display text-[clamp(20px,2vw,25px)] font-semibold leading-[1.3] tracking-[-0.01em] text-ink">
-                {lede}
-              </p>
+              <div className="text-center">
+                {ledeLabel && <div className="label mb-2.5 text-muted">{ledeLabel}</div>}
+                <p className="mx-auto max-w-[46ch] font-display text-[clamp(18px,1.8vw,22px)] font-normal leading-[1.45] text-body [&_strong]:font-semibold [&_strong]:text-ink">
+                  {lede}
+                </p>
+              </div>
             )}
             {terms && <TermTiles terms={terms} className="mx-auto w-full max-w-3xl" />}
           </div>
@@ -243,6 +249,17 @@ export function Define({ children, def }: { children: ReactNode; def: ReactNode 
         {def}
       </span>
     </span>
+  );
+}
+
+/** a pull quote, e.g. under a bullet that introduces it */
+export function Quote({ children, by }: { children: ReactNode; by?: ReactNode }) {
+  return (
+    <figure className="bubble-sm relative mt-1.5 border border-accent bg-accent-soft/40 py-4 pl-12 pr-5">
+      <QuoteIcon aria-hidden="true" size={18} className="absolute left-4 top-[18px] text-accent" />
+      <blockquote className="font-display text-[18px] font-semibold leading-snug text-ink md:text-[19px]">{children}</blockquote>
+      {by && <figcaption className="label mt-2 text-accent">{by}</figcaption>}
+    </figure>
   );
 }
 
@@ -518,8 +535,8 @@ export function StoryBeat({
   /** anchor id, e.g. "the-bet" */
   id: string;
   title: string;
-  /** two or three lines; one idea */
-  children: ReactNode;
+  /** two or three lines; one idea. Leave it out for a slide that is only its visual */
+  children?: ReactNode;
   /** the one big visual for this beat; a slide without one is just heading and bullets */
   visual?: ReactNode;
   /** the long version, shown behind "Go deeper" */
@@ -573,9 +590,11 @@ export function StoryBeat({
   );
   const body = (
     <>
-      <div className={`mt-4 grid gap-3 text-[16.5px] leading-relaxed [&>p]:text-body ${layout === "stack" ? "mx-auto max-w-[58ch]" : "max-w-[46ch]"}`}>
-        {children}
-      </div>
+      {children && (
+        <div className={`mt-4 grid gap-3 text-[16.5px] leading-relaxed [&>p]:text-body ${layout === "stack" ? "mx-auto max-w-[58ch]" : "max-w-[46ch]"}`}>
+          {children}
+        </div>
+      )}
       {deeper && <GoDeeper align={centered ? "center" : "left"}>{deeper}</GoDeeper>}
     </>
   );

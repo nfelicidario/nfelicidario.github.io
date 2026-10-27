@@ -32,13 +32,10 @@ export function TheSolution() {
   return (
     <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-stretch">
       <div className="bubble-sm flex flex-col gap-3 border border-dashed border-rule bg-bg p-4">
-        <div>
-          <div className="label">Before</div>
-          <div className="mt-0.5 text-[17px] font-bold leading-tight text-ink">A flow builder</div>
-        </div>
+        <div className="text-[17px] font-bold leading-tight text-ink">Before</div>
         <div className="flex items-stretch gap-2">
-          <Step n={1} label="Provision" tone="missing" note="Outside the product, by email" />
-          <Step n={2} label="Build" tone="on" note="For technical developers" />
+          <Step n={1} label="Provisioning" tone="missing" note="Outside the product, by email" />
+          <Step n={2} label="Flow Building" tone="on" note="For technical developers" />
         </div>
       </div>
 
@@ -48,13 +45,10 @@ export function TheSolution() {
       </div>
 
       <div className="bubble-sm flex flex-col gap-3 border border-accent bg-accent-soft/40 p-4">
-        <div>
-          <div className="label text-accent">After</div>
-          <div className="mt-0.5 text-[17px] font-bold leading-tight text-ink">A provisioning platform</div>
-        </div>
+        <div className="text-[17px] font-bold leading-tight text-accent">After</div>
         <div className="flex items-stretch gap-2">
-          <Step n={1} label="Provision" tone="on" note="For customers, and the operations team behind them" />
-          <Step n={2} label="Build" tone="outline" note="The flow builder, as step two" />
+          <Step n={1} label="Provisioning" tone="on" note="For customers and our internal operations team" />
+          <Step n={2} label="Flow Building" tone="outline" note="The flow builder, as step two" />
         </div>
       </div>
     </div>

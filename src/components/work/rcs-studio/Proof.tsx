@@ -1,14 +1,14 @@
 import type { LucideIcon } from "lucide-react";
-import { FlaskConical, Route, ShieldCheck, Timer, UserPlus } from "lucide-react";
+import { CodeXml, FileText, FlaskConical, Milestone, Route, ShieldCheck, Timer, UserPlus } from "lucide-react";
 
-type Card = { icon: LucideIcon; claim: string; evidence: string; stat?: string };
+type Card = { icon: LucideIcon; claim: string; evidence: string };
 
-const cards: Card[] = [
+const product: Card[] = [
   {
     icon: UserPlus,
     claim: "Customers will start on their own",
     evidence:
-      "Customers signed up and got an agent into Test Mode on their own, a first for a company that had only sold through a sales team.",
+      "Anyone could sign up and get an agent into Test Mode without talking to us, a first for a company that had only sold through a sales team.",
   },
   {
     icon: FlaskConical,
@@ -27,6 +27,40 @@ const cards: Card[] = [
   },
 ];
 
+const process: Card[] = [
+  {
+    icon: FileText,
+    claim: "Design docs carried the first seven months",
+    evidence: "A Figma design doc for nearly every change, so the team could react to a picture instead of a ticket.",
+  },
+  {
+    icon: Milestone,
+    claim: "The roadmap outlived the project",
+    evidence: "The roadmap I wrote is still what the product organization uses for executive reviews.",
+  },
+  {
+    icon: CodeXml,
+    claim: "Then I shipped the code",
+    evidence: "From March 2026, production TypeScript alongside the engineers: sign-up, sign-in, and the customer-facing provisioning flows.",
+  },
+];
+
+function Cards({ cards, cols }: { cards: Card[]; cols: string }) {
+  return (
+    <ul className={`grid gap-3 ${cols}`}>
+      {cards.map(({ icon: Icon, claim, evidence }) => (
+        <li key={claim} className="bubble-sm border border-rule bg-bg p-4">
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-soft text-accent">
+            <Icon size={16} aria-hidden="true" />
+          </span>
+          <p className="mt-3 text-[15px] font-semibold leading-snug text-ink">{claim}</p>
+          <p className="mt-1 text-[13px] leading-snug text-body">{evidence}</p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /* Timeline runs Aug 2025 to Jul 2026: 11 months. */
 const ticks = [
   { label: "Aug 2025", pos: 0, align: "left" },
@@ -38,28 +72,18 @@ const ticks = [
 export function Proof() {
   return (
     <div>
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map(({ icon: Icon, claim, evidence, stat }) => (
-          <li
-            key={claim}
-            className={`bubble-sm border p-4 ${stat ? "border-accent bg-accent-soft/40" : "border-rule bg-bg"}`}
-          >
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-soft text-accent">
-              <Icon size={16} aria-hidden="true" />
-            </span>
-            {stat && <div className="num mt-3 font-display text-[22px] font-bold text-ink">{stat}</div>}
-            <p className={`${stat ? "mt-1" : "mt-3"} text-[15px] font-semibold leading-snug text-ink`}>{claim}</p>
-            <p className="mt-1 text-[13px] leading-snug text-body">{evidence}</p>
-          </li>
-        ))}
-      </ul>
+      <div className="label mb-3">Product proofs</div>
+      <Cards cards={product} cols="sm:grid-cols-2 lg:grid-cols-4" />
 
       <p className="bubble-sm mt-3 flex items-start gap-2 border border-dashed border-rule bg-bg px-4 py-2.5 text-[13px] text-body">
         <Route size={14} className="mt-[3px] shrink-0 text-muted" aria-hidden="true" />
         Where it leaked: some customers reached Test Mode and never booked the launch conversation.
       </p>
 
-      <div className="mt-4 border-t border-rule pt-4">
+      <div className="label mt-7 mb-3">Process proofs</div>
+      <Cards cards={process} cols="md:grid-cols-3" />
+
+      <div className="mt-4">
         <div className="label">How my work changed shape</div>
         <div className="mt-2 flex h-2 gap-0.5" aria-hidden="true">
           <span className="flex-[7] rounded-l-full bg-raised" />

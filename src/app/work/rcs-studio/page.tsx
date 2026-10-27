@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CaseHero, NextCase } from "@/components/case/CaseLayout";
-import { Banner, Beats, Bullets, Define, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
+import { Banner, Beats, Bullets, Define, Quote, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
 import { ArrowDownToDot, CircleAlert, CodeXml, ListTodo } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
 import { Proof } from "@/components/work/rcs-studio/Proof";
@@ -80,7 +80,13 @@ export default function Page() {
       />
 
       <SixtySeconds
-        lede="RCS Studio starts as a flow builder, giving users the ability to create app-like experiences from RCS features and data connections, delivered inside their native messaging app."
+        ledeLabel="What it is"
+        lede={
+          <>
+            <strong>RCS Studio</strong> started as a flow builder for creating app-like experiences from RCS features and data
+            connections, delivered inside the recipient&apos;s native messaging app
+          </>
+        }
         problem={[
           <>Users can&apos;t send flows to customers without a live RCS agent</>,
           <>
@@ -171,7 +177,15 @@ export default function Page() {
             items={[
               "Without a live RCS agent, RCS Studio is essentially an in-depth demo",
               "Developers were not the ones buying",
-              <>Prospects&apos; first question after the demo: &ldquo;Cool demo, now how do I send to customers?&rdquo;</>,
+              {
+                text: "The first question after the demo:",
+                plain: true,
+                sub: [
+                  <Quote key="q" by="The same question, every time">
+                    &ldquo;Cool demo, now how do I send to customers?&rdquo;
+                  </Quote>,
+                ],
+              },
               <>Our answer was complex, manual, and didn&apos;t scale, so it cost deals and kept us out of the conversation for larger ones</>,
               "Provisioning was the unlock: once a customer could get an agent live on their own, the demo became a product and the flow builder became step two",
             ]}
@@ -190,9 +204,9 @@ export default function Page() {
           <Bullets
             items={[
               "Not everyone agreed that provisioning should lead, so instead of arguing I built a prototype of the provisioning flow",
-              "I put it in front of the operations team, the people provisioning by hand, and their reaction won over the skeptics",
-              "The reframe that stuck: a flow builder competes with one feature of the incumbents, while a provisioning platform competes with the incumbents",
-              "Provisioning became step one for everyone: customers get an agent live on their own, and the operations team gets one place to see submissions instead of email threads",
+              "I put it in front of the operations team, the people provisioning by hand, and their overwhelmingly positive reactions won over the skeptics",
+              "What won them over: build this out, and we save significant operations time and can scale every sender type we offer, not just RCS",
+              "Provisioning became step one for everyone: customers get an agent live on their own, and the operations team gets every submission collected as structured data instead of email threads. Once we can collect it, we can transform it, and that set the foundation for streamlining their work",
               "Three features followed: the customer form, tracking, and the API experience",
             ]}
           />
@@ -275,17 +289,7 @@ export default function Page() {
           layout="stack"
           align="left"
           visual={<Proof />}
-        >
-          <Bullets
-            items={[
-              "Anyone could sign up and get an agent into Test Mode on their own, and launching meant a conversation with sales",
-              "Some booked the call, and some got to Test Mode and never did, which showed where self-serve still leaked",
-              <>It is the company&apos;s first proof that customers will sign up and get started on their own</>,
-              "For the first seven months I worked from a Figma design doc for nearly every change, with a roadmap the product organization still uses for executive reviews",
-              "From March 2026 I shipped production TypeScript alongside the engineers: sign-up, sign-in, and the customer-facing provisioning flows",
-            ]}
-          />
-        </StoryBeat>
+        />
 
         <StoryBeat
           id="the-outcome"

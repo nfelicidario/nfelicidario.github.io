@@ -15,7 +15,7 @@ const moments: Moment[] = [
   { at: "Nov 2024", what: "Vibes bets on RCS" },
   { at: "Jan 2025", what: "Hackathon kicks off flow builder project" },
   { at: "Aug 2025", what: "Nolan joins the team" },
-  { at: "Next", what: "Make the flow builder usable", next: true },
+  { at: "Next", what: "Enhance the flow builder experience", next: true },
 ];
 
 function Dot({ next }: { next?: boolean }) {
