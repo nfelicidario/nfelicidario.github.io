@@ -13,7 +13,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ChevronDown, CircleAlert, Hammer, Keyboard, Quote as QuoteIcon, Trophy } from "lucide-react";
+import { ArrowRight, ChevronDown, CircleAlert, Hammer, Keyboard, Quote as QuoteIcon, Trophy } from "lucide-react";
 import { Stats, type Stat } from "./CaseLayout";
 
 /**
@@ -399,7 +399,7 @@ export function Beats({
     <BeatsContext.Provider value={ctx}>
       <div ref={rootRef} className="relative mx-auto max-w-6xl">
         {heading && (
-          <h2 className="pt-10 text-center text-[clamp(26px,3vw,34px)] font-bold tracking-[-0.02em] text-ink md:pt-12">
+          <h2 className="pt-8 pb-4 text-center text-[clamp(26px,3vw,34px)] font-bold tracking-[-0.02em] text-ink md:pt-10 md:pb-3">
             {heading}
           </h2>
         )}
@@ -531,10 +531,13 @@ export function StoryBeat({
   framed = true,
   icon,
   tagline,
+  note,
 }: {
   /** anchor id, e.g. "the-bet" */
   id: string;
   title: string;
+  /** a short explanation after the title, muted, behind an arrow */
+  note?: string;
   /** two or three lines; one idea. Leave it out for a slide that is only its visual */
   children?: ReactNode;
   /** the one big visual for this beat; a slide without one is just heading and bullets */
@@ -583,7 +586,17 @@ export function StoryBeat({
             {icon}
           </span>
         )}
-        {title}
+        {note ? (
+          <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span>{title}</span>
+            <span className="inline-flex items-center gap-2 text-[22px] font-medium text-muted md:text-[26px]">
+              <ArrowRight size={22} aria-hidden="true" className="shrink-0" />
+              {note}
+            </span>
+          </span>
+        ) : (
+          title
+        )}
       </h2>
       {tagline && <p className="mt-1.5 text-[17px] text-muted md:text-[19px]">{tagline}</p>}
     </>

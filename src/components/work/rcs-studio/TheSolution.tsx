@@ -57,9 +57,9 @@ export function TheSolution() {
 }
 
 const features: { Icon: LucideIcon; title: string; text: string }[] = [
-  { Icon: ListTodo, title: "Customer form", text: "From a bare form to a guided one" },
+  { Icon: ListTodo, title: "Customer form", text: "Clean, complete submissions" },
   { Icon: ArrowDownToDot, title: "Tracking", text: "Know where your agent is" },
-  { Icon: CodeXml, title: "API experience", text: "Provision and send by API" },
+  { Icon: CodeXml, title: "API experience", text: "Provision and send from code" },
 ];
 
 /** the three features that followed, under the slide 3 bullets; each is a slide of its own */

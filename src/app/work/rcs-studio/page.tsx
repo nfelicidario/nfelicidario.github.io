@@ -221,7 +221,7 @@ export default function Page() {
         <StoryBeat
           id="task-audit"
           title="Customer form"
-          tagline="From a bare form to a guided one"
+          note="Clean, complete submissions"
           icon={<ListTodo size={20} />}
           subtitle="Feature"
           railTitle="Customer form"
@@ -246,7 +246,7 @@ export default function Page() {
         <StoryBeat
           id="task-tracking"
           title="Tracking"
-          tagline="Know where your agent is"
+          note="Know where your agent is"
           icon={<ArrowDownToDot size={20} />}
           subtitle="Feature"
           railTitle="Tracking"
@@ -268,7 +268,7 @@ export default function Page() {
         <StoryBeat
           id="task-apis"
           title="API experience"
-          tagline="Provision and send by API"
+          note="Provision and send from code"
           icon={<CodeXml size={20} />}
           subtitle="Feature"
           railTitle="API experience"
@@ -283,7 +283,6 @@ export default function Page() {
               "Technical developers wanted to provision and send without touching the UI",
               "I designed a self-serve credential experience: create, label, and rotate keys for Test or Live, with no ticket to anyone",
               "I specified a provisioning API that mirrors the form, so a brand, agent, and campaign can be registered and tracked from code",
-              "The messaging API unlocks once the agent is live, which is also where the flow builder lives on, as step two",
             ]}
           />
         </StoryBeat>
