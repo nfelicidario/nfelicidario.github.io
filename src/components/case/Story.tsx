@@ -261,10 +261,7 @@ export function Definition({ term, respelling, pos = "noun", children }: { term:
         {respelling && <span className="num text-[14px] text-muted">{respelling}</span>}
         <span className="text-[14px] italic text-muted">{pos}</span>
       </div>
-      <p className="mt-1.5 flex gap-2 text-[15.5px] leading-snug text-body">
-        <span className="num shrink-0 text-muted">1.</span>
-        <span>{children}</span>
-      </p>
+      <p className="mt-2 border-l-2 border-accent pl-3 text-[15.5px] leading-snug text-body">{children}</p>
     </div>
   );
 }

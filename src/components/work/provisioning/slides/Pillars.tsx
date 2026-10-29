@@ -1,11 +1,11 @@
-import { FileOutput, LayoutTemplate, ShieldCheck, UserCog, Wand2, Workflow, ListChecks } from "lucide-react";
+import { FileText, LayoutTemplate, ShieldCheck, SquareArrowRightEnter, UserCog, Wand2, Workflow } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 /* Slide 2: the five moves that modernize the operational process, and the three feature sets that carry them. */
 
 const pillars: { Icon: LucideIcon; title: string; text: string }[] = [
   { Icon: ShieldCheck, title: "Validate and sanitize customer input", text: "So a request arrives complete and clean" },
-  { Icon: Wand2, title: "Automate what you can", text: "Prefill, checks, and transformations" },
+  { Icon: Wand2, title: "Automate what you can", text: "Wherever a partner has an API, use it" },
   { Icon: LayoutTemplate, title: "Templatize submissions", text: "One request, each partner's form prefilled" },
   { Icon: Workflow, title: "Streamline the workflow", text: "One place to work instead of ten" },
   { Icon: UserCog, title: "Give the ops team tooling", text: "Accounts, records, and search of their own" },
@@ -30,8 +30,8 @@ export function Pillars() {
 
 const sets: { Icon: LucideIcon; title: string; text: string }[] = [
   { Icon: UserCog, title: "Account management", text: "Accounts, users, and a way in" },
-  { Icon: FileOutput, title: "Read, Edit, and Transform", text: "From captured input to a PDF brief" },
-  { Icon: ListChecks, title: "Submissions", text: "One request, several submissions" },
+  { Icon: FileText, title: "Read, Edit, and Transform", text: "From captured input to a PDF brief" },
+  { Icon: SquareArrowRightEnter, title: "Submissions", text: "One request, several submissions" },
 ];
 
 export function ThreeFeatureSets() {

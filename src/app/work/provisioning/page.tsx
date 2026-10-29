@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { VibesLogo } from "@/components/VibesLogo";
 import { CaseHero, MetaBand, NextCase } from "@/components/case/CaseLayout";
-import { Banner, Beats, Bullets, Definition, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
-import { CircleAlert, FileOutput, ListChecks, UserCog } from "lucide-react";
+import { Banner, Beats, Bullets, Definition, SixtySeconds, StoryBeat, StoryLink } from "@/components/case/Story";
+import { CircleAlert, FileText, SquareArrowRightEnter, UserCog } from "lucide-react";
 import { Gate } from "@/components/Gate";
 import blob from "@/content/gated/provisioning.json";
 import { VibesAdminStage } from "@/components/work/provisioning/hero/VibesAdminStage";
@@ -23,12 +23,6 @@ export const metadata: Metadata = {
     "Provisioning at Vibes ran on ten portals and an inbox. I shadowed operations, then designed and shipped the customer intake and the internal admin that replaced it.",
 };
 
-const TIMELINE = [
-  { at: "Late 2025", what: "Shadowing" },
-  { at: "Early 2026", what: "Accounts" },
-  { at: "2026", what: "Shipping" },
-];
-
 const meta = [
   {
     label: "Role",
@@ -43,13 +37,14 @@ const meta = [
     label: "Team",
     value: (
       <ul className="grid gap-0.5 pl-4 marker:text-rule" style={{ listStyle: "disc" }}>
-        <li>Operations team, my closest partner</li>
         <li>Engineering manager</li>
         <li>Three engineers</li>
+        <li>No dedicated PM for most of the project</li>
+        <li>Operations team (stakeholder)</li>
       </ul>
     ),
   },
-  { label: "Timeline", value: <Span points={TIMELINE} direction="vertical" /> },
+  { label: "Timeline", value: "End of Q4 2025 – Present" },
   {
     label: "Stack",
     value: (
@@ -83,8 +78,8 @@ export default function ProvisioningPage() {
       <SixtySeconds
         lede={
           <>
-            <strong>Vibes Admin</strong> is the internal tool our teams use to provision sender types, track customer requests as
-            structured data, and manage accounts
+            <strong>Vibes Admin</strong> is the internal tool our teams use to provision sender types, track customer requests, and
+            manage accounts
           </>
         }
         problem={[
@@ -93,14 +88,15 @@ export default function ProvisioningPage() {
           "It couldn't scale, every request sank hours of expensive operations time, and it invited human error on both sides",
         ]}
         work={[
-          "Led discovery with the operations team through shadowing and interviews, owned the design, and shipped the provisioning pages in production code",
+          "Led discovery with the operations team through shadowing and interviews",
+          "Owned the design, and shipped the provisioning pages in production code",
           {
             text: "Modernized the operational process, supported by three features to start:",
             plain: true,
             sub: [
               <span key="accounts" className="inline-flex items-center gap-2"><UserCog size={14} className="text-accent" aria-hidden="true" />Account management</span>,
-              <span key="brief" className="inline-flex items-center gap-2"><FileOutput size={14} className="text-accent" aria-hidden="true" />Read, Edit, and Transform</span>,
-              <span key="subs" className="inline-flex items-center gap-2"><ListChecks size={14} className="text-accent" aria-hidden="true" />Submissions</span>,
+              <span key="brief" className="inline-flex items-center gap-2"><FileText size={14} className="text-accent" aria-hidden="true" />Read, Edit, and Transform</span>,
+              <span key="subs" className="inline-flex items-center gap-2"><SquareArrowRightEnter size={14} className="text-accent" aria-hidden="true" />Submissions</span>,
             ],
           },
         ]}
@@ -119,12 +115,12 @@ export default function ProvisioningPage() {
         takeawaysLabel="Changes to how I work"
         takeaways={[
           {
-            lead: "Earn trust by showing up.",
-            text: "Ops had been burned by an unresponsive product team before. Shadowing them and iterating on shared prototypes showed they were heard, and they became the product's most willing builders.",
+            lead: "Earn trust through action.",
+            text: "Ops had been burned by an unresponsive product team. Shadowing them and iterating on shared prototypes opened a real line of communication. In their words, it was the first time they felt heard, and it changed how the teams work with product.",
           },
           {
-            lead: "Onboard once, thoroughly.",
-            text: "Without a product manager, I ran the launches myself. Thorough video walkthroughs onboarded every stakeholder in one pass, with no follow-up sessions.",
+            lead: "Onboard live, then document.",
+            text: "Without a product manager, I ran the launches myself: a live walkthrough for every stakeholder group, then a recorded version for anyone who missed it and as the reference for later.",
           },
           {
             lead: "Synthesize, don't transcribe.",
@@ -182,7 +178,7 @@ export default function ProvisioningPage() {
                 text: "My stance: the process was a disaster, the tribal knowledge had to come out, and modernizing it was the only way to scale and chase larger business",
                 sub: ["I built out the admin page idea with the engineering manager, the vision became visible, and the argument ended"],
               },
-              "Due to the nature of the industry, the steps with third-party partners stay manual for now, so the plan modernizes everything around them",
+              "RCS is new enough that some partners had no API, or an incomplete one. Where there is an API we automate; where there isn't, the step stays manual and the plan modernizes everything around it",
             ]}
           />
         </StoryBeat>
@@ -231,7 +227,7 @@ export default function ProvisioningPage() {
           id="feature-brief"
           title="Read, Edit, and Transform"
           note="From captured input to a PDF brief"
-          icon={<FileOutput size={20} />}
+          icon={<FileText size={20} />}
           subtitle="Feature"
           railTitle="Read, Edit, and Transform"
           layout="stack"
@@ -253,7 +249,7 @@ export default function ProvisioningPage() {
           id="feature-submissions"
           title="Submissions"
           note="One request, several submissions"
-          icon={<ListChecks size={20} />}
+          icon={<SquareArrowRightEnter size={20} />}
           subtitle="Feature"
           railTitle="Submissions"
           layout="stack"
