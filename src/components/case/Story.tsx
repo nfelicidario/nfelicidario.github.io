@@ -252,6 +252,23 @@ export function Define({ children, def }: { children: ReactNode; def: ReactNode 
   );
 }
 
+/** a dictionary-style definition: the term, a respelling, the part of speech, then the sense */
+export function Definition({ term, respelling, pos = "noun", children }: { term: string; respelling?: string; pos?: string; children: ReactNode }) {
+  return (
+    <div className="bubble-sm border border-rule bg-bg px-5 py-4">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+        <span className="font-display text-[22px] font-bold tracking-[-0.01em] text-ink">{term}</span>
+        {respelling && <span className="num text-[14px] text-muted">{respelling}</span>}
+        <span className="text-[14px] italic text-muted">{pos}</span>
+      </div>
+      <p className="mt-1.5 flex gap-2 text-[15.5px] leading-snug text-body">
+        <span className="num shrink-0 text-muted">1.</span>
+        <span>{children}</span>
+      </p>
+    </div>
+  );
+}
+
 /** a pull quote, e.g. under a bullet that introduces it */
 export function Quote({ children, by }: { children: ReactNode; by?: ReactNode }) {
   return (

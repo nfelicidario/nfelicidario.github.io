@@ -4,7 +4,7 @@ import type { LucideIcon } from "lucide-react";
 /* Slide 1: what one RCS agent cost the operations team before Vibes Admin. Rounded, from internal notes. */
 
 const facts: { Icon: LucideIcon; value: string; label: string }[] = [
-  { Icon: AppWindow, value: "10", label: "portals per request, 4 of them internal systems" },
+  { Icon: AppWindow, value: "10", label: "interfaces per request, plus the email thread" },
   { Icon: Inbox, value: "6+", label: "emails back and forth per request" },
   { Icon: Timer, value: "~4 hrs", label: "of operations time per RCS agent" },
   { Icon: ListOrdered, value: "14", label: "steps, most of them never written down" },

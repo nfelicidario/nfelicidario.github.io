@@ -15,10 +15,10 @@ export function AdminOutcomes() {
     <div className="grid gap-4">
       <Stats
         items={[
+          { value: "100%", label: "of RCS agent requests now arrive as structured data" },
+          { value: "10 → 6", label: "interfaces per request, with 1 as the target" },
           { value: "~1 hr", label: "cut from every RCS agent's provisioning time, from about 4 hours" },
-          { value: "10 → 6", label: "portals per request, with 1 as the target" },
-          { value: "100%", label: "of agents now provisioned through the new flow" },
-          { value: "88%", label: "of provisioning accounts moved in within weeks" },
+          { value: "2 → 4", label: "sender types on one shape: RCS live, toll-free in alpha, two more next" },
         ]}
       />
       <div className="bubble-sm border border-rule bg-bg p-4">
@@ -41,8 +41,8 @@ export function AdminOutcomes() {
       </div>
       <Stats
         items={[
-          { value: "4 → 7", label: "people on the operations team, as demand grew" },
           { value: "1", label: "structured record per request, instead of an email thread" },
+          { value: "0", label: "emails to the verification vendor, that step is now automated" },
           { value: "0", label: "copy and paste, once templates cover every partner" },
         ]}
       />

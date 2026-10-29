@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { VibesLogo } from "@/components/VibesLogo";
 import { CaseHero, MetaBand, NextCase } from "@/components/case/CaseLayout";
-import { Banner, Beats, Bullets, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
-import { BookOpen, CircleAlert, FileOutput, ListChecks, UserCog } from "lucide-react";
+import { Banner, Beats, Bullets, Definition, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
+import { CircleAlert, FileOutput, ListChecks, UserCog } from "lucide-react";
 import { Gate } from "@/components/Gate";
 import blob from "@/content/gated/provisioning.json";
 import { VibesAdminStage } from "@/components/work/provisioning/hero/VibesAdminStage";
@@ -83,53 +83,52 @@ export default function ProvisioningPage() {
       <SixtySeconds
         lede={
           <>
-            <strong>Vibes Admin</strong> is the internal tool our operations team uses to provision every sender a customer requests. It
-            captures the request, cleans it, and turns it into the submissions each third-party partner needs
+            <strong>Vibes Admin</strong> is the internal tool our teams use to provision sender types, track customer requests as
+            structured data, and manage accounts
           </>
         }
         problem={[
-          "Every RCS agent was provisioned by hand across ten portals and an inbox",
-          "Ops copied customer emails into partner forms, chased missing fields, and tracked it all in a spreadsheet",
-          "It couldn't scale, it wasted hours on every request, and it invited human error on both sides",
+          "Every RCS agent was provisioned by hand across 10 interfaces and email",
+          "Ops copied customer emails into partner forms, chased missing fields, and tracked it all across several spreadsheets",
+          "It couldn't scale, every request sank hours of expensive operations time, and it invited human error on both sides",
         ]}
         work={[
-          "Shadowed and interviewed the operations team, then owned the design and shipped the provisioning pages in production code",
+          "Led discovery with the operations team through shadowing and interviews, owned the design, and shipped the provisioning pages in production code",
           {
-            text: "Modernized the operational process, supported by three feature sets to start:",
+            text: "Modernized the operational process, supported by three features to start:",
             plain: true,
             sub: [
               <span key="accounts" className="inline-flex items-center gap-2"><UserCog size={14} className="text-accent" aria-hidden="true" />Account management</span>,
-              <span key="brief" className="inline-flex items-center gap-2"><FileOutput size={14} className="text-accent" aria-hidden="true" />Capture to brief</span>,
-              <span key="subs" className="inline-flex items-center gap-2"><ListChecks size={14} className="text-accent" aria-hidden="true" />Submissions and search</span>,
+              <span key="brief" className="inline-flex items-center gap-2"><FileOutput size={14} className="text-accent" aria-hidden="true" />Read, Edit, and Transform</span>,
+              <span key="subs" className="inline-flex items-center gap-2"><ListChecks size={14} className="text-accent" aria-hidden="true" />Submissions</span>,
             ],
           },
         ]}
         result={[
-          "Every agent Vibes provisions now comes in through the new flow, as structured data instead of an email",
+          "Every RCS agent request Vibes provisions now comes in through the new flow, as structured data instead of an email",
           "About an hour cut from every agent's provisioning time",
           "The same shape now provisions toll-free, with 10DLC and Short Code next",
           "The split between customer requests and partner submissions became the company's standard",
         ]}
         stats={[
-          { value: "10 → 6", label: "portals per request, with 1 as the target" },
+          { value: "100%", label: "of RCS agent requests arrive as structured data" },
           { value: "~1 hr", label: "cut from every RCS agent's provisioning time" },
-          { value: "100%", label: "of agents provisioned through the new flow" },
-          { value: "88%", label: "of provisioning accounts moved in within weeks" },
-          { value: "4 → 7", label: "people on the operations team, as demand grew" },
+          { value: "10 → 6", label: "interfaces per request, with 1 as the target" },
+          { value: "2 → 4", label: "sender types on one shape: RCS live, toll-free in alpha, two more next" },
         ]}
         takeawaysLabel="Changes to how I work"
         takeaways={[
           {
-            lead: "Shadow before you sketch.",
-            text: "The map had steps nobody had written down. I would not have found them in a requirements doc.",
+            lead: "Earn trust by showing up.",
+            text: "Ops had been burned by an unresponsive product team before. Shadowing them and iterating on shared prototypes showed they were heard, and they became the product's most willing builders.",
           },
           {
-            lead: "Collect it, then transform it.",
-            text: "Structured input is the foundation. Once a request is data, every automation after it becomes possible.",
+            lead: "Onboard once, thoroughly.",
+            text: "Without a product manager, I ran the launches myself. Thorough video walkthroughs onboarded every stakeholder in one pass, with no follow-up sessions.",
           },
           {
-            lead: "The branch is the spec.",
-            text: "I prototype in the codebase, and the engineers point their sessions at my branch. Output matches the prototype, with real data behind it.",
+            lead: "Synthesize, don't transcribe.",
+            text: "Wishlist sessions produced a pile of ideas. Instead of building each one, I synthesized them into solutions that cleared several high-priority problems at once.",
           },
         ]}
       />
@@ -143,16 +142,15 @@ export default function ProvisioningPage() {
           align="left"
           visualFirst
           visual={
-            <Banner icon={<BookOpen size={17} />} label="Provisioning">
-              Getting a sender live: registering the brand, the sender, and its first campaign with the third-party partners who approve them.
-              For RCS the sender is an agent; for SMS it is a toll-free number, a 10DLC number, or a short code.
-            </Banner>
+            <Definition term="RCS provisioning" respelling="pro·vi·sion·ing">
+              Getting an RCS agent live through third-party approvals of the brand, the agent, and the campaign.
+            </Definition>
           }
           after={
             <div className="grid gap-5">
               <OpsToday />
               <Banner icon={<CircleAlert size={17} />} label="The problem">
-                It can&apos;t scale, it wastes hours on every request, and it&apos;s prone to human error, on the customer&apos;s side and on ours.
+                It can&apos;t scale, every request sinks hours of expensive operations time, and it&apos;s prone to human error on both sides, the customer&apos;s and ours.
               </Banner>
             </div>
           }
@@ -161,8 +159,8 @@ export default function ProvisioningPage() {
             items={[
               "RCS Studio gave customers a product, but every agent they created still had to be provisioned by our operations team",
               "Ops copied each request into a registry console, a verification vendor's inbox, and each carrier's portal or email template",
-              "Every missing field was chased over email, and every request was tracked by hand in a spreadsheet",
-              "The customer saw a button, an email thread, and a wait with no status",
+              "Every missing field was chased over email, and every request was tracked by hand across several spreadsheets",
+              "Customers saw only their email thread, with status updates on request. The final email was the first proof their agent existed, and the only way to track progress was a provisioning report ops built by hand",
             ]}
           />
         </StoryBeat>
@@ -212,7 +210,7 @@ export default function ProvisioningPage() {
           title="Account management"
           note="Accounts, users, and a way in"
           icon={<UserCog size={20} />}
-          subtitle="Feature set"
+          subtitle="Feature"
           railTitle="Account management"
           layout="stack"
           align="left"
@@ -231,11 +229,11 @@ export default function ProvisioningPage() {
 
         <StoryBeat
           id="feature-brief"
-          title="Capture to brief"
-          note="Input, edits, and a PDF brief"
+          title="Read, Edit, and Transform"
+          note="From captured input to a PDF brief"
           icon={<FileOutput size={20} />}
-          subtitle="Feature set"
-          railTitle="Capture to brief"
+          subtitle="Feature"
+          railTitle="Read, Edit, and Transform"
           layout="stack"
           align="left"
           visualFirst
@@ -253,11 +251,11 @@ export default function ProvisioningPage() {
 
         <StoryBeat
           id="feature-submissions"
-          title="Submissions and search"
+          title="Submissions"
           note="One request, several submissions"
           icon={<ListChecks size={20} />}
-          subtitle="Feature set"
-          railTitle="Submissions and search"
+          subtitle="Feature"
+          railTitle="Submissions"
           layout="stack"
           align="left"
           visualFirst
@@ -296,8 +294,8 @@ export default function ProvisioningPage() {
         >
           <Bullets
             items={[
-              "Every agent Vibes provisions now comes in through the new flow, as structured data",
-              "The operations team grew from four to seven on this work as demand grew, without the process breaking",
+              "Every RCS agent request Vibes provisions now comes in through the new flow, as structured data",
+              "Demand grew and the process held, with the same shape now carrying toll-free",
               "Customers see statuses instead of an email thread",
               <>
                 The customer side of this story is the <StoryLink href="/work/rcs-studio/">RCS Studio</StoryLink> case study
@@ -326,7 +324,7 @@ export default function ProvisioningPage() {
             items={[
               "Toll-free is in alpha on the same shape, with 10DLC and Short Code next",
               "Every sender type becomes brand, campaign, and sender-specific details, so each new one ships faster than the last",
-              "Advanced templates, triage support, and provisioning requests are the next three feature sets",
+              "Advanced templates, triage support, and provisioning requests are the next three features",
             ]}
           />
         </StoryBeat>

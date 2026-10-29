@@ -30,14 +30,14 @@ export function Pillars() {
 
 const sets: { Icon: LucideIcon; title: string; text: string }[] = [
   { Icon: UserCog, title: "Account management", text: "Accounts, users, and a way in" },
-  { Icon: FileOutput, title: "Capture to brief", text: "Input, edits, and a PDF brief" },
-  { Icon: ListChecks, title: "Submissions and search", text: "One request, several submissions" },
+  { Icon: FileOutput, title: "Read, Edit, and Transform", text: "From captured input to a PDF brief" },
+  { Icon: ListChecks, title: "Submissions", text: "One request, several submissions" },
 ];
 
 export function ThreeFeatureSets() {
   return (
     <div>
-      <div className="label mb-3">3 Feature sets:</div>
+      <div className="label mb-3">3 Features:</div>
       <ul className="grid gap-3 sm:grid-cols-3">
         {sets.map(({ Icon, title, text }) => (
           <li key={title} className="bubble-sm flex items-center gap-3 border border-rule bg-bg p-4">
