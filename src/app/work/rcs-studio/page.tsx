@@ -163,7 +163,7 @@ export default function Page() {
 
         <StoryBeat
           id="the-question"
-          title="Customers couldn't send a single message"
+          title="How do we go live?"
           subtitle="The problem"
           layout="stack"
           align="left"
