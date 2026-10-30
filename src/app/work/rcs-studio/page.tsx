@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CaseHero, NextCase } from "@/components/case/CaseLayout";
+import { CaseNav } from "@/components/case/CaseNav";
 import { Banner, Beats, Bullets, Define, Quote, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
 import { ArrowDownToDot, CircleAlert, CodeXml, ListTodo } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
@@ -78,6 +79,8 @@ export default function Page() {
         intro={<RcsIntro meta={meta} />}
         stage={<RcsStudioStage />}
       />
+
+      <CaseNav />
 
       <SixtySeconds
         lede={
@@ -160,7 +163,7 @@ export default function Page() {
 
         <StoryBeat
           id="the-question"
-          title="A demo that couldn't send"
+          title="Customers couldn't send a single message"
           subtitle="The problem"
           layout="stack"
           align="left"

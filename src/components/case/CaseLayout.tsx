@@ -48,7 +48,7 @@ export function CaseHero({
 }) {
   if (stage) {
     return (
-      <section className="mx-auto max-w-6xl pt-6 pb-14 md:pt-8 md:pb-16">
+      <section id="overview" className="mx-auto max-w-6xl pt-6 pb-14 md:pt-8 md:pb-16">
         {product && !intro && (
           <h1 className="mb-5 text-center text-[clamp(26px,3vw,34px)] font-bold tracking-[-0.02em] text-ink">
             {product}

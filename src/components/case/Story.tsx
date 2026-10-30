@@ -15,6 +15,7 @@ import {
 } from "react";
 import { ArrowRight, ChevronDown, CircleAlert, Hammer, Keyboard, Quote as QuoteIcon, Trophy } from "lucide-react";
 import { Stats, type Stat } from "./CaseLayout";
+import { setBeats } from "./beatsStore";
 
 /**
  * The slide-like story format. A `SixtySeconds` strip gives the whole arc (problem, the call,
@@ -69,7 +70,7 @@ export function SixtySeconds({
     { k: "The result", icon: <Trophy size={15} />, items: result },
   ];
   return (
-    <section className="mx-auto max-w-6xl pt-14 pb-6 md:pt-16" aria-label={heading}>
+    <section id="summary" className="mx-auto max-w-6xl scroll-mt-12 pt-14 pb-6 md:pt-16" aria-label={heading}>
       <h2 className="text-center text-[clamp(26px,3vw,34px)] font-bold tracking-[-0.02em] text-ink">{heading}</h2>
       <div className="bubble mt-8 border border-rule bg-surface p-5 md:p-7">
 
@@ -378,6 +379,12 @@ export function Beats({
     };
   }, [titles.length]);
 
+  // publish the slide list and position for the page-level CaseNav
+  useEffect(() => {
+    setBeats({ titles, current });
+    return () => setBeats(null);
+  }, [titles, current]);
+
   // Arrow keys jump beats, but only when nothing else wants the keys.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -411,7 +418,7 @@ export function Beats({
 
   return (
     <BeatsContext.Provider value={ctx}>
-      <div ref={rootRef} className="relative mx-auto max-w-6xl">
+      <div ref={rootRef} id="full-story" className="relative mx-auto max-w-6xl scroll-mt-12">
         {heading && (
           <h2 className="pt-22 pb-4 text-center text-[clamp(26px,3vw,34px)] font-bold tracking-[-0.02em] text-ink md:pt-26 md:pb-3">
             {heading}
@@ -471,39 +478,6 @@ export function Beats({
           </nav>
         </div>
 
-        {/* compact top rail, small screens */}
-        <nav
-          aria-label={`${label} progress`}
-          className="sticky top-0 z-20 -mx-1 border-b border-rule bg-bg/85 px-1 py-2.5 backdrop-blur xl:hidden"
-        >
-          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
-            <span className="label num text-muted">
-              {current + 1}
-              <span className="mx-1 opacity-60">/</span>
-              {titles.length}
-            </span>
-            <ol className="flex items-center gap-1.5" aria-label="Beats">
-              {titles.map((t, i) => (
-                <li key={t.id} className="flex">
-                  <a
-                    href={`#${t.id}`}
-                    title={t.title}
-                    aria-current={i === current ? "step" : undefined}
-                    onClick={go(t)}
-                    className={`block h-1.5 rounded-full transition-all duration-300 ${
-                      i === current ? "w-6 bg-accent" : i < current ? "w-1.5 bg-accent/50" : "w-1.5 bg-rule"
-                    }`}
-                  >
-                    <span className="sr-only">
-                      Beat {i + 1}: {t.title}
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ol>
-            <span className="label truncate text-ink">{titles[current]?.title}</span>
-          </div>
-        </nav>
         {children}
       </div>
     </BeatsContext.Provider>
