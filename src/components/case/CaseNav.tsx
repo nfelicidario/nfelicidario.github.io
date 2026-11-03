@@ -6,7 +6,7 @@ import { useBeats } from "./beatsStore";
 import { TOC_VARIANTS, setTocVariant, useTocVariant } from "./tocStore";
 
 /**
- * The table of contents for a case page. The sections are found by id (the hero is #overview, the
+ * The table of contents for a case page. The sections are found by id (the hero is #prototype, the
  * Summary #summary, the story #full-story); the active one is the last whose top has passed the top
  * of the viewport. `Nav` renders the pills in the site header for the default "navbar" treatment;
  * `CaseNav`, placed right after the hero, renders the alternatives and the review toggle.
@@ -14,18 +14,18 @@ import { TOC_VARIANTS, setTocVariant, useTocVariant } from "./tocStore";
 export type Section = { id: string; label: string };
 
 export const CASE_SECTIONS: Section[] = [
-  { id: "overview", label: "Overview" },
+  { id: "prototype", label: "Prototype" },
   { id: "summary", label: "Summary" },
-  { id: "full-story", label: "The full story" },
+  { id: "full-story", label: "Full story" },
 ];
 
 const OFFSET = 64;
 
 export function jumpToId(id: string) {
-  const el = document.getElementById(id);
-  if (!el) return;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const y = id === "overview" ? 0 : el.getBoundingClientRect().top + window.scrollY - OFFSET;
+  const el = document.getElementById(id);
+  if (id !== CASE_SECTIONS[0].id && !el) return;
+  const y = id === CASE_SECTIONS[0].id || !el ? 0 : el.getBoundingClientRect().top + window.scrollY - OFFSET;
   window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
   history.replaceState(null, "", `#${id}`);
 }

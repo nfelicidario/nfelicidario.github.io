@@ -313,7 +313,7 @@ const BeatsContext = createContext<Record<string, number>>({});
 export function Beats({
   children,
   label = "The story",
-  heading = "The full story",
+  heading = "Full story",
 }: {
   children: ReactNode;
   /** used for the rail's accessible name */
