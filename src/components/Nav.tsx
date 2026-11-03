@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { projects } from "@/content/projects";
 import { SlideProgress, TocPills, useActiveSection } from "./case/CaseNav";
-import { useTocVariant } from "./case/tocStore";
 
 const links = [
   { href: "/", label: "Work" },
@@ -15,7 +14,7 @@ const links = [
 ];
 
 /**
- * The site header. On a case page (default table-of-contents treatment) it sticks to the top and
+ * The site header. On a case page it sticks to the top and
  * carries a breadcrumb back to Work and the page's sections, with the slide counter while the
  * reader is in the full story. Below lg the sections drop to a second row. Once the reader scrolls,
  * the wordmark folds into the N mark from the favicon and unfolds again at the top.
@@ -61,10 +60,9 @@ function Brand({ compact }: { compact: boolean }) {
 }
 export function Nav() {
   const pathname = usePathname();
-  const variant = useTocVariant();
   const slug = pathname?.match(/^\/work\/([^/]+)\/?$/)?.[1];
   const project = slug ? projects.find((p) => p.slug === slug) : undefined;
-  const caseMode = !!project && variant === "navbar";
+  const caseMode = !!project;
   const active = useActiveSection();
   const [scrolled, setScrolled] = useState(false);
 
@@ -108,7 +106,7 @@ export function Nav() {
           {caseMode && (
             <div className="hidden items-center gap-3 lg:flex">
               <TocPills active={active} />
-              <SlideProgress active={active} name />
+              <SlideProgress active={active} />
             </div>
           )}
           <ul className="flex shrink-0 items-center gap-1">

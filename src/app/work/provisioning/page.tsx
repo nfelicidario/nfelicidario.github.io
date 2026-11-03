@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { VibesLogo } from "@/components/VibesLogo";
 import { CaseHero, MetaBand, NextCase } from "@/components/case/CaseLayout";
-import { CaseNav } from "@/components/case/CaseNav";
 import { Banner, Beats, Bullets, Definition, SixtySeconds, StoryBeat, StoryLink } from "@/components/case/Story";
 import { CircleAlert, FileText, SquareArrowRightEnter, UserCog } from "lucide-react";
 import { Gate } from "@/components/Gate";
@@ -76,7 +75,6 @@ export default function ProvisioningPage() {
         stage={<VibesAdminStage />}
       />
 
-      <CaseNav />
 
       <SixtySeconds
         lede={

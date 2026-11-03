@@ -16,7 +16,6 @@ import {
 import { ArrowRight, ChevronDown, CircleAlert, Hammer, Keyboard, Quote as QuoteIcon, Trophy } from "lucide-react";
 import { Stats, type Stat } from "./CaseLayout";
 import { setBeats } from "./beatsStore";
-import { useTocVariant } from "./tocStore";
 
 /**
  * The slide-like story format. A `SixtySeconds` strip gives the whole arc (problem, the call,
@@ -323,7 +322,6 @@ export function Beats({
 }) {
   const titles = useMemo(() => collectBeats(children), [children]);
   const [current, setCurrent] = useState(0);
-  const tocVariant = useTocVariant();
   const rootRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLElement>(null);
   // the side rail starts at the vertical centre of the first slide, then catches at the viewport centre
@@ -381,7 +379,7 @@ export function Beats({
     };
   }, [titles.length]);
 
-  // publish the slide list and position for the page-level CaseNav
+  // publish the slide list and position for the slide counter in the site header
   useEffect(() => {
     setBeats({ titles, current });
     return () => setBeats(null);
@@ -427,7 +425,7 @@ export function Beats({
           </h2>
         )}
         {/* side rail in the left gutter, only when the gutter has room for it */}
-        <div className={`absolute top-0 w-12 ${tocVariant === "rail" ? "hidden" : "hidden xl:block"}`} style={{ left: -72, bottom: railOffset?.end ?? 0 }} aria-hidden={false}>
+        <div className={`absolute top-0 w-12 hidden xl:block`} style={{ left: -72, bottom: railOffset?.end ?? 0 }} aria-hidden={false}>
           <nav
             ref={railRef}
             aria-label={`${label} progress`}

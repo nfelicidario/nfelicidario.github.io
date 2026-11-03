@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
-/** What `Beats` publishes so the page-level `CaseNav` can show slide progress without being nested in it. */
+/** What `Beats` publishes so the site header can show slide progress without being nested in it. */
 export type BeatsState = { titles: { id: string; title: string }[]; current: number };
 
 let state: BeatsState | null = null;

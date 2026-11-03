@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { CaseHero, NextCase } from "@/components/case/CaseLayout";
-import { CaseNav } from "@/components/case/CaseNav";
 import { Banner, Beats, Bullets, Define, Quote, SixtySeconds, Span, StoryBeat, StoryLink } from "@/components/case/Story";
 import { ArrowDownToDot, CircleAlert, CodeXml, ListTodo } from "lucide-react";
 import { RcsIntro } from "@/components/work/rcs-studio/Intro";
@@ -80,7 +79,6 @@ export default function Page() {
         stage={<RcsStudioStage />}
       />
 
-      <CaseNav />
 
       <SixtySeconds
         lede={
