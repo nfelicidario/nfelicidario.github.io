@@ -78,21 +78,21 @@ export const projects: Project[] = [
   },
   {
     slug: "making-the-team-faster",
-    title: "Agentic SDLC",
+    title: "AI modernization",
     gif: "/work/making-the-team-faster/hero.gif",
     bullets: [
-      "Planning flow set as the first team on Linear.",
-      "Prototypes in code deployed to shared environments instead of handoff.",
+      "Rebuilt how product design works around AI: merge requests and live prototypes instead of static files.",
+      "Carried the same model to product and technology, then the whole company.",
     ],
     outcomes: [
-      "About half the product and technology org runs on the flow.",
+      "About half of product and technology plans on the one tracker.",
       "Two of the largest features shipped from a prototype branch.",
     ],
     summary:
-      "No mandate, one willing team. The planning flow half the org now runs on, handoff replaced by prototypes in code, templates used from IC to board.",
+      "Vibes needed people to show what working with AI looks like. I rebuilt product design around it, then carried the model to product and technology and the company.",
     org: "Vibes",
     years: "2025–26",
-    metric: "½ the org on Linear",
+    metric: "3 levels of change",
     hues: ["#5b7bd6", "#1b2a4a"],
     status: "draft",
   },
