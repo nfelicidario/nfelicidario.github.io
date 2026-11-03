@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { projects } from "@/content/projects";
-import { SlideProgress, TocPills, useActiveSection } from "./case/CaseNav";
+import { TocPills, useActiveSection } from "./case/CaseNav";
 
 const links = [
   { href: "/", label: "Work" },
@@ -15,8 +15,7 @@ const links = [
 
 /**
  * The site header. On a case page it sticks to the top and
- * carries a breadcrumb back to Work and the page's sections, with the slide counter while the
- * reader is in the full story. Below lg the sections drop to a second row. Once the reader scrolls,
+ * carries a breadcrumb back to Work and the page's sections. Below lg the sections drop to a second row. Once the reader scrolls,
  * the wordmark folds into the N mark from the favicon and unfolds again at the top.
  */
 const SCROLLED_AT = 40;
@@ -104,9 +103,8 @@ export function Nav() {
             </Link>
           )}
           {caseMode && (
-            <div className="hidden items-center gap-3 lg:flex">
+            <div className="hidden lg:block">
               <TocPills active={active} />
-              <SlideProgress active={active} />
             </div>
           )}
           <ul className="flex shrink-0 items-center gap-1">
@@ -125,9 +123,8 @@ export function Nav() {
           </ul>
         </div>
         {caseMode && (
-          <div className="flex items-center justify-between gap-3 pb-2 lg:hidden">
+          <div className="pb-2 lg:hidden">
             <TocPills active={active} size="sm" />
-            <SlideProgress active={active} />
           </div>
         )}
       </nav>

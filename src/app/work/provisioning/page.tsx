@@ -337,7 +337,7 @@ export default function ProvisioningPage() {
         </StoryBeat>
       </Beats>
 
-      <NextCase slug="making-the-team-faster" />
+      <NextCase slug="design-system" />
     </div>
   );
 }
