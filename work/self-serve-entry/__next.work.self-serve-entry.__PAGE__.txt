@@ -1,0 +1,25 @@
+1:"$Sreact.fragment"
+2:I[80816,["/_next/static/chunks/0enhg80xnc_db.js","/_next/static/chunks/2qizfbfrqw-tc.js"],"SelfServeEntryLocked"]
+3:I[97367,["/_next/static/chunks/0enhg80xnc_db.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+8:I[97367,["/_next/static/chunks/0enhg80xnc_db.js"],"ViewportBoundary"]
+9:I[97367,["/_next/static/chunks/0enhg80xnc_db.js"],"MetadataBoundary"]
+a:I[27201,["/_next/static/chunks/0enhg80xnc_db.js"],"IconMark"]
+c:I[39756,["/_next/static/chunks/0enhg80xnc_db.js"],"default"]
+d:I[37457,["/_next/static/chunks/0enhg80xnc_db.js"],"default"]
+11:I[84834,["/_next/static/chunks/0enhg80xnc_db.js"],"Nav"]
+:HL["/_next/static/chunks/29xmhxbrbvjc-.css","style"]
+7:X
+f:X
+f:C
+0:{"buildId":"FyMZWFHmWSBVyJAYPrTNU","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{}],[["$","script","script-0",{"src":"/_next/static/chunks/2qizfbfrqw-tc.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":"$@6","staleTime":"$7","varyParams":null},{"rsc":["$","$1","h",{"children":[null,["$","$L8",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L9",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Self-serve entry point · Nolan Felicidario"}],["$","meta","1",{"name":"description","content":"Product designer who ships code. Senior product designer at Vibes, co-founder of Stride."}],["$","meta","2",{"name":"robots","content":"noindex, nofollow"}],["$","link","3",{"rel":"icon","href":"/icon.svg?icon.0tww_57vtpu22.svg","sizes":"any","type":"image/svg+xml"}],["$","$La","4",{}]]}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"isPartial":"$@b","staleTime":"$7","varyParams":null},{"rsc":["$","$1","c",{"children":[null,["$","$Lc",null,{"parallelRouterKey":"children","template":["$","$Ld",null,{}]}]]}],"isPartial":"$@e","staleTime":"$7","varyParams":"$f"},{"rsc":["$","$1","c",{"children":[null,["$","$Lc",null,{"parallelRouterKey":"children","template":["$","$Ld",null,{}]}]]}],"isPartial":"$@10","staleTime":"$7","varyParams":"$f"},{"rsc":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/29xmhxbrbvjc-.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/0enhg80xnc_db.js","async":true}]],["$","html",null,{"lang":"en","className":"funnel_display_1c0fc3d4-module__NTLV5a__variable figtree_8d3bf3c8-module__EqtGFG__variable h-full","children":["$","body",null,{"className":"min-h-full flex flex-col","children":[["$","$L11",null,{}],["$","main",null,{"className":"flex-1","children":["$","$Lc",null,{"parallelRouterKey":"children","template":["$","$Ld",null,{}],"notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]]}]}],["$","footer",null,{"className":"container-x mt-24","children":["$","div",null,{"className":"mx-auto flex max-w-6xl flex-wrap items-baseline justify-between gap-x-8 gap-y-3 border-t border-rule py-8 text-[14px] text-muted","children":[["$","ul",null,{"className":"flex flex-wrap gap-x-6 gap-y-2","children":[["$","li",null,{"children":["$","a",null,{"className":"hover:text-ink","href":"mailto:nafelicidario@gmail.com","children":"Email"}]}],["$","li",null,{"children":["$","a",null,{"className":"hover:text-ink","href":"https://www.linkedin.com/in/nolan-felicidario","rel":"me noopener","target":"_blank","children":"LinkedIn"}]}],["$","li",null,{"children":["$","a",null,{"className":"hover:text-ink","href":"https://github.com/nfelicidario/nfelicidario.github.io","rel":"me noopener","target":"_blank","children":"View source"}]}]]}],["$","p",null,{"className":"text-[13px] text-muted","children":["Built with Next.js and Claude Code, ",2026,"."]}]]}]}]]}]}]]}],"isPartial":"$@12","staleTime":"$7","varyParams":null}],"isUpgradeableISRFallback":false,"a":"$@13","rootVaryParams":null,"needsRuntimeRequest":"$@14"}
+5:null
+7:300
+14:true
+7:C
+13:0
+b:"$undefined"
+e:"$undefined"
+10:"$undefined"
+12:"$undefined"
+6:"$undefined"
